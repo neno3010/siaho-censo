@@ -1,90 +1,151 @@
-<?php include 'conexion.php'; ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Censo de Saberes</title>
+    <title>SIAHO - Saberes Ancestrales</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body class="bg-light">
 
-<div class="container my-5">
-    <div class="card shadow-sm mb-4">
-        <div class="card-body bg-dark text-white rounded-top">
-            <h2 class="m-0">📊 Sistema de Registro: Saberes Ancestrales</h2>
-        </div>
+<div class="container py-4">
+    <div class="card bg-dark text-white p-4 mb-4 shadow-sm rounded">
+        <h2 class="mb-0 d-flex align-items-center">
+            <span class="me-3">📊</span> Sistema de Registro: Saberes Ancestrales
+        </h2>
     </div>
 
-    <div class="row mb-4 g-3">
-        <div class="col-md-6">
-            <input type="text" id="buscar" class="form-control" placeholder="🔍 Buscar por nombre o cédula...">
+    <div class="row g-3 mb-4">
+        <div class="col-md-8">
+            <input type="text" id="inputBuscar" class="form-control form-control-lg" placeholder="Buscar por nombre o cédula...">
         </div>
-        <div class="col-md-6">
-            <select id="filtroEspecialidad" class="form-select">
+        <div class="col-md-4">
+            <select id="selectEspecialidad" class="form-select form-select-lg">
                 <option value="">Todas las Especialidades</option>
-                <option value="Chaman">Chaman</option>
-                <option value="Partera">Partera</option>
-                <option value="Artesano">Artesano</option>
             </select>
         </div>
     </div>
 
-    <div class="table-responsive card shadow-sm">
-        <table class="table table-hover align-middle m-0">
-            <thead class="table-secondary">
-                <tr>
-                    <th>Cédula</th>
-                    <th>Nombre</th>
-                    <th>Municipio</th>
-                    <th>Especialidad</th>
-                    <th>Enfermedades que trata</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="tablaEspecialistas">
-                <?php
-                $sql = "SELECT * FROM especialistas ORDER BY id DESC";
-                $result = $conn->query($sql);
-                
-                if ($result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td><b>{$row['cedula']}</b></td>";
-                        echo "<td>{$row['nombre']}</td>";
-                        echo "<td>{$row['municipio']}</td>";
-                        echo "<td><span class='badge bg-info text-dark'>{$row['especialidad']}</span></td>";
-                        echo "<td>{$row['enfermedades_que_trata']}</td>";
-                        echo "<td><button class='btn btn-sm btn-outline-dark'>Ver Ficha</button></td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='6' class='text-center text-muted'>No hay registros procesados aún.</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Cédula</th>
+                        <th>Nombre</th>
+                        <th>Municipio</th>
+                        <th>Especialidad</th>
+                        <th>Enfermedades que trata</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaCuerpo">
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted" id="estadoCarga">
+                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                            Cargando registros en tiempo real desde Google Sheets...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
-document.getElementById('buscar').addEventListener('keyup', function(){
-    let value = this.value.toLowerCase();
-    let rows = document.querySelectorAll('#tablaEspecialistas tr');
+// =========================================================================
+// CONFIGURACIÓN: Pega aquí la URL de tu Google Apps Script (Terminado en /exec)
+// =========================================================================
+const URL_API_GOOGLE = "AQUÍ_PEGA_TU_URL_DE_APPS_SCRIPT_EXEC";
+// =========================================================================
+
+let todosLosDatos = [];
+
+// 1. Función para obtener los datos desde Google Sheets al cargar la página
+async function cargarDatos() {
+    try {
+        const respuesta = await fetch(URL_API_GOOGLE);
+        const resultado = await respuesta.json();
+        
+        if (resultado.status === "success") {
+            todosLosDatos = resultado.data; // Guardamos los registros recibidos
+            rellenarFiltros(todosLosDatos);
+            renderizarTabla(todosLosDatos);
+        } else {
+            mostrarError("No se pudieron procesar los datos de la hoja.");
+        }
+    } catch (error) {
+        console.error(error);
+        mostrarError("Error de conexión con Google Sheets.");
+    }
+}
+
+// 2. Función para pintar las filas en la tabla
+function renderizarTabla(datos) {
+    const cuerpo = document.getElementById('tablaCuerpo');
     
-    rows.forEach(row => {
-        let text = row.textContent.toLowerCase();
-        row.style.display = text.includes(value) ? '' : 'none';
+    if (datos.length === 0) {
+        cuerpo.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No hay registros procesados aún.</td></tr>`;
+        return;
+    }
+
+    cuerpo.innerHTML = datos.map(row => `
+        <tr>
+            <td><b>${row.cedula || 'N/E'}</b></td>
+            <td>${row.nombre || 'N/E'}</td>
+            <td>${row.municipio || 'N/E'}</td>
+            <td><span class="badge bg-info text-dark">${row.especialidad || 'General'}</span></td>
+            <td>${row.enfermedades_que_trata || 'Ninguna'}</td>
+            <td class="text-center">
+                <button class="btn btn-outline-secondary btn-sm" onclick="alert('Ficha Completa:\\nComunidad: ${row.comunidad}\\nObservaciones: ${row.observaciones}')">Ver Ficha</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// 3. Rellenar el filtro dinámico de especialidades
+function rellenarFiltros(datos) {
+    const select = document.getElementById('selectEspecialidad');
+    const especialidades = [...new Set(datos.map(d => d.especialidad).filter(Boolean))];
+    especialidades.forEach(esp => {
+        const opt = document.createElement('option');
+        opt.value = esp;
+        opt.textContent = esp;
+        select.appendChild(opt);
     });
-});
-</script>
-<script>
-// Registrar el Service Worker para habilitar la PWA
+}
+
+// 4. Lógica de filtrado en vivo (Buscador)
+document.getElementById('inputBuscar').addEventListener('input', filtrarDatos);
+document.getElementById('selectEspecialidad').addEventListener('change', filtrarDatos);
+
+function filtrarDatos() {
+    const busqueda = document.getElementById('inputBuscar').value.toLowerCase();
+    const especialidad = document.getElementById('selectEspecialidad').value;
+
+    const filtrados = todosLosDatos.filter(item => {
+        const cumpleNombre = (item.nombre || '').toLowerCase().includes(busqueda);
+        const cumpleCedula = (item.cedula || '').toString().includes(busqueda);
+        const cumpleEspecialidad = especialidad === "" || item.especialidad === Array;
+
+        return (cumpleNombre || cumpleCedula) && (especialidad === "" || item.especialidad === especialidad);
+    });
+
+    renderizarTabla(filtrados);
+}
+
+function mostrarError(msg) {
+    document.getElementById('tablaCuerpo').innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">⚠️ ${msg}</td></tr>`;
+}
+
+// Inicializar la carga de datos
+cargarDatos();
+
+// Registrar el Service Worker de la PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-            .then(reg => console.log('Service Worker registrado con éxito', reg))
-            .catch(err => console.error('Error al registrar el Service Worker', err));
+        navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
     });
 }
 </script>
