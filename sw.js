@@ -1,11 +1,10 @@
 const CACHE_NAME = 'siaho-v1';
 const ASSETS = [
-  'index.html',
-  'manifest.json',
-  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css'
+  './',
+  './index.html' // Cambia esto a './p.txt' si tu archivo principal se llama p.txt
 ];
 
-// Instalar el Service Worker y guardar archivos esenciales en caché
+// Instalar el Service Worker y almacenar en caché la estructura básica
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -29,11 +28,11 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Servir la app desde el caché cuando no haya internet
+// Estrategia de red: Intentar cargar de internet, si falla usar caché
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      return cachedResponse || fetch(e.request);
+    fetch(e.request).catch(() => {
+      return caches.match(e.request);
     })
   );
 });
