@@ -267,8 +267,15 @@
                         <input type="file" id="newsFile" class="form-control" accept="image/*">
                     </div>
                 </div>
-                
-                <div class="modal fade" id="modalConfirmarSalida" tabindex="-1" aria-hidden="true">
+                <div class="modal-footer bg-light py-2">
+                    <button type="button" class="btn btn-sm btn-danger d-none" id="btnBorrarNoticia" onclick="eliminarNoticiaActual()">Eliminar Noticia</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold" id="btnGuardarNoticia">Publicar en la Nube</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+         <div class="modal fade" id="modalConfirmarSalida" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content border-0 rounded-4 shadow-lg text-center p-3">
             <div class="modal-body pt-4">
@@ -361,14 +368,11 @@ let imagenGlobalBase64 = "";
 let modalInstancia = null;
 let modalAdminInstancia = null;
 let modalVerFichaInstancia = null;
+let modalSalidaInstancia = null; 
 let noticiaImagenBase64 = "";
 let noticiasData = [];
-let modoAuthActual = "LOGIN"; 
-let modalAdminInstancia = null;
-let modalVerFichaInstancia = null;
-let modalSalidaInstancia = null; // <- Agrega esta variable global
+let modoAuthActual = "LOGIN";
 document.addEventListener("DOMContentLoaded", () => {
-    // Inicialización segura de componentes visuales de Bootstrap
     try {
         if (document.getElementById('modalRegistro')) {
             modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
@@ -386,20 +390,16 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error inicializando modales de interfaz:", error);
     }
     
-    // Registro del Service Worker para PWA
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js')
             .then(reg => console.log('Service Worker activo'))
             .catch(err => console.warn('Error en Service Worker', err));
     }
 
-    // CONTROL CRÍTICO: Comprobar sesión y escuchar eventos del buscador y auth
     comprobarEstadoSesion();
-    
     if (document.getElementById('inputBuscar')) {
         document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
     }
-    
     if (document.getElementById('formAutenticacion')) {
         document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
     }
