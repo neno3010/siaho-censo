@@ -1,12 +1,18 @@
 {
-  "name": "SIAHO - Censo de Saberes",
-  "short_name": "SIAHO",
-  "start_url": "index.html",
+  "name": "SIAHO - Censo de Saberes Ancestrales",
+  "short_name": "SIAHO Censo",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0d6efd",
-  "theme_color": "#0d6efd",
+  "background_color": "#1e1b4b",
+  "theme_color": "#1e1b4b",
   "orientation": "portrait",
   "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3208/3208615.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3208/3208615.png",
       "sizes": "512x512",
