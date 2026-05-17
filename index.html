@@ -368,20 +368,42 @@ let modalAdminInstancia = null;
 let modalVerFichaInstancia = null;
 let modalSalidaInstancia = null; // <- Agrega esta variable global
 document.addEventListener("DOMContentLoaded", () => {
-    modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
-    modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
-    modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
-    modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida')); // <- Inicialízalo aquí
-    
-    if ('serviceWorker' in navigator) {
-        // ... tu Service Worker
+    // Inicialización segura de componentes visuales de Bootstrap
+    try {
+        if (document.getElementById('modalRegistro')) {
+            modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
+        }
+        if (document.getElementById('modalAdminNoticias')) {
+            modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
+        }
+        if (document.getElementById('modalVerFicha')) {
+            modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
+        }
+        if (document.getElementById('modalConfirmarSalida')) {
+            modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
+        }
+    } catch (error) {
+        console.error("Error inicializando modales de interfaz:", error);
     }
     
-    comprobarEstadoSesion();
-    document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
-    document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
-});
+    // Registro del Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker activo'))
+            .catch(err => console.warn('Error en Service Worker', err));
+    }
 
+    // CONTROL CRÍTICO: Comprobar sesión y escuchar eventos del buscador y auth
+    comprobarEstadoSesion();
+    
+    if (document.getElementById('inputBuscar')) {
+        document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
+    }
+    
+    if (document.getElementById('formAutenticacion')) {
+        document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
+    }
+});
 function comprobarEstadoSesion() {
     const sesionActiva = localStorage.getItem("siaho_sesion_activa");
     if (sesionActiva) {
