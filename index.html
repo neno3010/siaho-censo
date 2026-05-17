@@ -9,8 +9,12 @@
     <link rel="manifest" href="./manifest.json">
     
     <title>SIAHO Censo Móvil Profesional</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bundle.min.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
@@ -24,7 +28,6 @@
         }
         body { background-color: var(--bg); font-family: system-ui, -apple-system, sans-serif; padding-bottom: 100px; overflow-x: hidden; }
         
-        /* --- ESTILOS PANTALLA LOGIN/REGISTRO --- */
         #pantallaAuth {
             position: fixed;
             top:0; left:0; width:100%; height:100%; 
@@ -39,7 +42,6 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
         }
         
-        /* --- ESTILOS APP PRINCIPAL --- */
         .banner-ancestral {
             position: relative;
             width: 100%; padding: 1.5rem 1.25rem; display: flex;
@@ -358,12 +360,11 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bundle.min.js"></script>
 <script>
 // =========================================================================
 // VARIABLES GLOBALES Y CONFIGURACIÓN CRÍTICA
 // =========================================================================
-const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbxx--Ucb-U9j3XLpKJIoTlcx9J8cRvZTOxT0t5tHXHbU3Jf6NFS9VgfcdngD9VTigTnVg/exec";
+const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbz8DCxqdvunBHa-3Tyy8gli2CSbOyiAM5qLTF85qkKoFehqro2GyvsscqVoOcgii341Xg/exec";
 let todosLosDatos = [];
 let imagenGlobalBase64 = ""; 
 let modalInstancia = null;
@@ -375,24 +376,30 @@ let noticiasData = [];
 let modoAuthActual = "LOGIN"; 
 
 // =========================================================================
-// INICIALIZADOR DEL DOM
+// INICIALIZADOR DEL DOM CON VERIFICACIÓN DE SEGURIDAD
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-    try {
-        if (document.getElementById('modalRegistro')) {
-            modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
+    // Verificar si bootstrap se descargó e inició correctamente
+    if (typeof bootstrap !== 'undefined') {
+        try {
+            if (document.getElementById('modalRegistro')) {
+                modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
+            }
+            if (document.getElementById('modalAdminNoticias')) {
+                modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
+            }
+            if (document.getElementById('modalVerFicha')) {
+                modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
+            }
+            if (document.getElementById('modalConfirmarSalida')) {
+                modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
+            }
+        } catch (error) {
+            console.error("Error inicializando modales de interfaz:", error);
         }
-        if (document.getElementById('modalAdminNoticias')) {
-            modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
-        }
-        if (document.getElementById('modalVerFicha')) {
-            modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
-        }
-        if (document.getElementById('modalConfirmarSalida')) {
-            modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
-        }
-    } catch (error) {
-        console.error("Error inicializando modales de interfaz:", error);
+    } else {
+        console.error("Falla crítica: La CDN de Bootstrap no pudo cargarse o tardó demasiado.");
+        alert("Error de conexión: No se pudo cargar Bootstrap. Por favor recarga la página.");
     }
     
     if ('serviceWorker' in navigator) {
@@ -474,7 +481,7 @@ function comprobarEstadoSesion() {
         inicializarAplicacionCompleta();
     } else {
         document.getElementById('pantallaAuth').style.setProperty('display', 'flex', 'important');
-        document.getElementById('appContenido').style.none = 'none';
+        document.getElementById('appContenido').style.display = 'none';
     }
 }
 
@@ -711,7 +718,8 @@ function abrirAdminNoticias(esNueva, index = null) {
         noticiaImagenBase64 = noticiasData[index].foto || "";
         document.getElementById('btnBorrarNoticia').classList.remove('d-none');
     }
-    modalAdminInstancia.show();
+    
+    if (modalAdminInstancia) modalAdminInstancia.show();
 }
 
 function procesarEnvioNoticia(e) {
@@ -726,11 +734,11 @@ function procesarEnvioNoticia(e) {
         titulo: document.getElementById('newsTitle').value.trim(),
         descripcion: document.getElementById('newsDesc').value.trim(),
         foto: noticiaImagenBase64,
-        registradoPor: usuarioActivo // <-- PARÁMETRO MANDATORIO CORREGIDO AQUÍ
+        registradoPor: usuarioActivo
     };
 
     notificar("📡 Transmitiendo noticia a cartelera...", "#4f46e5");
-    modalAdminInstancia.hide();
+    if (modalAdminInstancia) modalAdminInstancia.hide();
 
     fetch(URL_API_GOOGLE, {
         method: "POST",
@@ -751,8 +759,8 @@ function eliminarNoticiaActual() {
     const index = document.getElementById('noticiaIndex').value;
     const usuarioActivo = localStorage.getItem("siaho_sesion_activa") || "";
     
-    if (index !== "NUEVO" && confirm("¿Está totalmente seguro de remover esta noticia de la cartelera nacional?")) {
-        modalAdminInstancia.hide();
+    if (index !== "NUEVO" && confirm("¿Está totalmente seguro de remover esta noticia de la cartelera?")) {
+        if (modalAdminInstancia) modalAdminInstancia.hide();
         notificar("🗑️ Removiendo noticia...", "#1e293b");
         
         const payload = { 
@@ -779,6 +787,10 @@ function eliminarNoticiaActual() {
 // PROCESAMIENTO Y GESTIÓN DE CULTORES (CENSO)
 // =========================================================================
 function abrirParaCrear() {
+    if (!modalInstancia) {
+        alert("La interfaz de formularios no está lista aún. Reintente por favor.");
+        return;
+    }
     document.getElementById('formularioCenso').reset();
     document.getElementById('action_type').value = "CREAR";
     document.getElementById('modalTitulo').innerText = "NUEVO CENSO POPULAR ANCESTRAL";
@@ -816,11 +828,11 @@ function abrirVerFicha(cultor) {
     }
 
     document.getElementById('btnEditarDesdeFicha').onclick = function() {
-        modalVerFichaInstancia.hide();
+        if (modalVerFichaInstancia) modalVerFichaInstancia.hide();
         abrirParaEditar(cultor);
     };
 
-    modalVerFichaInstancia.show();
+    if (modalVerFichaInstancia) modalVerFichaInstancia.show();
 }
 
 function abrirParaEditar(cultor) {
@@ -862,7 +874,7 @@ function abrirParaEditar(cultor) {
         document.getElementById('btnEliminarCultor').classList.add('d-none');
     }
 
-    modalInstancia.show();
+    if (modalInstancia) modalInstancia.show();
 }
 
 function procesarEnvioCenso(e) {
@@ -892,7 +904,7 @@ function procesarEnvioCenso(e) {
     };
     
     notificar("🚀 Transmitiendo datos a la nube...", "#0284c7");
-    modalInstancia.hide();
+    if (modalInstancia) modalInstancia.hide();
 
     fetch(URL_API_GOOGLE, {
         method: "POST",
@@ -915,7 +927,7 @@ function eliminarCultorActual() {
     const usuarioActivo = localStorage.getItem("siaho_sesion_activa") || "";
     
     if (ci && confirm(`¿Seguro que desea eliminar por completo el registro de C.I: ${ci}?`)) {
-        modalInstancia.hide();
+        if (modalInstancia) modalInstancia.hide();
         notificar("🗑️ Eliminando registro...", "#1e293b");
         
         const payload = { 
@@ -970,7 +982,7 @@ function inyectarHTMLAcordeon(idContenedor, objetoDatos, claveFiltro) {
         
         subDatos.forEach(cultor => {
             listaIntegrantesHTML += `
-                <li class="list-group-item small d-flex justify-content-between align-items-center bg-white border-bottom py-2" style="font-size:0.8rem; cursor:pointer;" onclick="modalVerFichaInstancia.show(); abrirVerFicha(${JSON.stringify(cultor).replace(/"/g, '&quot;')})">
+                <li class="list-group-item small d-flex justify-content-between align-items-center bg-white border-bottom py-2" style="font-size:0.8rem; cursor:pointer;" onclick="if(modalVerFichaInstancia) modalVerFichaInstancia.show(); abrirVerFicha(${JSON.stringify(cultor).replace(/"/g, '&quot;')})">
                     <span class="text-dark fw-medium"><i class="fa-solid fa-user-tag text-muted me-2 small"></i>${cultor.nombre}</span>
                     <span class="text-secondary super-small">V-${cultor.cedula}</span>
                 </li>`;
@@ -1083,10 +1095,12 @@ function formatearFechaEstandar(fechaRaw) {
 
 function notificar(mensaje, colorFondo = "#1e293b") {
     const alerta = document.getElementById('alertaFlotante');
-    alerta.innerText = mensaje;
-    alerta.style.backgroundColor = colorFondo;
-    alerta.style.display = 'block';
-    setTimeout(() => { alerta.style.display = 'none'; }, 3500);
+    if (alerta) {
+        alerta.innerText = mensaje;
+        alerta.style.backgroundColor = colorFondo;
+        alerta.style.display = 'block';
+        setTimeout(() => { alerta.style.display = 'none'; }, 3500);
+    }
 }
 </script>
 </body>
