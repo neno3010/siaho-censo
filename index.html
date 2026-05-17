@@ -13,11 +13,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bundle.min.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
     <style>
         :root { 
             --primary: #0284c7; 
@@ -50,14 +45,6 @@
             background: linear-gradient(135deg, #130f2b 0%, #1e1b4b 45%, #312e81 100%);
             border-bottom: 3.5px solid #d97706; overflow: hidden;
         }
-        .banner-ancestral::before {
-            content: "";
-            position: absolute; top: -50%; right: -25%; width: 280px; height: 280px;
-            background: radial-gradient(circle, rgba(217, 119, 6, 0.22) 0%, rgba(79, 70, 229, 0.12) 50%, rgba(0,0,0,0) 75%);
-            filter: blur(25px); z-index: 1; pointer-events: none;
-        }
-        .banner-ancestral > div { position: relative; z-index: 2; }
-        .banner-ancestral p i { color: #fbbf24; text-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
         
         .news-carousel { display: flex; overflow-x: auto; gap: 14px; padding: 5px 2px 15px 2px; scrollbar-width: none; }
         .news-carousel::-webkit-scrollbar { display: none; }
@@ -85,23 +72,20 @@
             border: 4px solid #fff; box-shadow: 0 6px 16px rgba(2,132,199,0.4); 
             font-size: 1.3rem; transition: transform 0.2s;
         }
-        .fab-add:active { transform: scale(0.92); }
 
-        .card-custom { border: none; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s; cursor: pointer; }
-        .card-custom:active { transform: scale(0.98); }
+        .card-custom { border: none; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); cursor: pointer; }
         .avatar-container { width: 55px; height: 55px; min-width: 55px; overflow: hidden; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         
         .section-title-custom { background: linear-gradient(90deg, #0284c7, #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.5px; margin-top: 15px; margin-bottom: 8px; display: flex; align-items: center; }
         .section-title-custom::after { content: ''; flex-grow: 1; background: linear-gradient(90deg, #cbd5e1, transparent); height: 2px; margin-left: 10px; }
-        .form-control-interactive { border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; transition: all 0.25s ease; background-color: #ffffff; font-size: 0.85rem; }
-        .form-control-interactive:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); }
+        .form-control-interactive { border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; background-color: #ffffff; font-size: 0.85rem; }
         
         .stat-accordion-item { background: white; border-radius: 14px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; overflow: hidden; }
         .stat-header-trigger { width: 100%; padding: 14px; border: none; background: white; display: flex; justify-content: space-between; align-items: center; text-align: left; }
         .stat-count-badge { background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; }
         .stat-details-box { background: #f8fafc; padding: 10px 14px; border-top: 1px solid #f1f5f9; display: none; }
 
-        .ficha-exportable { background: #fff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; position: relative; }
+        .ficha-exportable { background: #fff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; }
         .ficha-header { border-bottom: 3px double #0284c7; padding-bottom: 12px; margin-bottom: 15px; text-align: center; }
         .ficha-avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; margin: 0 auto 10px auto; display: block; }
 
@@ -116,21 +100,21 @@
     <div class="auth-card">
         <div class="text-center mb-4">
             <h3 class="fw-bold text-dark mb-0" id="authTitulo">Iniciar Sesión</h3>
-            <p class="text-muted small" id="authSubtitulo">Ingresa tus credenciales para acceder al sistema sabios y sabias </p>
+            <p class="text-muted small" id="authSubtitulo">Ingresa tus credenciales para acceder al sistema</p>
         </div>
         <form id="formAutenticacion">
             <div class="mb-3">
                 <label class="form-label small fw-bold text-secondary">Correo Electrónico</label>
                 <div class="position-relative">
                     <i class="fa-solid fa-envelope position-absolute text-muted" style="left:12px; top:13px;"></i>
-                    <input type="email" id="authCorreo" class="form-control form-control-interactive ps-5" placeholder="usuario@correo.com" required>
+                    <input type="email" id="authCorreo" class="form-control form-control-interactive" style="padding-left: 40px;" placeholder="usuario@correo.com" required>
                 </div>
             </div>
             <div class="mb-3">
                 <label class="form-label small fw-bold text-secondary">Contraseña</label>
                 <div class="position-relative">
                     <i class="fa-solid fa-lock position-absolute text-muted" style="left:12px; top:13px;"></i>
-                    <input type="password" id="authPassword" class="form-control form-control-interactive ps-5" placeholder="••••••••" required>
+                    <input type="password" id="authPassword" class="form-control form-control-interactive" style="padding-left: 40px;" placeholder="••••••••" required>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary w-100 fw-bold py-2 rounded-3 shadow-sm mb-3" id="btnAuthSubmit">Entrar al Sistema</button>
@@ -145,15 +129,15 @@
     <div class="banner-ancestral">
         <div class="w-100 d-flex justify-content-between align-items-center">
             <div>
-                <h2 class="fw-bold mb-0 text-white" style="letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.4)">IASPI</h2>
+                <h2 class="fw-bold mb-0 text-white">SIAHO</h2>
                 <p class="text-white-50 mb-0 small" style="font-size: 0.8rem;"><i class="fa-solid fa-tree me-1"></i>Saberes Ancestrales Territoriales</p>
             </div>
             <div class="text-end d-flex align-items-center gap-3">
                 <div class="text-end">
-                    <h1 class="fw-black mb-0 text-white" id="statTotal" style="font-size: 2.2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5)">0</h1>
+                    <h1 class="fw-black mb-0 text-white" id="statTotal" style="font-size: 2.2rem;">0</h1>
                     <span class="text-white-50 super-small" style="font-size:0.65rem;">CULTORES</span>
                 </div>
-                <button class="btn btn-sm btn-outline-light border-0" onclick="cerrarSesionActual()" title="Cerrar Sesión">
+                <button class="btn btn-sm btn-outline-light border-0" onclick="cerrarSesionActual()">
                     <i class="fa-solid fa-right-from-bracket fa-lg"></i>
                 </button>
             </div>
@@ -172,7 +156,7 @@
 
         <div class="position-relative my-2">
             <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:15px; top:14px;"></i>
-            <input type="text" id="inputBuscar" class="form-control shadow-sm border-0 ps-5" placeholder="Buscar por nombre o cédula..." style="height:44px; border-radius:22px;">
+            <input type="text" id="inputBuscar" class="form-control shadow-sm border-0" style="height:44px; border-radius:22px; padding-left: 45px;" placeholder="Buscar por nombre o cédula...">
         </div>
 
         <div id="listaMovil" class="mt-2"></div>
@@ -182,7 +166,7 @@
         <div class="d-flex align-items-center mb-3 p-2 bg-white rounded-3 shadow-sm">
             <div class="p-2 bg-primary text-white rounded-3 me-3"><i class="fa-solid fa-chart-pie fa-lg"></i></div>
             <div>
-                <h6 class="fw-bold text-dark mb-0">Distribución Territorial Fina</h6>
+                <h6 class="fw-bold text-dark mb-0">Distribución Territorial</h6>
                 <small class="text-muted">Toca un territorio para ver los censados</small>
             </div>
         </div>
@@ -222,32 +206,32 @@
                 <div class="ficha-exportable">
                     <div class="ficha-header">
                         <h5 class="fw-bold text-primary mb-0">REPÚBLICA BOLIVARIANA DE VENEZUELA</h5>
-                        <small class="fw-bold text-muted small">IASPI - REGISTRO NACIONAL DE CULTORES</small>
+                        <small class="fw-bold text-muted small">SIAHO - REGISTRO NACIONAL DE CULTORES</small>
                     </div>
                     <img id="f-foto" src="" class="ficha-avatar shadow-sm" alt="Foto">
                     <h5 class="text-center fw-bold text-dark mb-1" id="f-nombre">---</h5>
                     <p class="text-center text-muted small mb-3">C.I: <span id="f-cedula">---</span></p>
                     
                     <div class="row g-2" style="font-size: 0.85rem;">
-                        <div class="col-6 border-bottom pb-1"><strong>F. Nacimiento:</strong> <span id="f-fecha" class="text-secondary">---</span></div>
-                        <div class="col-6 border-bottom pb-1"><strong>Género:</strong> <span id="f-sexo" class="text-secondary">---</span></div>
-                        <div class="col-6 border-bottom pb-1"><strong>Municipio:</strong> <span id="f-mun" class="text-secondary"></span></div>
-                        <div class="col-6 border-bottom pb-1"><strong>Parroquia:</strong> <span id="f-par" class="text-secondary"></span></div>
-                        <div class="col-6 border-bottom pb-1"><strong>Comuna:</strong> <span id="f-com" class="text-secondary"></span></div>
-                        <div class="col-6 border-bottom pb-1"><strong>Comunidad:</strong> <span id="f-comu" class="text-secondary"></span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>F. Nacimiento:</strong> <span id="f-fecha">---</span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>Género:</strong> <span id="f-sexo">---</span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>Municipio:</strong> <span id="f-mun"></span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>Parroquia:</strong> <span id="f-par"></span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>Comuna:</strong> <span id="f-com"></span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>Comunidad:</strong> <span id="f-comu"></span></div>
                         <div class="col-12 border-bottom pb-1"><strong>Especialidad:</strong> <span id="f-esp" class="badge bg-primary text-white"></span></div>
-                        <div class="col-12 border-bottom pb-1"><strong>Artesanía:</strong> <span id="f-art" class="text-secondary"></span></div>
-                        <div class="col-12 border-bottom pb-1"><strong>Origen Runa/Maestro:</strong> <span id="f-apre" class="text-secondary"></span></div>
-                        <div class="col-12 border-bottom pb-1"><strong>Enfermedades Tratadas:</strong> <span id="f-enf" class="text-secondary"></span></div>
-                        <div class="col-12 border-bottom pb-1"><strong>Plantas que Usa:</strong> <span id="f-pla" class="text-secondary"></span></div>
-                        <div class="col-12"><strong>Observaciones:</strong> <p id="f-obs" class="text-muted small mb-0 mt-1" style="line-height:1.3;"></p></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Artesanía:</strong> <span id="f-art"></span></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Maestro:</strong> <span id="f-apre"></span></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Enfermedades:</strong> <span id="f-enf"></span></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Plantas que Usa:</strong> <span id="f-pla"></span></div>
+                        <div class="col-12"><strong>Observaciones:</strong> <p id="f-obs" class="text-muted small mb-0 mt-1"></p></div>
                     </div>
                 </div>
             </div>
             <div class="p-3 bg-white rounded-bottom-4 d-flex gap-2">
-                <button class="btn btn-danger w-100 btn-sm fw-bold py-2" onclick="exportarFichaA_PDF()"><i class="fa-solid fa-file-pdf me-2"></i>Descargar PDF</button>
-                <button class="btn btn-success w-100 btn-sm fw-bold py-2" onclick="exportarFichaA_Imagen()"><i class="fa-solid fa-image me-2"></i>Descargar Imagen</button>
-                <button class="btn btn-warning w-100 btn-sm fw-bold py-2 text-white" id="btnEditarDesdeFicha"><i class="fa-solid fa-pen me-2"></i>Editar</button>
+                <button class="btn btn-danger w-100 btn-sm fw-bold py-2" onclick="exportarFichaA_PDF()">Descargar PDF</button>
+                <button class="btn btn-success w-100 btn-sm fw-bold py-2" onclick="exportarFichaA_Imagen()">Imagen</button>
+                <button class="btn btn-warning w-100 btn-sm fw-bold py-2 text-white" id="btnEditarDesdeFicha">Editar</button>
             </div>
         </div>
     </div>
@@ -257,28 +241,28 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 rounded-4">
             <div class="modal-header bg-dark text-white py-3">
-                <h6 class="modal-title fw-bold" id="tituloModalNoticia"><i class="fa-solid fa-newspaper me-2 text-warning"></i>Gestionar Noticia</h6>
+                <h6 class="modal-title fw-bold" id="tituloModalNoticia">Gestionar Noticia</h6>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="formNuevaNoticia">
                 <input type="hidden" id="noticiaIndex" value="">
                 <div class="modal-body p-3">
                     <div class="mb-2">
-                        <label class="form-label small fw-bold">Título del Acontecimiento</label>
-                        <input type="text" id="newsTitle" class="form-control" placeholder="Ej: Encuentro de Sabios Populares" required>
+                        <label class="form-label small fw-bold">Título</label>
+                        <input type="text" id="newsTitle" class="form-control" required>
                     </div>
                     <div class="mb-2">
-                        <label class="form-label small fw-bold">Breve Resumen Informativo</label>
-                        <textarea id="newsDesc" class="form-control" rows="3" placeholder="Contenido de la cartelera..." required></textarea>
+                        <label class="form-label small fw-bold">Resumen</label>
+                        <textarea id="newsDesc" class="form-control" rows="3" required></textarea>
                     </div>
                     <div class="mb-2">
-                        <label class="form-label small fw-bold">Fotografía Portada de Noticia</label>
+                        <label class="form-label small fw-bold">Foto Portada</label>
                         <input type="file" id="newsFile" class="form-control" accept="image/*">
                     </div>
                 </div>
                 <div class="modal-footer bg-light py-2">
-                    <button type="button" class="btn btn-sm btn-danger d-none" id="btnBorrarNoticia" onclick="eliminarNoticiaActual()">Eliminar Noticia</button>
-                    <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold" id="btnGuardarNoticia">Publicar en la Nube</button>
+                    <button type="button" class="btn btn-sm btn-danger d-none" id="btnBorrarNoticia" onclick="eliminarNoticiaActual()">Eliminar</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold">Publicar</button>
                 </div>
             </form>
         </div>
@@ -287,17 +271,11 @@
 
 <div class="modal fade" id="modalConfirmarSalida" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4 shadow-lg text-center p-3">
-            <div class="modal-body pt-4">
-                <div class="mb-3 text-warning">
-                    <i class="fa-solid fa-triangle-exclamation fa-3x opacity-75"></i>
-                </div>
-                <h6 class="fw-bold text-dark mb-2" style="font-size: 1.05rem;">¿Cerrar Sesión Segura?</h6>
-                <p class="text-muted small mb-0">Se limpiará la memoria temporal de cultores en este dispositivo móvil.</p>
-            </div>
-            <div class="d-flex gap-2 justify-content-center mt-3 pb-2">
-                <button type="button" class="btn btn-sm btn-light fw-bold px-3 text-muted" data-bs-dismiss="modal" style="border-radius: 10px; min-width: 90px;">Cancelar</button>
-                <button type="button" class="btn btn-sm btn-danger fw-bold px-3 shadow-sm" onclick="confirmarCierreEfectivo()" style="border-radius: 10px; min-width: 90px; background: linear-gradient(135deg, #ef4444, #b91c1c);">Salir</button>
+        <div class="modal-content border-0 rounded-4 p-3 text-center">
+            <h6 class="fw-bold text-dark mb-2">¿Cerrar Sesión?</h6>
+            <div class="d-flex gap-2 justify-content-center mt-3">
+                <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="confirmarCierreEfectivo()">Salir</button>
             </div>
         </div>
     </div>
@@ -308,201 +286,147 @@
         <div class="modal-content border-0" style="background: var(--form-grad);">
             <div class="modal-header border-0 py-3 bg-white shadow-sm">
                 <h6 class="modal-title fw-bold text-primary" id="modalTitulo">NUEVO CENSO</h6>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="formularioCenso">
                 <input type="hidden" id="action_type" value="CREAR">
                 <div class="modal-body p-3">
                     <div class="text-center mb-3">
                         <div class="upload-zone shadow" onclick="document.getElementById('fotoFile').click()" style="width: 110px; height: 110px; border: 3px dashed var(--primary); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #f0f9ff; cursor: pointer; margin: 0 auto;">
-                            <i class="fa-solid fa-camera fa-2x text-primary" id="iconoCamara" style="display: block;"></i>
+                            <i class="fa-solid fa-camera fa-2x text-primary" id="iconoCamara"></i>
                             <div id="previewCont" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
                         </div>
-                        <div class="mt-2"><small class="text-primary fw-bold" style="font-size:0.75rem; cursor:pointer;" onclick="document.getElementById('fotoFile').click()">Cargar Foto del Cultor</small></div>
                         <input type="file" class="d-none" id="fotoFile" accept="image/*">
                     </div>
 
                     <div class="row g-2">
-                        <div class="section-title-custom"><i class="fa-solid fa-map-location-dot me-2 text-primary"></i>1. UBICACIÓN TERRITORIAL</div>
+                        <div class="section-title-custom">1. UBICACIÓN</div>
                         <div class="col-6"><input type="text" class="form-control form-control-interactive" id="municipio" placeholder="Municipio" required></div>
                         <div class="col-6"><input type="text" class="form-control form-control-interactive" id="parroquia" placeholder="Parroquia" required></div>
                         <div class="col-6"><input type="text" class="form-control form-control-interactive" id="comuna" placeholder="Comuna" required></div>
                         <div class="col-6"><input type="text" class="form-control form-control-interactive" id="comunidad" placeholder="Comunidad" required></div>
 
-                        <div class="section-title-custom"><i class="fa-solid fa-id-card me-2 text-accent"></i>2. DATOS PERSONALES</div>
-                        <div class="col-6"><input type="text" class="form-control form-control-interactive" id="cedula" placeholder="Cédula de Identidad" required></div>
+                        <div class="section-title-custom">2. DATOS PERSONALES</div>
+                        <div class="col-6"><input type="text" class="form-control form-control-interactive" id="cedula" placeholder="Cédula" required></div>
                         <div class="col-6"><input type="date" class="form-control form-control-interactive" id="fechanacimiento"></div>
-                        <div class="col-12"><input type="text" class="form-control form-control-interactive" id="nombre" placeholder="Nombres y Apellidos" required></div>
+                        <div class="col-12"><input type="text" class="form-control form-control-interactive" id="nombre" placeholder="Nombre completo" required></div>
                         <div class="col-12">
                             <select class="form-select form-control-interactive" id="sexo">
-                                <option value="" disabled selected>Seleccione Género</option>
                                 <option value="Masculino">Masculino</option>
                                 <option value="Femenino">Femenino</option>
                             </select>
                         </div>
 
-                        <div class="section-title-custom"><i class="fa-solid fa-feather-pointed me-2 text-success"></i>3. SABERES Y DETALLES ANCESTRALES</div>
+                        <div class="section-title-custom">3. SABERES ANCESTRALES</div>
                         <div class="col-6"><input type="text" class="form-control form-control-interactive" id="especialidad" placeholder="Especialidad" required></div>
-                        <div class="col-6"><input type="text" class="form-control form-control-interactive" id="artesania" placeholder="Artesanía que realiza"></div>
+                        <div class="col-6"><input type="text" class="form-control form-control-interactive" id="artesania" placeholder="Artesanía"></div>
                         <div class="col-12"><input type="text" class="form-control form-control-interactive" id="dequienaprendio" placeholder="¿De quién aprendió?"></div>
                         <div class="col-12"><input type="text" class="form-control form-control-interactive" id="enfermedadesquetrata" placeholder="Enfermedades que trata"></div>
-                        <div class="col-12"><input type="text" class="form-control form-control-interactive" id="plantasoproductosqueusa" placeholder="Plantas o productos que usa"></div>
-                        <div class="col-12"><textarea class="form-control form-control-interactive" id="observaciones" rows="2" placeholder="Observaciones generales..."></textarea></div>
+                        <div class="col-12"><input type="text" class="form-control form-control-interactive" id="plantasoproductosqueusa" placeholder="Productos que usa"></div>
+                        <div class="col-12"><textarea class="form-control form-control-interactive" id="observaciones" rows="2" placeholder="Observaciones..."></textarea></div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 bg-white py-2 shadow-lg rounded-bottom">
-                    <button type="button" class="btn btn-sm btn-danger d-none" id="btnEliminarCultor" onclick="eliminarCultorActual()">Eliminar Cultor</button>
-                    <button type="button" class="btn btn-light btn-sm text-muted" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold" id="btnGuardar">Guardar</button>
+                <div class="modal-footer border-0 bg-white py-2">
+                    <button type="button" class="btn btn-sm btn-danger d-none" id="btnEliminarCultor" onclick="eliminarCultorActual()">Eliminar</button>
+                    <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <script>
 // =========================================================================
-// VARIABLES GLOBALES Y CONFIGURACIÓN CRÍTICA
+// VARIABLES GLOBALES
 // =========================================================================
 const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbz8DCxqdvunBHa-3Tyy8gli2CSbOyiAM5qLTF85qkKoFehqro2GyvsscqVoOcgii341Xg/exec";
 let todosLosDatos = [];
 let imagenGlobalBase64 = ""; 
-let modalInstancia = null;
-let modalAdminInstancia = null;
-let modalVerFichaInstancia = null;
-let modalSalidaInstancia = null;
+let modalInstancia = null, modalAdminInstancia = null, modalVerFichaInstancia = null, modalSalidaInstancia = null;
 let noticiaImagenBase64 = "";
 let noticiasData = [];
 let modoAuthActual = "LOGIN"; 
 
 // =========================================================================
-// INICIALIZADOR DEL DOM CON VERIFICACIÓN DE SEGURIDAD
+// INICIALIZADOR SEGURO
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
-    // Verificar si bootstrap se descargó e inició correctamente
-    if (typeof bootstrap !== 'undefined') {
-        try {
-            if (document.getElementById('modalRegistro')) {
-                modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
-            }
-            if (document.getElementById('modalAdminNoticias')) {
-                modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
-            }
-            if (document.getElementById('modalVerFicha')) {
-                modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
-            }
-            if (document.getElementById('modalConfirmarSalida')) {
-                modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
-            }
-        } catch (error) {
-            console.error("Error inicializando modales de interfaz:", error);
-        }
-    } else {
-        console.error("Falla crítica: La CDN de Bootstrap no pudo cargarse o tardó demasiado.");
-        alert("Error de conexión: No se pudo cargar Bootstrap. Por favor recarga la página.");
+    // Inicializar modales de Bootstrap con manejo de errores estricto
+    try {
+        modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
+        modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
+        modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
+        modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
+    } catch (e) {
+        console.error("Error cargando componentes UI de Bootstrap:", e);
     }
     
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker activo'))
-            .catch(err => console.warn('Error en Service Worker', err));
-    }
-
     comprobarEstadoSesion();
-    if (document.getElementById('inputBuscar')) {
-        document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
-    }
-    if (document.getElementById('formAutenticacion')) {
-        document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
-    }
     
-    if (document.getElementById('fotoFile')) {
-        document.getElementById('fotoFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    imagenGlobalBase64 = evt.target.result;
-                    document.getElementById('iconoCamara').style.display = 'none';
-                    document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
+    // Listeners del Sistema
+    document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
+    document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
+    document.getElementById('formularioCenso').addEventListener('submit', procesarEnvioCenso);
+    document.getElementById('formNuevaNoticia').addEventListener('submit', procesarEnvioNoticia);
 
-    if (document.getElementById('newsFile')) {
-        document.getElementById('newsFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    noticiaImagenBase64 = evt.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
+    // Inputs de Fotos
+    document.getElementById('fotoFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                imagenGlobalBase64 = evt.target.result;
+                document.getElementById('iconoCamara').style.display = 'none';
+                document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 
-    if (document.getElementById('formularioCenso')) {
-        document.getElementById('formularioCenso').addEventListener('submit', procesarEnvioCenso);
-    }
-
-    if (document.getElementById('formNuevaNoticia')) {
-        document.getElementById('formNuevaNoticia').addEventListener('submit', procesarEnvioNoticia);
-    }
+    document.getElementById('newsFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = function(evt) { noticiaImagenBase64 = evt.target.result; };
+            reader.readAsDataURL(file);
+        }
+    });
 });
 
 // =========================================================================
-// SISTEMA DE CONTROL DE SESIÓN Y AUTENTICACIÓN LOCAL
+// CONTROL DE SESIÓN
 // =========================================================================
 function comprobarEstadoSesion() {
     const sesionActiva = localStorage.getItem("siaho_sesion_activa");
     if (sesionActiva) {
-        document.getElementById('pantallaAuth').style.setProperty('display', 'none', 'important');
+        document.getElementById('pantallaAuth').style.display = 'none';
         document.getElementById('appContenido').style.display = 'block';
-        todosLosDatos = [];
-        const listaMovil = document.getElementById('listaMovil');
-        if (listaMovil) {
-            listaMovil.innerHTML = `
-                <div class="text-center py-5 text-muted">
-                    <i class="fa-solid fa-spinner fa-spin fa-2x text-primary mb-2"></i>
-                    <p class="small mb-0">Autenticando canal seguro y cargando tus registros...</p>
-                </div>`;
-        }
-        document.getElementById('statTotal').innerText = "0";
         
-        if(sesionActiva === "admin@siaho.com") {
+        if(sesionActiva.trim().toLowerCase() === "admin@siaho.com") {
             document.getElementById('btnCrearNoticia').classList.remove('d-none');
         } else {
             document.getElementById('btnCrearNoticia').classList.add('d-none');
         }
-
-        inicializarAplicacionCompleta();
+        cargarDatos();
     } else {
-        document.getElementById('pantallaAuth').style.setProperty('display', 'flex', 'important');
+        document.getElementById('pantallaAuth').style.display = 'flex';
         document.getElementById('appContenido').style.display = 'none';
+        cargarDatosPublicos();
     }
 }
 
 function conmutarModoAuth(e) {
     e.preventDefault();
-    const titulo = document.getElementById('authTitulo');
-    const subtitulo = document.getElementById('authSubtitulo');
-    const btnSubmit = document.getElementById('btnAuthSubmit');
-    const btnModo = document.getElementById('btnCambiarModo');
+    const t = document.getElementById('authTitulo'), s = document.getElementById('authSubtitulo'), b = document.getElementById('btnAuthSubmit'), m = document.getElementById('btnCambiarModo');
     if (modoAuthActual === "LOGIN") {
-        modoAuthActual = "REGISTRO";
-        titulo.innerText = "Crear Cuenta Móvil";
-        subtitulo.innerText = "Registra tu correo institucional para enrolarte en SIAHO";
-        btnSubmit.innerText = "Registrar y Entrar";
-        btnModo.innerText = "¿Ya tienes un usuario? Inicia sesión aquí";
+        modoAuthActual = "REGISTRO"; t.innerText = "Crear Cuenta"; s.innerText = "Regístrate en SIAHO"; b.innerText = "Registrar y Entrar"; m.innerText = "¿Ya tienes usuario? Loguéate";
     } else {
-        modoAuthActual = "LOGIN";
-        titulo.innerText = "Iniciar Sesión";
-        subtitulo.innerText = "Ingresa tus credenciales para acceder al SIAHO";
-        btnSubmit.innerText = "Entrar al Sistema";
-        btnModo.innerText = "¿No tienes cuenta? Regístrate aquí";
+        modoAuthActual = "LOGIN"; t.innerText = "Iniciar Sesión"; s.innerText = "Ingresa al sistema"; b.innerText = "Entrar"; m.innerText = "¿No tienes cuenta? Regístrate";
     }
 }
 
@@ -510,598 +434,288 @@ function procesarAutenticacion(e) {
     e.preventDefault();
     const correo = document.getElementById('authCorreo').value.trim().toLowerCase();
     const password = document.getElementById('authPassword').value;
-    let usuariosGuardados = JSON.parse(localStorage.getItem("siaho_usuarios_db")) || [];
+    let usuarios = JSON.parse(localStorage.getItem("siaho_usuarios_db")) || [];
+    
     if (modoAuthActual === "REGISTRO") {
-        const existe = usuariosGuardados.find(u => u.correo === correo);
-        if (existe) {
-            notificar("❌ Este correo ya se encuentra registrado", "#fbbf24");
-            return;
-        }
-        usuariosGuardados.push({ correo: correo, pass: password });
-        localStorage.setItem("siaho_usuarios_db", JSON.stringify(usuariosGuardados));
+        if (usuarios.find(u => u.correo === correo)) { notificar("❌ Correo ya registrado", "#fbbf24"); return; }
+        usuarios.push({ correo: correo, pass: password });
+        localStorage.setItem("siaho_usuarios_db", JSON.stringify(usuarios));
         localStorage.setItem("siaho_sesion_activa", correo);
-        notificar("🎉 Cuenta configurada exitosamente", "#22c55e");
         comprobarEstadoSesion();
     } else {
-        const usuarioValido = usuariosGuardados.find(u => u.correo === correo && u.pass === password);
-        if (usuarioValido || (correo === "admin@siaho.com" && password === "12345")) {
+        const uValido = usuarios.find(u => u.correo === correo && u.pass === password);
+        if (uValido || (correo === "admin@siaho.com" && password === "12345")) {
             localStorage.setItem("siaho_sesion_activa", correo);
-            if(!usuarioValido) {
-                usuariosGuardados.push({ correo: "admin@siaho.com", pass: "12345" });
-                localStorage.setItem("siaho_usuarios_db", JSON.stringify(usuariosGuardados));
-            }
-            notificar("🔒 Acceso autorizado", "#22c55e");
             comprobarEstadoSesion();
         } else {
-            notificar("⚠️ Credenciales incorrectas o usuario inexistente", "#ef4444");
+            notificar("⚠️ Credenciales incorrectas", "#ef4444");
         }
     }
 }
 
-function cerrarSesionActual() {
-    if (modalSalidaInstancia) {
-        modalSalidaInstancia.show();
-    }
-}
-
+function cerrarSesionActual() { if (modalSalidaInstancia) modalSalidaInstancia.show(); }
 function confirmarCierreEfectivo() {
-    if (modalSalidaInstancia) {
-        modalSalidaInstancia.hide();
-    }
+    if (modalSalidaInstancia) modalSalidaInstancia.hide();
     localStorage.removeItem("siaho_sesion_activa");
-    document.getElementById('formAutenticacion').reset();
-    todosLosDatos = [];
-    noticiasData = [];
+    todosLosDatos = []; noticiasData = [];
     document.getElementById('listaMovil').innerHTML = "";
     document.getElementById('contenedorNoticias').innerHTML = "";
     document.getElementById('statTotal').innerText = "0";
-    notificar("👋 Sesión finalizada correctamente", "#64748b");
     comprobarEstadoSesion();
 }
 
-function inicializarAplicacionCompleta() {
-    cargarDatos(); 
-    setInterval(cargarDatos, 15000);
-}
-
 // =========================================================================
-// PIPELINE DE SINCRONIZACIÓN (FILTRADO SEGÚN USUARIO LOGUEADO)
+// CONEXIÓN CLOUD DATA
 // =========================================================================
 function cargarDatos() {
     const usuarioActivo = localStorage.getItem("siaho_sesion_activa") || "";
-    
+    document.getElementById('listaMovil').innerHTML = '<div class="text-center py-4"><i class="fa-solid fa-spinner fa-spin fa-2x text-primary"></i></div>';
+
     fetch(`${URL_API_GOOGLE}?usuario=${encodeURIComponent(usuarioActivo)}`)
         .then(res => res.json())
         .then(data => {
-            if (data && data.records) {
-                todosLosDatos = data.records;
+            if (data) {
+                todosLosDatos = data.records || [];
                 noticiasData = data.noticias || [];
-                
                 document.getElementById('statTotal').innerText = todosLosDatos.length;
-                
-                if (!document.getElementById('inputBuscar').value.trim()) {
-                    renderizarListado(todosLosDatos);
-                }
-                
+                renderizarListado(todosLosDatos);
                 renderizarNoticias();
                 procesarEstadisticasTerritoriales();
             }
         })
         .catch(err => {
-            console.error("Error en sincronización en la nube:", err);
+            console.error(err);
+            notificar("⚠️ Modo Offline o error de red", "#64748b");
         });
 }
 
+function cargarDatosPublicos() {
+    fetch(URL_API_GOOGLE)
+        .then(res => res.json())
+        .then(data => { if(data && data.noticias) { noticiasData = data.noticias; renderizarNoticias(); } });
+}
+
 function renderizarListado(datos) {
-    const listaMovil = document.getElementById('listaMovil');
-    if (!listaMovil) return;
-
-    if (datos.length === 0) {
-        listaMovil.innerHTML = `
-            <div class="text-center py-5 text-muted">
-                <i class="fa-solid fa-folder-open fa-2x mb-2 opacity-50"></i>
-                <p class="small mb-0">No se encontraron registros de cultores.</p>
-            </div>`;
-        return;
-    }
-
+    const lista = document.getElementById('listaMovil');
+    if (datos.length === 0) { lista.innerHTML = '<p class="text-center text-muted py-4 small">Sin registros cargados.</p>'; return; }
+    
     let html = "";
-    datos.forEach(cultor => {
-        const fotoSrc = cultor.foto && cultor.foto.startsWith('data:image') 
-            ? cultor.foto 
-            : 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=150';
-
+    datos.forEach(c => {
+        const foto = c.foto || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=150';
         html += `
-            <div class="card card-custom p-3 mb-2 bg-white" onclick="abrirVerFicha(${JSON.stringify(cultor).replace(/"/g, '&quot;')})">
+            <div class="card card-custom p-3 mb-2 bg-white" onclick='abrirVerFicha(${JSON.stringify(c)})'>
                 <div class="d-flex align-items-center gap-3">
-                    <div class="avatar-container">
-                        <img src="${fotoSrc}" alt="Cultor" style="width:100%; height:100%; object-fit:cover;">
+                    <div class="avatar-container"><img src="${foto}" style="width:100%; height:100%; object-fit:cover;"></div>
+                    <div class="flex-grow-1">
+                        <h6 class="fw-bold text-dark mb-0">${c.nombre}</h6>
+                        <small class="text-muted">V-${c.cedula} • ${c.municipio}</small><br>
+                        <span class="badge bg-light text-primary border mt-1">${c.especialidad}</span>
                     </div>
-                    <div class="flex-grow-1" style="min-width: 0;">
-                        <h6 class="fw-bold text-dark mb-0 text-truncate">${cultor.nombre}</h6>
-                        <p class="text-muted mb-0 small" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-id-card me-1 text-secondary"></i>V-${cultor.cedula}
-                            <span class="mx-1">•</span>
-                            <i class="fa-solid fa-location-dot me-1 text-danger"></i>${cultor.municipio}
-                        </p>
-                        <span class="badge bg-light text-primary border mt-1" style="font-size:0.7rem; font-weight:600;">
-                            ${cultor.especialidad}
-                        </span>
-                    </div>
-                    <div class="text-end">
-                        <i class="fa-solid fa-chevron-right text-muted opacity-50"></i>
-                    </div>
+                    <i class="fa-solid fa-chevron-right text-muted opacity-50"></i>
                 </div>
             </div>`;
     });
-
-    listaMovil.innerHTML = html;
+    lista.innerHTML = html;
 }
 
 function filtrarListadoPrincipal() {
-    const termino = document.getElementById('inputBuscar').value.toLowerCase().trim();
-    if (!termino) {
-        renderizarListado(todosLosDatos);
-        return;
-    }
-
-    const datosFiltrados = todosLosDatos.filter(cultor => {
-        const nombre = cultor.nombre ? cultor.nombre.toLowerCase() : "";
-        const cedula = cultor.cedula ? cultor.cedula.toString() : "";
-        const especialidad = cultor.especialidad ? cultor.especialidad.toLowerCase() : "";
-        const municipio = cultor.municipio ? cultor.municipio.toLowerCase() : "";
-        
-        return nombre.includes(termino) || 
-               cedula.includes(termino) || 
-               especialidad.includes(termino) ||
-               municipio.includes(termino);
-    });
-
-    renderizarListado(datosFiltrados);
+    const t = document.getElementById('inputBuscar').value.toLowerCase().trim();
+    if(!t) { renderizarListado(todosLosDatos); return; }
+    const f = todosLosDatos.filter(c => (c.nombre||"").toLowerCase().includes(t) || (c.cedula||"").toString().includes(t));
+    renderizarListado(f);
 }
 
 // =========================================================================
-// CONTROL DE NOTICIAS DE CARTELERA INFORMATIVA
+// NOTICIAS Y FORMULARIOS
 // =========================================================================
 function renderizarNoticias() {
-    const contenedor = document.getElementById('contenedorNoticias');
-    if (!contenedor) return;
-
-    if (noticiasData.length === 0) {
-        contenedor.innerHTML = `
-            <div class="text-center w-100 p-3 bg-white rounded-3 border text-muted small">
-                No hay acontecimientos publicados en cartelera.
-            </div>`;
-        return;
-    }
-
+    const con = document.getElementById('contenedorNoticias');
+    if (noticiasData.length === 0) { con.innerHTML = '<div class="text-center w-100 p-2 text-muted small">Cartelera vacía</div>'; return; }
     let html = "";
-    noticiasData.forEach((noticia, index) => {
-        const fotoSrc = noticia.foto && noticia.foto.startsWith('data:image') 
-            ? noticia.foto 
-            : 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=400';
-            
-        const esAdmin = localStorage.getItem("siaho_sesion_activa") === "admin@siaho.com";
-        const clickEvent = esAdmin ? `onclick="abrirAdminNoticias(false, ${index})"` : '';
-
+    noticiasData.forEach((n, i) => {
+        const foto = n.foto || 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=400';
+        const esAdmin = (localStorage.getItem("siaho_sesion_activa") === "admin@siaho.com");
         html += `
-            <div class="news-card" ${clickEvent} style="${esAdmin ? 'cursor:pointer;' : ''}">
-                <div class="news-img-container">
-                    <img src="${fotoSrc}" alt="Portada">
-                </div>
+            <div class="news-card" ${esAdmin ? `onclick="abrirAdminNoticias(false, ${i})"` : ''}>
+                <div class="news-img-container"><img src="${foto}"></div>
                 <div class="p-2">
-                    <h7 class="fw-bold text-dark d-block text-truncate mb-0" style="font-size:0.82rem;">${noticia.titulo}</h7>
-                    <p class="text-muted small mb-0 text-truncate-2" style="font-size:0.72rem; line-height:1.2; max-height:2.4em; display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical; overflow:hidden;">
-                        ${noticia.descripcion}
-                    </p>
+                    <h6 class="fw-bold text-dark text-truncate mb-0" style="font-size:0.8rem;">${n.titulo}</h6>
+                    <p class="text-muted super-small mb-0 text-truncate">${n.descripcion}</p>
                 </div>
             </div>`;
     });
-    contenedor.innerHTML = html;
+    con.innerHTML = html;
 }
 
 function abrirAdminNoticias(esNueva, index = null) {
-    if (localStorage.getItem("siaho_sesion_activa") !== "admin@siaho.com") return;
-    
-    document.getElementById('formNuevaNoticia').reset();
-    noticiaImagenBase64 = "";
-    
+    document.getElementById('formNuevaNoticia').reset(); noticiaImagenBase64 = "";
     if(esNueva) {
-        document.getElementById('tituloModalNoticia').innerText = "Publicar Acontecimiento";
-        document.getElementById('noticiaIndex').value = "NUEVO";
-        document.getElementById('btnBorrarNoticia').classList.add('d-none');
+        document.getElementById('noticiaIndex').value = "NUEVO"; document.getElementById('btnBorrarNoticia').classList.add('d-none');
     } else {
-        document.getElementById('tituloModalNoticia').innerText = "Modificar Noticia";
         document.getElementById('noticiaIndex').value = index;
         document.getElementById('newsTitle').value = noticiasData[index].titulo;
         document.getElementById('newsDesc').value = noticiasData[index].descripcion;
         noticiaImagenBase64 = noticiasData[index].foto || "";
         document.getElementById('btnBorrarNoticia').classList.remove('d-none');
     }
-    
-    if (modalAdminInstancia) modalAdminInstancia.show();
+    if(modalAdminInstancia) modalAdminInstancia.show();
 }
 
 function procesarEnvioNoticia(e) {
     e.preventDefault();
-    const index = document.getElementById('noticiaIndex').value;
-    const usuarioActivo = localStorage.getItem("siaho_sesion_activa") || "";
-    
+    const idx = document.getElementById('noticiaIndex').value;
     const payload = {
-        scope: "NOTICIA",
-        action: index === "NUEVO" ? "CREAR" : "EDITAR",
-        index: index,
-        titulo: document.getElementById('newsTitle').value.trim(),
-        descripcion: document.getElementById('newsDesc').value.trim(),
-        foto: noticiaImagenBase64,
-        registradoPor: usuarioActivo
+        scope: "NOTICIA", action: idx === "NUEVO" ? "CREAR" : "EDITAR", index: idx,
+        titulo: document.getElementById('newsTitle').value, descripcion: document.getElementById('newsDesc').value,
+        foto: noticiaImagenBase64, registradoPor: localStorage.getItem("siaho_sesion_activa")
     };
-
-    notificar("📡 Transmitiendo noticia a cartelera...", "#4f46e5");
-    if (modalAdminInstancia) modalAdminInstancia.hide();
-
-    fetch(URL_API_GOOGLE, {
-        method: "POST",
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
-        notificar(data.status === "success" ? "📰 Cartelera actualizada con éxito" : "⚠️ Error: " + data.message, data.status === "success" ? "#22c55e" : "#ef4444");
-        cargarDatos();
-    })
-    .catch(() => {
-        notificar("❌ Falla en la conexión", "#ef4444");
-    });
+    if(modalAdminInstancia) modalAdminInstancia.hide();
+    fetch(URL_API_GOOGLE, { method: "POST", body: JSON.stringify(payload) }).then(() => { cargarDatos(); });
 }
 
 function eliminarNoticiaActual() {
-    const index = document.getElementById('noticiaIndex').value;
-    const usuarioActivo = localStorage.getItem("siaho_sesion_activa") || "";
-    
-    if (index !== "NUEVO" && confirm("¿Está totalmente seguro de remover esta noticia de la cartelera?")) {
-        if (modalAdminInstancia) modalAdminInstancia.hide();
-        notificar("🗑️ Removiendo noticia...", "#1e293b");
-        
-        const payload = { 
-            scope: "NOTICIA", 
-            action: "ELIMINAR", 
-            index: index,
-            registradoPor: usuarioActivo 
-        };
-        
-        fetch(URL_API_GOOGLE, {
-            method: "POST",
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(() => {
-            notificar("🗑️ Registro de cartelera destruido", "#64748b");
-            cargarDatos();
-        });
+    const idx = document.getElementById('noticiaIndex').value;
+    if (confirm("¿Eliminar noticia?")) {
+        if(modalAdminInstancia) modalAdminInstancia.hide();
+        fetch(URL_API_GOOGLE, { method: "POST", body: JSON.stringify({ scope: "NOTICIA", action: "ELIMINAR", index: idx, registradoPor: localStorage.getItem("siaho_sesion_activa") }) }).then(() => cargarDatos());
     }
 }
 
-// =========================================================================
-// PROCESAMIENTO Y GESTIÓN DE CULTORES (CENSO)
-// =========================================================================
 function abrirParaCrear() {
-    if (!modalInstancia) {
-        alert("La interfaz de formularios no está lista aún. Reintente por favor.");
-        return;
-    }
     document.getElementById('formularioCenso').reset();
     document.getElementById('action_type').value = "CREAR";
-    document.getElementById('modalTitulo').innerText = "NUEVO CENSO POPULAR ANCESTRAL";
     document.getElementById('cedula').disabled = false;
     document.getElementById('btnEliminarCultor').classList.add('d-none');
-    
-    imagenGlobalBase64 = "";
-    document.getElementById('iconoCamara').style.display = 'block';
+    imagenGlobalBase64 = ""; document.getElementById('iconoCamara').style.display = 'block';
     document.getElementById('previewCont').innerHTML = '';
-    
-    modalInstancia.show();
+    if(modalInstancia) modalInstancia.show();
 }
 
-function abrirVerFicha(cultor) {
-    document.getElementById('f-nombre').innerText = cultor.nombre || "---";
-    document.getElementById('f-cedula').innerText = cultor.cedula || "---";
-    document.getElementById('f-fecha').innerText = cultor.fechanacimiento ? cultor.fechanacimiento.substring(0,10) : "---";
-    document.getElementById('f-sexo').innerText = cultor.sexo || "---";
-    document.getElementById('f-mun').innerText = cultor.municipio || "---";
-    document.getElementById('f-par').innerText = cultor.parroquia || "---";
-    document.getElementById('f-com').innerText = cultor.comuna || "---";
-    document.getElementById('f-comu').innerText = cultor.comunidad || "---";
-    document.getElementById('f-esp').innerText = cultor.especialidad || "---";
-    document.getElementById('f-art').innerText = cultor.artesania || "---";
-    document.getElementById('f-apre').innerText = cultor.dequienaprendio || "---";
-    document.getElementById('f-enf').innerText = cultor.enfermedadesquetrata || "---";
-    document.getElementById('f-pla').innerText = cultor.plantasoproductosqueusa || "---";
-    document.getElementById('f-obs').innerText = cultor.observaciones || "Ninguna.";
+function abrirVerFicha(c) {
+    document.getElementById('f-nombre').innerText = c.nombre;
+    document.getElementById('f-cedula').innerText = c.cedula;
+    document.getElementById('f-fecha').innerText = c.fechanacimiento ? c.fechanacimiento.substring(0,10) : "---";
+    document.getElementById('f-sexo').innerText = c.sexo;
+    document.getElementById('f-mun').innerText = c.municipio;
+    document.getElementById('f-par').innerText = c.parroquia;
+    document.getElementById('f-com').innerText = c.comuna;
+    document.getElementById('f-comu').innerText = c.comunidad;
+    document.getElementById('f-esp').innerText = c.especialidad;
+    document.getElementById('f-art').innerText = c.artesania;
+    document.getElementById('f-apre').innerText = c.dequienaprendio;
+    document.getElementById('f-enf').innerText = c.enfermedadesquetrata;
+    document.getElementById('f-pla').innerText = c.plantasoproductosqueusa;
+    document.getElementById('f-obs').innerText = c.observaciones || "Ninguna.";
+    document.getElementById('f-foto').src = c.foto || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=150';
 
-    const fFoto = document.getElementById('f-foto');
-    if (cultor.foto && cultor.foto.startsWith('data:image')) {
-        fFoto.src = cultor.foto;
-    } else {
-        fFoto.src = 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=150';
-    }
-
-    document.getElementById('btnEditarDesdeFicha').onclick = function() {
-        if (modalVerFichaInstancia) modalVerFichaInstancia.hide();
-        abrirParaEditar(cultor);
+    document.getElementById('btnEditarDesdeFicha').onclick = () => {
+        if(modalVerFichaInstancia) modalVerFichaInstancia.hide();
+        abrirParaEditar(c);
     };
-
-    if (modalVerFichaInstancia) modalVerFichaInstancia.show();
+    if(modalVerFichaInstancia) modalVerFichaInstancia.show();
 }
 
-function abrirParaEditar(cultor) {
-    document.getElementById('formularioCenso').reset();
+function abrirParaEditar(c) {
     document.getElementById('action_type').value = "EDITAR";
-    document.getElementById('modalTitulo').innerText = "CORREGIR DATOS DEL CULTORES";
+    document.getElementById('municipio').value = c.municipio;
+    document.getElementById('parroquia').value = c.parroquia;
+    document.getElementById('comuna').value = c.comuna;
+    document.getElementById('comunidad').value = c.comunidad;
+    document.getElementById('cedula').value = c.cedula; document.getElementById('cedula').disabled = true;
+    document.getElementById('nombre').value = c.nombre;
+    document.getElementById('sexo').value = c.sexo;
+    document.getElementById('especialidad').value = c.especialidad;
+    document.getElementById('artesania').value = c.artesania;
+    document.getElementById('dequienaprendio').value = c.dequienaprendio;
+    document.getElementById('enfermedadesquetrata').value = c.enfermedadesquetrata;
+    document.getElementById('plantasoproductosqueusa').value = c.plantasoproductosqueusa;
+    document.getElementById('observaciones').value = c.observaciones;
     
-    document.getElementById('municipio').value = cultor.municipio || "";
-    document.getElementById('parroquia').value = cultor.parroquia || "";
-    document.getElementById('comuna').value = cultor.comuna || "";
-    document.getElementById('comunidad').value = cultor.comunidad || "";
-    document.getElementById('cedula').value = cultor.cedula || "";
-    document.getElementById('cedula').disabled = true; 
-    document.getElementById('nombre').value = cultor.nombre || "";
-    document.getElementById('sexo').value = cultor.sexo || "";
-    document.getElementById('especialidad').value = cultor.especialidad || "";
-    document.getElementById('artesania').value = cultor.artesania || "";
-    document.getElementById('dequienaprendio').value = cultor.dequienaprendio || "";
-    document.getElementById('enfermedadesquetrata').value = cultor.enfermedadesquetrata || "";
-    document.getElementById('plantasoproductosqueusa').value = cultor.plantasoproductosqueusa || "";
-    document.getElementById('observaciones').value = cultor.observaciones || "";
-    
-    if (cultor.fechanacimiento) {
-        document.getElementById('fechanacimiento').value = formatearFechaEstandar(cultor.fechanacimiento);
-    }
-
-    imagenGlobalBase64 = cultor.foto || "";
-    if (imagenGlobalBase64 && imagenGlobalBase64.startsWith('data:image')) {
+    imagenGlobalBase64 = c.foto || "";
+    if (imagenGlobalBase64) {
         document.getElementById('iconoCamara').style.display = 'none';
         document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
-    } else {
-        document.getElementById('iconoCamara').style.display = 'block';
-        document.getElementById('previewCont').innerHTML = '';
     }
-
-    if(localStorage.getItem("siaho_sesion_activa") === "admin@siaho.com") {
-        document.getElementById('btnEliminarCultor').classList.remove('d-none');
-    } else {
-        document.getElementById('btnEliminarCultor').classList.add('d-none');
-    }
-
-    if (modalInstancia) modalInstancia.show();
+    
+    if(localStorage.getItem("siaho_sesion_activa") === "admin@siaho.com") document.getElementById('btnEliminarCultor').classList.remove('d-none');
+    if(modalInstancia) modalInstancia.show();
 }
 
 function procesarEnvioCenso(e) {
     e.preventDefault();
-    const action = document.getElementById('action_type').value;
-    const usuarioActivo = localStorage.getItem("siaho_sesion_activa") || "";
-    
     const payload = {
-        scope: "CENSO",
-        action: action,
-        municipio: document.getElementById('municipio').value.trim(),
-        parroquia: document.getElementById('parroquia').value.trim(),
-        comuna: document.getElementById('comuna').value.trim(),
-        comunidad: document.getElementById('comunidad').value.trim(),
-        cedula: document.getElementById('cedula').value.trim(),
-        fechanacimiento: document.getElementById('fechanacimiento').value,
-        nombre: document.getElementById('nombre').value.trim(),
-        sexo: document.getElementById('sexo').value,
-        especialidad: document.getElementById('especialidad').value.trim(),
-        artesania: document.getElementById('artesania').value.trim(),
-        dequienaprendio: document.getElementById('dequienaprendio').value.trim(),
-        enfermedadesquetrata: document.getElementById('enfermedadesquetrata').value.trim(),
-        plantasoproductosqueusa: document.getElementById('plantasoproductosqueusa').value.trim(),
-        observaciones: document.getElementById('observaciones').value.trim(),
-        foto: imagenGlobalBase64,
-        registradoPor: usuarioActivo
+        scope: "CENSO", action: document.getElementById('action_type').value,
+        municipio: document.getElementById('municipio').value, parroquia: document.getElementById('parroquia').value,
+        comuna: document.getElementById('comuna').value, comunidad: document.getElementById('comunidad').value,
+        cedula: document.getElementById('cedula').value, nombre: document.getElementById('nombre').value,
+        fechanacimiento: document.getElementById('fechanacimiento').value, sexo: document.getElementById('sexo').value,
+        especialidad: document.getElementById('especialidad').value, artesania: document.getElementById('artesania').value,
+        dequienaprendio: document.getElementById('dequienaprendio').value, enfermedadesquetrata: document.getElementById('enfermedadesquetrata').value,
+        plantasoproductosqueusa: document.getElementById('plantasoproductosqueusa').value, observaciones: document.getElementById('observaciones').value,
+        foto: imagenGlobalBase64, registradoPor: localStorage.getItem("siaho_sesion_activa")
     };
-    
-    notificar("🚀 Transmitiendo datos a la nube...", "#0284c7");
-    if (modalInstancia) modalInstancia.hide();
-
-    fetch(URL_API_GOOGLE, {
-        method: "POST",
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
-        notificar(data.status === "success" ? "✅ Datos resguardados con éxito" : "⚠️ Error: " + data.message, data.status === "success" ? "#22c55e" : "#ef4444");
-        cargarDatos();
-    })
-    .catch(() => {
-        notificar("❌ Error crítico de envío", "#ef4444");
-        cargarDatos();
-    });
+    if(modalInstancia) modalInstancia.hide();
+    fetch(URL_API_GOOGLE, { method: "POST", body: JSON.stringify(payload) }).then(() => cargarDatos());
 }
 
 function eliminarCultorActual() {
     const ci = document.getElementById('cedula').value;
-    const usuarioActivo = localStorage.getItem("siaho_sesion_activa") || "";
-    
-    if (ci && confirm(`¿Seguro que desea eliminar por completo el registro de C.I: ${ci}?`)) {
-        if (modalInstancia) modalInstancia.hide();
-        notificar("🗑️ Eliminando registro...", "#1e293b");
-        
-        const payload = { 
-            scope: "CENSO", 
-            action: "ELIMINAR", 
-            cedula: ci,
-            registradoPor: usuarioActivo
-        };
-        
-        fetch(URL_API_GOOGLE, {
-            method: "POST",
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(data => {
-            notificar("🗑️ Registro de la base de datos eliminado", "#64748b");
-            cargarDatos();
-        });
+    if (confirm("¿Eliminar cultor?")) {
+        if(modalInstancia) modalInstancia.hide();
+        fetch(URL_API_GOOGLE, { method: "POST", body: JSON.stringify({ scope: "CENSO", action: "ELIMINAR", cedula: ci, registradoPor: localStorage.getItem("siaho_sesion_activa") }) }).then(() => cargarDatos());
     }
 }
 
 // =========================================================================
-// MOTOR ESTADÍSTICO TERRITORIAL DINÁMICO
+// ESTADÍSTICAS
 // =========================================================================
 function procesarEstadisticasTerritoriales() {
-    const desgloses = { municipio: {}, parroquia: {}, comuna: {} };
-
+    const d = { municipio: {}, parroquia: {}, comuna: {} };
     todosLosDatos.forEach(c => {
-        const m = c.municipio ? c.municipio.trim().toUpperCase() : "NO DEFINIDO";
-        const p = c.parroquia ? c.parroquia.trim().toUpperCase() : "NO DEFINIDO";
-        const co = c.comuna ? c.comuna.trim().toUpperCase() : "NO DEFINIDO";
-
-        desgloses.municipio[m] = (desgloses.municipio[m] || 0) + 1;
-        desgloses.parroquia[p] = (desgloses.parroquia[p] || 0) + 1;
-        desgloses.comuna[co] = (desgloses.comuna[co] || 0) + 1;
+        const m = (c.municipio || "ND").trim().toUpperCase();
+        const p = (c.parroquia || "ND").trim().toUpperCase();
+        const co = (c.comuna || "ND").trim().toUpperCase();
+        d.municipio[m] = (d.municipio[m] || 0) + 1;
+        d.parroquia[p] = (d.parroquia[p] || 0) + 1;
+        d.comuna[co] = (d.comuna[co] || 0) + 1;
     });
-
-    inyectarHTMLAcordeon('desgloseMunicipios', desgloses.municipio, 'municipio');
-    inyectarHTMLAcordeon('desgloseParroquias', desgloses.parroquia, 'parroquia');
-    inyectarHTMLAcordeon('desgloseComunas', desgloses.comuna, 'comuna');
+    inyectarAcordeon('desgloseMunicipios', d.municipio, 'municipio');
+    inyectarAcordeon('desgloseParroquias', d.parroquia, 'parroquia');
+    inyectarAcordeon('desgloseComunas', d.comuna, 'comuna');
 }
 
-function inyectarHTMLAcordeon(idContenedor, objetoDatos, claveFiltro) {
-    const contenedor = document.getElementById(idContenedor);
-    if (!contenedor) return;
-
+function inyectarAcordeon(id, obj, clave) {
+    const con = document.getElementById(id); if(!con) return;
     let html = "";
-    Object.keys(objetoDatos).sort().forEach((territorio, index) => {
-        const subDatos = todosLosDatos.filter(c => c[claveFiltro] && c[claveFiltro].trim().toUpperCase() === territorio);
-        let listaIntegrantesHTML = `<ul class="list-group list-group-flush shadow-sm rounded-3">`;
-        
-        subDatos.forEach(cultor => {
-            listaIntegrantesHTML += `
-                <li class="list-group-item small d-flex justify-content-between align-items-center bg-white border-bottom py-2" style="font-size:0.8rem; cursor:pointer;" onclick="if(modalVerFichaInstancia) modalVerFichaInstancia.show(); abrirVerFicha(${JSON.stringify(cultor).replace(/"/g, '&quot;')})">
-                    <span class="text-dark fw-medium"><i class="fa-solid fa-user-tag text-muted me-2 small"></i>${cultor.nombre}</span>
-                    <span class="text-secondary super-small">V-${cultor.cedula}</span>
-                </li>`;
-        });
-        listaIntegrantesHTML += "</ul>";
-
+    Object.keys(obj).sort().forEach((t, idx) => {
+        const sub = todosLosDatos.filter(c => (c[clave]||"").trim().toUpperCase() === t);
+        let list = '<ul class="list-group list-group-flush">';
+        sub.forEach(c => { list += `<li class="list-group-item small" onclick='abrirVerFicha(${JSON.stringify(c)})'>${c.nombre} <span class="text-muted float-end">V-${c.cedula}</span></li>`; });
+        list += '</ul>';
         html += `
             <div class="stat-accordion-item">
-                <button class="stat-header-trigger" onclick="conmutarDespliegueEstadistico('${idContenedor}_box_${index}')">
-                    <span class="fw-bold text-dark" style="font-size:0.85rem;"><i class="fa-solid fa-map-pin me-2 text-primary opacity-75"></i>${territorio}</span>
-                    <span class="stat-count-badge">${objetoDatos[territorio]}</span>
+                <button class="stat-header-trigger" onclick="document.getElementById('${id}_b_${idx}').style.display = (document.getElementById('${id}_b_${idx}').style.display === 'block') ? 'none' : 'block'">
+                    <span>${t}</span> <span class="stat-count-badge">${obj[t]}</span>
                 </button>
-                <div class="stat-details-box" id="${idContenedor}_box_${index}">
-                    ${listaIntegrantesHTML}
-                </div>
+                <div class="stat-details-box" id="${id}_b_${idx}">${list}</div>
             </div>`;
     });
-    contenedor.innerHTML = html;
+    con.innerHTML = html;
 }
 
-function conmutarDespliegueEstadistico(idBox) {
-    const box = document.getElementById(idBox);
-    if (box) {
-        box.style.display = (box.style.display === 'block') ? 'none' : 'block';
-    }
-}
-
-// =========================================================================
-// EXPORTADORES (PDF/IMAGEN)
-// =========================================================================
-function exportarFichaA_PDF() {
-    const elemento = document.getElementById('areaDescargaFicha');
-    const cedula = document.getElementById('f-cedula').innerText;
-    const opt = {
-        margin: [10, 10, 10, 10],
-        filename: `FICHA_SIAHO_V${cedula}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 3, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'letter', orientation: 'portrait' }
-    };
-    notificar("📥 Generando documento PDF certificado...", "#0284c7");
-    html2pdf().set(opt).from(elemento).save();
-}
-
-function exportarFichaA_Imagen() {
-    const elemento = document.getElementById('areaDescargaFicha');
-    const cedula = document.getElementById('f-cedula').innerText;
-    notificar("🖼️ Construyendo captura de alta resolución...", "#22c55e");
-    
-    html2canvas(elemento, { scale: 3, useCORS: true, backgroundColor: "#f8fafc" }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `FICHA_SIAHO_V${cedula}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-    });
-}
-
-// =========================================================================
-// UTILIDADES AUXILIARES
-// =========================================================================
-function cambiarVista(vista) {
-    const principal = document.getElementById('vistaPrincipal');
-    const estadisticas = document.getElementById('vistaEstadisticas');
-    const navReg = document.getElementById('navRegistros');
-    const navEst = document.getElementById('navEstadisticas');
-    
-    if (vista === 'registros') {
-        principal.classList.remove('d-none');
-        estadisticas.classList.add('d-none');
-        navReg.classList.add('active');
-        navEst.classList.remove('active');
+function cambiarVista(v) {
+    if (v === 'registros') {
+        document.getElementById('vistaPrincipal').classList.remove('d-none'); document.getElementById('vistaEstadisticas').classList.add('d-none');
+        document.getElementById('navRegistros').classList.add('active'); document.getElementById('navEstadisticas').classList.remove('active');
     } else {
-        principal.classList.add('d-none');
-        estadisticas.classList.remove('d-none');
-        navReg.classList.remove('active');
-        navEst.classList.add('active');
+        document.getElementById('vistaPrincipal').classList.add('d-none'); document.getElementById('vistaEstadisticas').classList.remove('d-none');
+        document.getElementById('navRegistros').classList.remove('active'); document.getElementById('navEstadisticas').classList.add('active');
     }
 }
 
-function formatearFechaEstandar(fechaRaw) {
-    if (!fechaRaw) return "";
-    let str = fechaRaw.toString().trim();
-    if (!str) return "";
-    if (str.includes('T')) return str.split('T')[0];
-    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
-    
-    if (str.includes(" de ")) {
-        const meses = { "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06", "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12" };
-        if (str.includes(",")) str = str.split(",")[1].trim();
-        let partes = str.split(" de ");
-        if (partes.length === 3) {
-            let dia = partes[0].padStart(2, '0');
-            let mes = meses[partes[1].toLowerCase()] || "01";
-            let anio = partes[2];
-            return `${anio}-${mes}-${dia}`;
-        }
-    }
-    if (str.includes("/")) {
-        let partes = str.split("/");
-        if (partes.length === 3) {
-            let dia = partes[0].padStart(2, '0');
-            let mes = partes[1].padStart(2, '0');
-            let anio = partes[2];
-            if (anio.length === 2) anio = "19" + anio;
-            return `${anio}-${mes}-${dia}`;
-        }
-    }
-    return "";
-}
-
-function notificar(mensaje, colorFondo = "#1e293b") {
-    const alerta = document.getElementById('alertaFlotante');
-    if (alerta) {
-        alerta.innerText = mensaje;
-        alerta.style.backgroundColor = colorFondo;
-        alerta.style.display = 'block';
-        setTimeout(() => { alerta.style.display = 'none'; }, 3500);
-    }
-}
+function exportarFichaA_PDF() { html2pdf().set({ margin:10, filename:'Ficha.pdf', html2canvas:{scale:3, useCORS:true} }).from(document.getElementById('areaDescargaFicha')).save(); }
+function exportarFichaA_Imagen() { html2canvas(document.getElementById('areaDescargaFicha'), {scale:3, useCORS:true}).then(canvas => { const a = document.createElement('a'); a.download='Ficha.png'; a.href=canvas.toDataURL(); a.click(); }); }
+function notificar(m, c) { const a = document.getElementById('alertaFlotante'); a.innerText = m; a.style.backgroundColor = c; a.style.display='block'; setTimeout(() => a.style.display='none', 3000); }
 </script>
 </body>
 </html>
