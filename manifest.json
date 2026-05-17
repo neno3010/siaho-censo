@@ -1,23 +1,16 @@
 {
-  "name": "SIAHO - Censo de Saberes Ancestrales",
-  "short_name": "SIAHO Censo",
+  "name": "SIAHO Censo Móvil",
+  "short_name": "SIAHO",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1e1b4b",
-  "theme_color": "#1e1b4b",
-  "orientation": "portrait",
+  "theme_color": "#0284c7",
+  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3208/3208615.png",
+      "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230284c7'><path d='M12 2L2 22h20L12 2z'/></svg>",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3208/3208615.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/svg+xml"
     }
   ]
 }
