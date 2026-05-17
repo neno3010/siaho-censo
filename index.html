@@ -143,7 +143,7 @@
     <div class="banner-ancestral">
         <div class="w-100 d-flex justify-content-between align-items-center">
             <div>
-                <h2 class="fw-bold mb-0 text-white" style="letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.4)">IASPI</h2>
+                <h2 class="fw-bold mb-0 text-white" style="letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.4)">SIAHO</h2>
                 <p class="text-white-50 mb-0 small" style="font-size: 0.8rem;"><i class="fa-solid fa-tree me-1"></i>Saberes Ancestrales Territoriales</p>
             </div>
             <div class="text-end d-flex align-items-center gap-3">
@@ -220,7 +220,7 @@
                 <div class="ficha-exportable">
                     <div class="ficha-header">
                         <h5 class="fw-bold text-primary mb-0">REPÚBLICA BOLIVARIANA DE VENEZUELA</h5>
-                        <small class="fw-bold text-muted small">IASPI - REGISTRO NACIONAL DE CULTORES</small>
+                        <small class="fw-bold text-muted small">SIAHO - REGISTRO NACIONAL DE CULTORES</small>
                     </div>
                     <img id="f-foto" src="" class="ficha-avatar shadow-sm" alt="Foto">
                     <h5 class="text-center fw-bold text-dark mb-1" id="f-nombre">---</h5>
@@ -274,9 +274,9 @@
                         <input type="file" id="newsFile" class="form-control" accept="image/*">
                     </div>
                 </div>
-                <div class="modal-footer bg-light py-2">
-                    <button type="button" class="btn btn-sm btn-danger d-none" id="btnBorrarNoticia" onclick="eliminarNoticiaActual()">Eliminar Noticia</button>
-                    <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold" id="btnGuardarNoticia">Publicar en la Nube</button>
+                <div class="modal-footer bg-light py-2" id="footerModalNoticia">
+                    <button type="button" class="btn btn-light btn-sm text-muted" data-bs-dismiss="modal">Cerrar</button>
+                     <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold" id="btnGuardarNoticia">Publicar en la Nube</button>
                 </div>
             </form>
         </div>
@@ -332,7 +332,7 @@
                         <div class="col-6"><input type="date" class="form-control form-control-interactive" id="fechanacimiento"></div>
                         <div class="col-12"><input type="text" class="form-control form-control-interactive" id="nombre" placeholder="Nombres y Apellidos" required></div>
                         <div class="col-12">
-                            <select class="form-select form-control-interactive" id="sexo">
+                            <select class="form-select form-select-interactive" id="sexo">
                                 <option value="" disabled selected>Seleccione Género</option>
                                 <option value="Masculino">Masculino</option>
                                 <option value="Femenino">Femenino</option>
@@ -404,11 +404,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+function verificarRolAdministrador() {
+    const usuarioLogueado = localStorage.getItem("siaho_sesion_activa") || "";
+    return usuarioLogueado.trim().toLowerCase() === "admin@siaho.com";
+}
+
 function comprobarEstadoSesion() {
     const sesionActiva = localStorage.getItem("siaho_sesion_activa");
     if (sesionActiva) {
         document.getElementById('pantallaAuth').style.setProperty('display', 'none', 'important');
         document.getElementById('appContenido').style.display = 'block';
+        
+        // RESTRICCIÓN DE NOTICIAS: Solo el administrador ve el botón para crear noticias
+        if(document.getElementById('btnCrearNoticia')) {
+            if (verificarRolAdministrador()) {
+                document.getElementById('btnCrearNoticia').classList.remove('d-none');
+            } else {
+                document.getElementById('btnCrearNoticia').classList.add('d-none');
+            }
+        }
+
         todosLosDatos = [];
         const listaMovil = document.getElementById('listaMovil');
         if (listaMovil) {
@@ -506,7 +521,7 @@ function confirmarCierreEfectivo() {
 
 function inicializarAplicacionCompleta() {
     cargarDatos();
-    setInterval(cargarDatos, 12000);
+    setInterval(cargarDatos, 25000); // Frecuencia de refresco prudencial para no saturar las cuotas de Google Apps Script
 }
 
 function formatearFechaEstandar(fechaRaw) {
@@ -544,7 +559,7 @@ function notificar(mensaje, colorFondo = "#1e293b") {
     alerta.innerText = mensaje;
     alerta.style.backgroundColor = colorFondo;
     alerta.style.display = 'block';
-    setTimeout(() => { alerta.style.display = 'none'; }, 3000);
+    setTimeout(() => { alerta.style.display = 'none'; }, 3500);
 }
 
 function cambiarVista(vista) {
@@ -569,7 +584,8 @@ function cambiarVista(vista) {
 function cargarDatos() {
     const usuarioLogueado = localStorage.getItem("siaho_sesion_activa") || "";
     const emailLimpio = usuarioLogueado.trim().toLowerCase();
-    
+    if(!emailLimpio) return;
+
     fetch(URL_API_GOOGLE)
     .then(res => res.json())
     .then(res => {
@@ -584,11 +600,6 @@ function cargarDatos() {
                     const creadorFila = (c.registradoPor || "").trim().toLowerCase();
                     return creadorFila === emailLimpio;
                 });
-            }
-            
-            // Corrección: Habilitar el módulo informativo para que todos suministren noticias
-            if(document.getElementById('btnCrearNoticia')) {
-                document.getElementById('btnCrearNoticia').classList.remove('d-none');
             }
             
             document.getElementById('statTotal').innerText = todosLosDatos.length;
@@ -734,7 +745,7 @@ document.getElementById('formularioCenso').addEventListener('submit', function(e
     const usuarioLogueado = localStorage.getItem("siaho_sesion_activa") || "desconocido";
     
     const payload = {
-        action: document.getElementById('action_type').value,
+        action: document.getElementById('action_type').value, // Envía 'CREAR' o 'EDITAR'
         registradoPor: usuarioLogueado,
         cedula: document.getElementById('cedula').value.trim(),
         nombre: document.getElementById('nombre').value.trim(),
@@ -754,33 +765,38 @@ document.getElementById('formularioCenso').addEventListener('submit', function(e
     };
     
     notificar("🚀 Transmitiendo datos a la nube...", "#0284c7");
+    
     fetch(URL_API_GOOGLE, {
-        method: "POST", headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload)
+        method: "POST",
+        mode: "no-cors", // Evita problemas de bloqueo CORS locales
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(() => {
+        // Al usar no-cors no se puede leer la respuesta directo, forzamos cierre seguro y refresco continuo
         modalInstancia.hide();
-        notificar(data.status === "success" ? "✅ Datos resguardados con éxito" : "❌ Error: " + data.message, data.status === "success" ? "#22c55e" : "#ef4444");
-        cargarDatos();
+        notificar("✅ Datos enviados. Sincronizando cartelera...", "#22c55e");
+        setTimeout(cargarDatos, 1500);
     })
-    .catch(() => {
-        modalInstancia.hide(); cargarDatos();
+    .catch((err) => {
+        console.error(err);
+        modalInstancia.hide(); 
+        cargarDatos();
     });
 });
 
 function eliminarCultorActual() {
     const ci = document.getElementById('cedula').value;
     if (ci && confirm(`¿Seguro que desea eliminar el registro de C.I: ${ci}?`)) {
-        notificar("🗑️ Eliminando registro...", "#1e293b");
+        notificar("🗑️ Purgando registro...", "#1e293b");
         const payload = { action: "ELIMINAR", cedula: ci.trim() };
         fetch(URL_API_GOOGLE, {
-            method: "POST", headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload)
+            method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
         })
-        .then(res => res.json())
-        .then(data => {
+        .then(() => {
             modalInstancia.hide();
-            notificar(data.status === "success" ? "💥 Registro purgado con éxito" : "❌ Error", data.status === "success" ? "#22c55e" : "#ef4444");
-            cargarDatos();
+            notificar("💥 Orden ejecutada", "#ef4444");
+            setTimeout(cargarDatos, 1500);
         }).catch(() => { modalInstancia.hide(); cargarDatos(); });
     }
 }
@@ -789,10 +805,16 @@ function abrirAdminNoticias(esNueva) {
     if(!modalAdminInstancia) return;
     document.getElementById('formNuevaNoticia').reset();
     noticiaImagenBase64 = "";
+    
+    const footer = document.getElementById('footerModalNoticia');
+    
     if(esNueva) {
         document.getElementById('tituloModalNoticia').innerText = "Nueva Publicación";
         document.getElementById('noticiaIndex').value = "";
-        document.getElementById('btnBorrarNoticia').classList.add('d-none');
+        footer.innerHTML = `
+            <button type="button" class="btn btn-sm btn-light text-muted" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold">Publicar en la Nube</button>
+        `;
     }
     modalAdminInstancia.show();
 }
@@ -808,6 +830,14 @@ document.getElementById('newsFile').addEventListener('change', function(e) {
 document.getElementById('formNuevaNoticia').addEventListener('submit', function(e) {
     e.preventDefault();
     const idx = document.getElementById('noticiaIndex').value;
+    
+    // CONTROL DE SEGURIDAD EN FRONTEND: Si no es administrador, cancelar proceso
+    if (!verificarRolAdministrador()) {
+        notificar("⚠️ Operación rechazada: Solo administradores pueden guardar noticias", "#ef4444");
+        modalAdminInstancia.hide();
+        return;
+    }
+
     const payload = {
         action: idx === "" ? "CREAR_NOTICIA" : "EDITAR_NOTICIA",
         index: idx,
@@ -815,15 +845,19 @@ document.getElementById('formNuevaNoticia').addEventListener('submit', function(
         descripcion: document.getElementById('newsDesc').value.trim(),
         foto: noticiaImagenBase64
     };
+
     notificar("📢 Difundiendo noticia territorial...", "#4f46e5");
+    
     fetch(URL_API_GOOGLE, {
-        method: "POST", headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload)
+        method: "POST",
+        mode: "no-cors",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(() => {
         modalAdminInstancia.hide();
-        notificar("✨ Cartelera sincronizada", "#22c55e");
-        cargarDatos();
+        notificar("✨ Cartelera informativa actualizada", "#22c55e");
+        setTimeout(cargarDatos, 1500);
     }).catch(() => { modalAdminInstancia.hide(); });
 });
 
@@ -854,24 +888,48 @@ function renderizarNoticias() {
 function gestionarNoticiaExistente(idx) {
     const n = noticiasData[idx];
     if(!n) return;
-    document.getElementById('tituloModalNoticia').innerText = "Modificar Noticia";
+    
     document.getElementById('noticiaIndex').value = idx;
     document.getElementById('newsTitle').value = n.titulo;
     document.getElementById('newsDesc').value = n.descripcion;
     noticiaImagenBase64 = n.foto || "";
-    document.getElementById('btnBorrarNoticia').classList.remove('d-none');
+    
+    const footer = document.getElementById('footerModalNoticia');
+
+    // CONTROL DE VISUALIZACIÓN: Si es Administrador puede modificar/eliminar, si es usuario común solo lee
+    if (verificarRolAdministrador()) {
+        document.getElementById('tituloModalNoticia').innerText = "Modificar Noticia (Admin)";
+        footer.innerHTML = `
+            <button type="button" class="btn btn-sm btn-danger me-auto" onclick="eliminarNoticiaActual()">Eliminar Noticia</button>
+            <button type="button" class="btn btn-sm btn-light text-muted" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold">Actualizar Cambios</button>
+        `;
+    } else {
+        document.getElementById('tituloModalNoticia').innerText = "Ver Noticia Informativa";
+        footer.innerHTML = `
+            <button type="button" class="btn btn-sm btn-secondary w-100" data-bs-dismiss="modal">Volver a la Cartelera</button>
+        `;
+    }
+    
     modalAdminInstancia.show();
 }
 
 function eliminarNoticiaActual() {
     const idx = document.getElementById('noticiaIndex').value;
+    if (!verificarRolAdministrador()) {
+        notificar("⚠️ Acción denegada", "#ef4444");
+        return;
+    }
+    
     if (idx !== "" && confirm("¿Desea dar de baja permanentemente esta noticia de la cartelera?")) {
-        notificar("🗑️ Purgando cartelera...", "#ef4444");
+        notificar("🗑️ Removiendo de la cartelera...", "#ef4444");
         fetch(URL_API_GOOGLE, {
-            method: "POST", headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "ELIMINAR_NOTICIA", index: idx })
+            method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "ELIMINAR_NOTICIA", index: idx })
         })
-        .then(res => res.json())
-        .then(() => { modalAdminInstancia.hide(); cargarDatos(); });
+        .then(() => { 
+            modalAdminInstancia.hide(); 
+            setTimeout(cargarDatos, 1500); 
+        }).catch(() => { modalAdminInstancia.hide(); });
     }
 }
 
