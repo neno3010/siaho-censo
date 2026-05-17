@@ -686,11 +686,35 @@ function exportarFichaA_PDF() {
 function exportarFichaA_Imagen() {
     const elemento = document.getElementById('areaDescargaFicha');
     const ci = document.getElementById('f-cedula').innerText;
-    html2canvas(elemento, { useCORS: true, scale: 2 }).then(canvas => {
-        const enlace = document.createElement('a');
-        enlace.download = `Ficha_Cultor_${ci}.png`;
-        enlace.href = canvas.toDataURL('image/png');
-        enlace.click();
+    
+    notificar("📷 Generando imagen de la ficha...", "#0284c7");
+
+    // Forzar que html2canvas use configuraciones de renderizado limpio
+    html2canvas(elemento, {
+        useCORS: true,          // Permite cargar imágenes externas de Google
+        allowTaint: true,       // Permite capturar imágenes cross-origin
+        scale: 3,               // Aumenta la resolución para que se vea nítida en el teléfono
+        logging: false,         // Desactiva logs innecesarios
+        backgroundColor: "#ffffff" // Evita fondos transparentes erróneos
+    }).then(canvas => {
+        try {
+            const enlace = document.createElement('a');
+            enlace.download = `Ficha_Cultor_${ci}.png`;
+            enlace.href = canvas.toDataURL('image/png');
+            
+            // Simular clic compatible con navegadores móviles en PWA
+            document.body.appendChild(enlace);
+            enlace.click();
+            document.body.removeChild(enlace);
+            
+            notificar("✅ Imagen guardada en descargas", "#22c55e");
+        } catch (error) {
+            console.error("Error al exportar imagen:", error);
+            notificar("❌ Error de seguridad al guardar imagen móvil", "#ef4444");
+        }
+    }).catch(err => {
+        console.error("Error en html2canvas:", err);
+        notificar("❌ No se pudo procesar el lienzo de la imagen", "#ef4444");
     });
 }
 
