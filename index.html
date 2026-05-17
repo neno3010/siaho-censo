@@ -363,7 +363,7 @@
 // =========================================================================
 // VARIABLES GLOBALES Y CONFIGURACIÓN CRÍTICA (DECLARADAS UNA SOLA VEZ)
 // =========================================================================
-const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbwsG6oVj93VOmTPCihiWVdX9Hdi077HcGoERthJ2xhOl3ROaJ3qTvdhrmDrPjNEip-tjA/exec";
+const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbzeT2gtFTSg-00CkvvfuLXBU8gAJPaOLF5_ZjTZxRaN9Ser9ZPevaIF1IEXRirYv10snw/exec";
 let todosLosDatos = [];
 let imagenGlobalBase64 = ""; 
 let modalInstancia = null;
@@ -568,7 +568,11 @@ function inicializarAplicacionCompleta() {
 // PIPELINE DE SINCRONIZACIÓN Y RENDERIZADO DE DATOS (NUBE DE GOOGLE)
 // =========================================================================
 function cargarDatos() {
-    fetch(URL_API_GOOGLE)
+    // Obtener el usuario activo actualmente
+    const usuarioActivo = localStorage.getItem("siaho_sesion_activa") || "";
+    
+    // Agregamos ?usuario=correo@correo.com al final de la URL
+    fetch(`${URL_API_GOOGLE}?usuario=${encodeURIComponent(usuarioActivo)}`)
         .then(res => res.json())
         .then(data => {
             if (data && data.records) {
@@ -587,17 +591,8 @@ function cargarDatos() {
         })
         .catch(err => {
             console.error("Error en sincronización en la nube:", err);
-            const listaMovil = document.getElementById('listaMovil');
-            if (listaMovil && listaMovil.innerHTML.includes('fa-spinner')) {
-                listaMovil.innerHTML = `
-                    <div class="text-center py-5 text-muted">
-                        <i class="fa-solid fa-cloud-sun fa-2x mb-2 text-warning"></i>
-                        <p class="small mb-0">Modo local activo temporalmente de forma segura.</p>
-                    </div>`;
-            }
         });
 }
-
 function renderizarListado(datos) {
     const listaMovil = document.getElementById('listaMovil');
     if (!listaMovil) return;
@@ -870,6 +865,7 @@ function abrirParaEditar(cultor) {
 function procesarEnvioCenso(e) {
     e.preventDefault();
     const action = document.getElementById('action_type').value;
+    const usuarioActivo = localStorage.getItem("siaho_sesion_activa") || "";
     
     const payload = {
         scope: "CENSO",
@@ -888,7 +884,8 @@ function procesarEnvioCenso(e) {
         enfermedadesquetrata: document.getElementById('enfermedadesquetrata').value.trim(),
         plantasoproductosqueusa: document.getElementById('plantasoproductosqueusa').value.trim(),
         observaciones: document.getElementById('observaciones').value.trim(),
-        foto: imagenGlobalBase64
+        foto: imagenGlobalBase64,
+        registradoPor: usuarioActivo // <-- Enviamos quién está guardando el censo
     };
     
     notificar("🚀 Transmitiendo datos a la nube...", "#0284c7");
@@ -909,7 +906,6 @@ function procesarEnvioCenso(e) {
         cargarDatos();
     });
 }
-
 // =========================================================================
 // ACCIÓN DE ELIMINAR CULTORE ACTUAL
 // =========================================================================
