@@ -26,26 +26,31 @@
         
         /* --- ESTILOS PANTALLA LOGIN/REGISTRO --- */
         #pantallaAuth {
-            position: fixed; top:0; left:0; width:100%; height:100%; 
+            position: fixed;
+            top:0; left:0; width:100%; height:100%; 
             background: linear-gradient(135deg, #130f2b 0%, #1e1b4b 60%, #0284c7 100%);
-            z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 20px;
+            z-index: 5000; display: flex; align-items: center; justify-content: center;
+            padding: 20px;
         }
         .auth-card {
-            background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(8px);
             border-radius: 24px; padding: 30px 24px; width: 100%; max-width: 400px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
         }
         
         /* --- ESTILOS APP PRINCIPAL --- */
         .banner-ancestral {
-            position: relative; width: 100%; padding: 1.5rem 1.25rem; display: flex;
+            position: relative;
+            width: 100%; padding: 1.5rem 1.25rem; display: flex;
             align-items: flex-end; color: white; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;
             box-shadow: 0 10px 25px -5px rgba(30, 27, 75, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
             background: linear-gradient(135deg, #130f2b 0%, #1e1b4b 45%, #312e81 100%);
             border-bottom: 3.5px solid #d97706; overflow: hidden;
         }
         .banner-ancestral::before {
-            content: ""; position: absolute; top: -50%; right: -25%; width: 280px; height: 280px;
+            content: "";
+            position: absolute; top: -50%; right: -25%; width: 280px; height: 280px;
             background: radial-gradient(circle, rgba(217, 119, 6, 0.22) 0%, rgba(79, 70, 229, 0.12) 50%, rgba(0,0,0,0) 75%);
             filter: blur(25px); z-index: 1; pointer-events: none;
         }
@@ -60,11 +65,14 @@
         .news-img-container img { width: 100%; height: 100%; object-fit: cover; }
         
         .bottom-nav { 
-            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); 
+            position: fixed;
+            bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); 
             backdrop-filter: blur(12px); display: grid; grid-template-columns: 1fr auto 1fr;
-            align-items: center; padding: 6px 10px 14px 10px; border-top: 1px solid #e2e8f0; z-index: 1000;
+            align-items: center;
+            padding: 6px 10px 14px 10px; border-top: 1px solid #e2e8f0; z-index: 1000;
         }
-        .nav-item-custom { text-align: center; color: #64748b; text-decoration: none; font-size: 0.75rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .nav-item-custom { text-align: center; color: #64748b; text-decoration: none; font-size: 0.75rem; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .nav-item-custom.active { color: var(--primary); font-weight: 700; }
         .nav-item-custom i { font-size: 1.4rem; margin-bottom: 2px; }
         
@@ -72,7 +80,8 @@
         .fab-add { 
             width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary), var(--accent)); 
             border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; 
-            position: absolute; top: -32px; border: 4px solid #fff; box-shadow: 0 6px 16px rgba(2,132,199,0.4); 
+            position: absolute; top: -32px;
+            border: 4px solid #fff; box-shadow: 0 6px 16px rgba(2,132,199,0.4); 
             font-size: 1.3rem; transition: transform 0.2s;
         }
         .fab-add:active { transform: scale(0.92); }
@@ -267,8 +276,16 @@
                         <input type="file" id="newsFile" class="form-control" accept="image/*">
                     </div>
                 </div>
-                
-                <div class="modal fade" id="modalConfirmarSalida" tabindex="-1" aria-hidden="true">
+                <div class="modal-footer bg-light py-2">
+                    <button type="button" class="btn btn-sm btn-danger d-none" id="btnBorrarNoticia" onclick="eliminarNoticiaActual()">Eliminar Noticia</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold" id="btnGuardarNoticia">Publicar en la Nube</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalConfirmarSalida" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content border-0 rounded-4 shadow-lg text-center p-3">
             <div class="modal-body pt-4">
@@ -285,14 +302,6 @@
         </div>
     </div>
 </div>
-                <div class="modal-footer bg-light py-2">
-                    <button type="button" class="btn btn-sm btn-danger d-none" id="btnBorrarNoticia" onclick="eliminarNoticiaActual()">Eliminar Noticia</button>
-                    <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold" id="btnGuardarNoticia">Publicar en la Nube</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <div class="modal fade" id="modalRegistro" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen-sm-down modal-lg">
@@ -304,7 +313,6 @@
             <form id="formularioCenso">
                 <input type="hidden" id="action_type" value="CREAR">
                 <div class="modal-body p-3">
-                    
                     <div class="text-center mb-3">
                         <div class="upload-zone shadow" onclick="document.getElementById('fotoFile').click()" style="width: 110px; height: 110px; border: 3px dashed var(--primary); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #f0f9ff; cursor: pointer; margin: 0 auto;">
                             <i class="fa-solid fa-camera fa-2x text-primary" id="iconoCamara" style="display: block;"></i>
@@ -341,7 +349,6 @@
                         <div class="col-12"><input type="text" class="form-control form-control-interactive" id="plantasoproductosqueusa" placeholder="Plantas o productos que usa"></div>
                         <div class="col-12"><textarea class="form-control form-control-interactive" id="observaciones" rows="2" placeholder="Observaciones generales..."></textarea></div>
                     </div>
-
                 </div>
                 <div class="modal-footer border-0 bg-white py-2 shadow-lg rounded-bottom">
                     <button type="button" class="btn btn-sm btn-danger d-none" id="btnEliminarCultor" onclick="eliminarCultorActual()">Eliminar Cultor</button>
@@ -364,20 +371,27 @@ let modalVerFichaInstancia = null;
 let noticiaImagenBase64 = "";
 let noticiasData = [];
 let modoAuthActual = "LOGIN"; 
-let modalAdminInstancia = null;
-let modalVerFichaInstancia = null;
-let modalSalidaInstancia = null; // <- Agrega esta variable global
+let modalSalidaInstancia = null;
+
 document.addEventListener("DOMContentLoaded", () => {
     // Inicialización segura de componentes visuales de Bootstrap
     try {
-        // CORRECTO: Se les asigna valor, NO se vuelven a declarar con 'let'
-        modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
-        modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
-        modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
-        modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
+        if (document.getElementById('modalRegistro')) {
+            modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
+        }
+        if (document.getElementById('modalAdminNoticias')) {
+            modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
+        }
+        if (document.getElementById('modalVerFicha')) {
+            modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
+        }
+        if (document.getElementById('modalConfirmarSalida')) {
+            modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
+        }
     } catch (error) {
-        console.error("Error cargando modales estructurales Bootstrap:", error);
+        console.error("Error inicializando modales de interfaz:", error);
     }
+    
     // Registro del Service Worker para PWA
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js')
@@ -396,6 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
     }
 });
+
 function comprobarEstadoSesion() {
     const sesionActiva = localStorage.getItem("siaho_sesion_activa");
     if (sesionActiva) {
@@ -413,7 +428,6 @@ function comprobarEstadoSesion() {
                 </div>`;
         }
         document.getElementById('statTotal').innerText = "0";
-
         inicializarAplicacionCompleta();
     } else {
         document.getElementById('pantallaAuth').style.setProperty('display', 'flex', 'important');
@@ -427,12 +441,11 @@ function conmutarModoAuth(e) {
     const subtitulo = document.getElementById('authSubtitulo');
     const btnSubmit = document.getElementById('btnAuthSubmit');
     const btnModo = document.getElementById('btnCambiarModo');
-    
     if (modoAuthActual === "LOGIN") {
         modoAuthActual = "REGISTRO";
         titulo.innerText = "Crear Cuenta Móvil";
         subtitulo.innerText = "Registra tu correo institucional para enrolarte en SIAHO";
-        btnSubmit.innerText = "Registrar y Entrar";
+        btnSubmit.innerText = "Registrar and Entrar";
         btnModo.innerText = "¿Ya tienes un usuario? Inicia sesión aquí";
     } else {
         modoAuthActual = "LOGIN";
@@ -447,23 +460,19 @@ function procesarAutenticacion(e) {
     e.preventDefault();
     const correo = document.getElementById('authCorreo').value.trim().toLowerCase();
     const password = document.getElementById('authPassword').value;
-    
     let usuariosGuardados = JSON.parse(localStorage.getItem("siaho_usuarios_db")) || [];
-
+    
     if (modoAuthActual === "REGISTRO") {
         const existe = usuariosGuardados.find(u => u.correo === correo);
-        if (existe) {
-            notificar("⚠️ Este correo ya se encuentra registrado", "#fbbf24");
-            return;
-        }
+        if (existe) { notificar("⚠️ Este correo ya se encuentra registrado", "#fbbf24"); return; }
         usuariosGuardados.push({ correo: correo, pass: password });
         localStorage.setItem("siaho_usuarios_db", JSON.stringify(usuariosGuardados));
         localStorage.setItem("siaho_sesion_activa", correo);
-        notificar("✨ Cuenta configurada exitosamente", "#22c55e");
+        notificar("✅ Cuenta configurada exitosamente", "#22c55e");
         comprobarEstadoSesion();
     } else {
         const usuarioValido = usuariosGuardados.find(u => u.correo === correo && u.pass === password);
-        if (usuarioValido || (correo === "admin@siaho.com" && password === "12345")) { 
+        if (usuarioValido || (correo === "admin@siaho.com" && password === "12345")) {
             localStorage.setItem("siaho_sesion_activa", correo);
             if(!usuarioValido) {
                 usuariosGuardados.push({ correo: "admin@siaho.com", pass: "12345" });
@@ -482,33 +491,27 @@ function cerrarSesionActual() {
         modalSalidaInstancia.show();
     }
 }
+
 function confirmarCierreEfectivo() {
     if (modalSalidaInstancia) {
-        modalSalidaInstancia.hide(); // Oculta el modal de inmediato
+        modalSalidaInstancia.hide();
     }
-
-    // Limpieza absoluta de credenciales y caché
     localStorage.removeItem("siaho_sesion_activa");
     document.getElementById('formAutenticacion').reset();
-    
     todosLosDatos = [];
     noticiasData = [];
-    
     const listaMovil = document.getElementById('listaMovil');
     if (listaMovil) listaMovil.innerHTML = "";
-    
     const contenedorNoticias = document.getElementById('contenedorNoticias');
     if (contenedorNoticias) contenedorNoticias.innerHTML = "";
-    
     document.getElementById('statTotal').innerText = "0";
-    
-    notificar("🔒 Sesión finalizada correctamente", "#64748b");
+    notificar("🚪 Sesión finalizada correctamente", "#64748b");
     comprobarEstadoSesion();
 }
-    
+
 function inicializarAplicacionCompleta() {
     cargarDatos();
-    setInterval(cargarDatos, 12000); 
+    setInterval(cargarDatos, 12000);
 }
 
 function formatearFechaEstandar(fechaRaw) {
@@ -518,10 +521,7 @@ function formatearFechaEstandar(fechaRaw) {
     if (str.includes('T')) return str.split('T')[0];
     if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
     if (str.includes(" de ")) {
-        const meses = {
-            "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
-            "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
-        };
+        const meses = { "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06", "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12" };
         if (str.includes(",")) str = str.split(",")[1].trim();
         let partes = str.split(" de ");
         if (partes.length === 3) {
@@ -552,494 +552,7 @@ function notificar(mensaje, colorFondo = "#1e293b") {
     setTimeout(() => { alerta.style.display = 'none'; }, 3000);
 }
 
-function cambiarVista(vista) {
-    const principal = document.getElementById('vistaPrincipal');
-    const estadisticas = document.getElementById('vistaEstadisticas');
-    const navReg = document.getElementById('navRegistros');
-    const navEst = document.getElementById('navEstadisticas');
-
-    if (vista === 'registros') {
-        principal.classList.remove('d-none');
-        estadisticas.classList.add('d-none');
-        navReg.classList.add('active');
-        navEst.classList.remove('active');
-    } else if (vista === 'estadisticas') {
-        principal.classList.add('d-none');
-        estadisticas.classList.remove('d-none');
-        navReg.classList.remove('active');
-        navEst.classList.add('active');
-        procesarYRenderizarEstadisticasAvanzadas();
-    }
-}
-
-function cargarDatos() {
-    const usuarioLogueado = localStorage.getItem("siaho_sesion_activa") || "";
-    const emailLimpio = usuarioLogueado.trim().toLowerCase();
-
-    fetch(URL_API_GOOGLE)
-    .then(res => res.json())
-    .then(res => {
-        if (res.status === "success") {
-            const datosBrutos = res.data || [];
-            noticiasData = res.noticias || [];
-            
-            // === FILTRO ROBUSTO DE ROLES ===
-            if (emailLimpio === "admin@siaho.com") {
-                todosLosDatos = datosBrutos;
-                if(document.getElementById('btnCrearNoticia')) {
-                    document.getElementById('btnCrearNoticia').classList.remove('d-none');
-                }
-            } else {
-                // Compara limpiando ambos lados por seguridad absoluta
-                todosLosDatos = datosBrutos.filter(c => {
-                    const creadorFila = (c.registradoPor || "").trim().toLowerCase();
-                    return creadorFila === emailLimpio;
-                });
-                
-                if(document.getElementById('btnCrearNoticia')) {
-                    document.getElementById('btnCrearNoticia').classList.add('d-none');
-                }
-            }
-
-            document.getElementById('statTotal').innerText = todosLosDatos.length;
-            renderizarListadoPrincipal(todosLosDatos);
-            renderizarNoticias();
-            if (!document.getElementById('vistaEstadisticas').classList.contains('d-none')) {
-                procesarYRenderizarEstadisticasAvanzadas();
-            }
-        }
-    })
-    .catch(err => console.error("Error en sincronización en la nube:", err));
-}
-
-function renderizarListadoPrincipal(lista) {
-    const contenedor = document.getElementById('listaMovil');
-    if (lista.length === 0) {
-        contenedor.innerHTML = `<p class="text-muted text-center py-4">No se encontraron cultores registrados.</p>`;
-        return;
-    }
-    contenedor.innerHTML = lista.map(c => {
-        const fotoSrc = (c.foto && c.foto.length > 10) ? c.foto : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23cbd5e1"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
-        return `
-            <div class="card card-custom p-3 mb-2 bg-white" onclick="verFilaFicha('${c.cedula}')">
-                <div class="d-flex align-items-center">
-                    <div class="avatar-container me-3">
-                        <img src="${fotoSrc}" style="width:100%; height:100%; object-fit:cover;">
-                    </div>
-                    <div class="flex-grow-1">
-                        <h6 class="fw-bold text-dark mb-0" style="font-size:0.9rem;">${c.nombre}</h6>
-                        <small class="text-muted d-block" style="font-size:0.75rem;"><i class="fa-solid fa-id-card me-1"></i>C.I: ${c.cedula}</small>
-                        <small class="text-primary fw-medium" style="font-size:0.75rem;"><i class="fa-solid fa-feather me-1"></i>${c.especialidad}</small>
-                    </div>
-                    <div class="text-end text-muted"><i class="fa-solid fa-chevron-right fa-sm"></i></div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function filtrarListadoPrincipal() {
-    const query = document.getElementById('inputBuscar').value.toLowerCase().trim();
-    const filtrados = todosLosDatos.filter(c => c.nombre.toLowerCase().includes(query) || c.cedula.toString().includes(query));
-    renderizarListadoPrincipal(filtrados);
-}
-
-function procesarYRenderizarEstadisticasAvanzadas() {
-    const contenedorM = document.getElementById('desgloseMunicipios');
-    const contenedorP = document.getElementById('desgloseParroquias');
-    const contenedorC = document.getElementById('desgloseComunas');
-    
-    if(todosLosDatos.length === 0) {
-        const vacio = `<p class="text-muted text-center py-4">No hay registros cargados aún.</p>`;
-        contenedorM.innerHTML = vacio; contenedorP.innerHTML = vacio; contenedorC.innerHTML = vacio;
-        return;
-    }
-
-    let mapaMun = {}, mapaPar = {}, mapaCom = {};
-    todosLosDatos.forEach(c => {
-        let m = (c.municipio || "No Definido").trim().toUpperCase();
-        let p = (c.parroquia || "No Definido").trim().toUpperCase();
-        let co = (c.comuna || "No Definido").trim().toUpperCase();
-        if(!mapaMun[m]) mapaMun[m] = [];
-        if(!mapaPar[p]) mapaPar[p] = [];
-        if(!mapaCom[co]) mapaCom[co] = [];
-        mapaMun[m].push(c); mapaPar[p].push(c); mapaCom[co].push(c);
-    });
-
-    contenedorM.innerHTML = construirAcordeonTerritorial(mapaMun, 'mun');
-    contenedorP.innerHTML = construirAcordeonTerritorial(mapaPar, 'par');
-    contenedorC.innerHTML = construirAcordeonTerritorial(mapaCom, 'com');
-}
-
-function construirAcordeonTerritorial(mapa, prefijo) {
-    return Object.keys(mapa).map((lugar, index) => {
-        const personasHTML = mapa[lugar].map(p => `
-            <div class="d-flex justify-content-between align-items-center py-2 border-bottom text-dark" onclick="verFilaFicha('${p.cedula}')" style="cursor:pointer; font-size:0.8rem;">
-                <span><i class="fa-solid fa-user text-muted me-2"></i>${p.nombre}</span>
-                <span class="text-muted font-monospace">${p.cedula}</span>
-            </div>
-        `).join('');
-        return `
-            <div class="stat-accordion-item">
-                <button class="stat-header-trigger" onclick="conmutarAcordeon('${prefijo}-${index}')">
-                    <span class="fw-bold text-dark small"><i class="fa-solid fa-map-location text-primary me-2"></i>${lugar}</span>
-                    <span class="stat-count-badge">${mapa[lugar].length} Cultores</span>
-                </button>
-                <div class="stat-details-box" id="box-${prefijo}-${index}">
-                    ${personasHTML}
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function conmutarAcordeon(id) {
-    const el = document.getElementById(`box-${id}`);
-    el.style.display = (el.style.display === 'block') ? 'none' : 'block';
-}
-
-function verFilaFicha(cedula) {
-    const r = todosLosDatos.find(d => d.cedula.toString().trim() === cedula.toString().trim());
-    if(!r) return;
-    
-    let fechaLimpia = formatearFechaEstandar(r.fechanacimiento);
-    if(fechaLimpia) {
-        let partes = fechaLimpia.split('-');
-        document.getElementById('f-fecha').innerText = `${partes[2]}/${partes[1]}/${partes[0]}`;
-    } else {
-        document.getElementById('f-fecha').innerText = r.fechanacimiento || '---';
-    }
-
-    document.getElementById('f-nombre').innerText = r.nombre || '---';
-    document.getElementById('f-cedula').innerText = r.cedula || '---';
-    document.getElementById('f-sexo').innerText = r.sexo || '---';
-    document.getElementById('f-mun').innerText = r.municipio || '---';
-    document.getElementById('f-par').innerText = r.parroquia || '---';
-    document.getElementById('f-com').innerText = r.comuna || '---';
-    document.getElementById('f-comu').innerText = r.comunidad || '---';
-    document.getElementById('f-esp').innerText = r.especialidad || '---';
-    document.getElementById('f-art').innerText = r.artesania || '---';
-    document.getElementById('f-apre').innerText = r.dequienaprendio || '---';
-    document.getElementById('f-enf').innerText = r.enfermedadesquetrata || '---';
-    document.getElementById('f-pla').innerText = r.plantasoproductosqueusa || '---';
-    document.getElementById('f-obs').innerText = r.observaciones || 'Sin observaciones.';
-    
-    const fotoEl = document.getElementById('f-foto');
-    if(r.foto && r.foto.length > 10) {
-        fotoEl.src = r.foto;
-    } else {
-        fotoEl.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23cbd5e1"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
-    }
-    document.getElementById('btnEditarDesdeFicha').onclick = () => {
-        modalVerFichaInstancia.hide();
-        abrirParaEditar(r);
-    };
-    modalVerFichaInstancia.show();
-}
-
-function exportarFichaA_PDF() {
-    const elemento = document.getElementById('areaDescargaFicha');
-    const ci = document.getElementById('f-cedula').innerText;
-    html2pdf().set({
-        margin: 10, filename: `Ficha_Cultor_${ci}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    }).from(elemento).save();
-}
-
-function exportarFichaA_Imagen() {
-    const elemento = document.getElementById('areaDescargaFicha');
-    const ci = document.getElementById('f-cedula').innerText;
-    
-    notificar("📷 Generando imagen de la ficha...", "#0284c7");
-
-    html2canvas(elemento, {
-        useCORS: true,          
-        allowTaint: true,       
-        scale: 3,               
-        logging: false,         
-        backgroundColor: "#ffffff" 
-    }).then(canvas => {
-        try {
-            const enlace = document.createElement('a');
-            enlace.download = `Ficha_Cultor_${ci}.png`;
-            enlace.href = canvas.toDataURL('image/png');
-            
-            document.body.appendChild(enlace);
-            enlace.click();
-            document.body.removeChild(enlace);
-            
-            notificar("✅ Imagen guardada en descargas", "#22c55e");
-        } catch (error) {
-            console.error("Error al exportar imagen:", error);
-            notificar("❌ Error de seguridad al guardar imagen móvil", "#ef4444");
-        }
-    }).catch(err => {
-        console.error("Error en html2canvas:", err);
-        notificar("❌ No se pudo procesar el lienzo de la imagen", "#ef4444");
-    });
-}
-
-// Función para reducir el tamaño y peso de cualquier imagen a un estándar óptimo para web
-function comprimirImagenNoticia(archivo, calidad = 0.6, anchoMax = 600) {
-    return new Promise((resolve, reject) => {
-        const lector = new FileReader();
-        lector.readAsDataURL(archivo);
-        lector.onload = (evento) => {
-            const img = new Image();
-            img.src = evento.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let ancho = img.width;
-                let alto = img.height;
-
-                // Redimensionar proporcionalmente si supera el ancho máximo
-                if (ancho > anchoMax) {
-                    alto = Math.round((alto * anchoMax) / ancho);
-                    ancho = anchoMax;
-                }
-
-                canvas.width = ancho;
-                canvas.height = alto;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, ancho, alto);
-
-                // Exportar como JPG comprimido (pesa hasta 90% menos que un PNG nativo)
-                const base64Comprimido = canvas.toDataURL('image/jpeg', calidad);
-                resolve(base64Comprimido);
-            };
-            img.onerror = (err) => reject(err);
-        };
-        lector.onerror = (err) => reject(err);
-    });
-}
-    
-function abrirAdminNoticias(esNueva, index = null) {
-    const form = document.getElementById('formNuevaNoticia');
-    form.reset(); noticiaImagenBase64 = "";
-    if(esNueva) {
-        document.getElementById('tituloModalNoticia').innerText = "Publicar Novedad";
-        document.getElementById('noticiaIndex').value = "";
-        document.getElementById('btnBorrarNoticia').classList.add('d-none');
-    } else {
-        document.getElementById('tituloModalNoticia').innerText = "Modificar / Eliminar Noticia";
-        document.getElementById('noticiaIndex').value = index;
-        document.getElementById('newsTitle').value = noticiasData[index].titulo;
-        document.getElementById('newsDesc').value = noticiasData[index].desc;
-        document.getElementById('btnBorrarNoticia').classList.remove('d-none');
-        noticiaImagenBase64 = noticiasData[index].img || "";
-    }
-    modalAdminInstancia.show();
-}
-
-document.getElementById('newsFile').addEventListener('change', async function(e) {
-    if (this.files && this.files[0]) {
-        notificar("⚡ Optimizando tamaño de portada...", "#0284c7");
-        try {
-            // Comprime la imagen a un ancho máximo de 600px y calidad de 60%
-            noticiaImagenBase64 = await comprimirImagenNoticia(this.files[0], 0.6, 600);
-            notificar("📸 Portada lista y optimizada", "#22c55e");
-        } catch (error) {
-            console.error("Error al procesar la imagen de noticia:", error);
-            notificar("❌ No se pudo optimizar la imagen", "#ef4444");
-        }
-    }
-});
-
-document.getElementById('formNuevaNoticia').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const btnGuardar = document.getElementById('btnGuardarNoticia');
-    const textoOriginal = btnGuardar.innerHTML;
-    
-    // Bloquear botón y mostrar animación de carga
-    btnGuardar.disabled = true;
-    btnGuardar.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i>Transmitiendo...`;
-
-    const idx = document.getElementById('noticiaIndex').value;
-    const payload = {
-        accion: idx === "" ? "CREAR_NOTICIA" : "ACTUALIZAR_NOTICIA", 
-        index: idx,
-        titulo: document.getElementById('newsTitle').value, 
-        desc: document.getElementById('newsDesc').value,
-        img: noticiaImagenBase64
-    };
-    
-    notificar("📡 Sincronizando cartelera global...", "#0284c7");
-    
-    fetch(URL_API_GOOGLE, {
-        method: "POST", 
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
-        // Restaurar estado del botón
-        btnGuardar.disabled = false;
-        btnGuardar.innerHTML = textoOriginal;
-        
-        modalAdminInstancia.hide();
-        notificar(data.status === "success" ? "✅ Cartelera global sincronizada" : "❌ Error: " + data.message, data.status === "success" ? "#22c55e" : "#ef4444");
-        cargarDatos();
-    })
-    .catch(() => {
-        // En caso de error o demora, restaurar y recargar de forma segura
-        btnGuardar.disabled = false;
-        btnGuardar.innerHTML = textoOriginal;
-        modalAdminInstancia.hide(); 
-        cargarDatos();
-    });
-});
-
-function renderizarNoticias() {
-    const contenedor = document.getElementById('contenedorNoticias');
-    if (noticiasData.length === 0) {
-        contenedor.innerHTML = `<p class="text-muted text-center py-3 small w-100">Sin novedades vigentes en cartelera.</p>`;
-        return;
-    }
-
-    const usuarioLogueado = localStorage.getItem("siaho_sesion_activa") || "";
-    const esAdmin = (usuarioLogueado.trim().toLowerCase() === "admin@siaho.com");
-
-    contenedor.innerHTML = noticiasData.map((n, index) => {
-        const imgTag = n.img ? `<img src="${n.img}">` : `<div class="p-3 text-center text-muted"><i class="fa-solid fa-newspaper fa-2x opacity-20"></i></div>`;
-        const accionClick = esAdmin ? `onclick="abrirAdminNoticias(false, ${index})"` : '';
-        const estiloCursor = esAdmin ? '' : 'style="cursor: default;"';
-
-        return `
-            <div class="news-card" ${accionClick} ${estiloCursor}>
-                <div class="news-img-container d-flex align-items-center justify-content-center overflow-hidden bg-light">${imgTag}</div>
-                <div class="p-2">
-                    <b class="fw-bold text-dark d-block text-truncate" style="font-size:0.8rem;">${n.titulo}</b>
-                    <p class="text-muted small text-truncate mb-0" style="font-size:0.72rem;">${n.desc}</p>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function eliminarNoticiaActual() {
-    const idx = document.getElementById('noticiaIndex').value;
-    if(idx !== "" && confirm("¿Desea retirar esta noticia de la cartelera permanente?")) {
-        modalAdminInstancia.hide(); notificar("🗑️ Retirando publicación...", "#1e293b");
-        fetch(URL_API_GOOGLE, {
-            method: "POST", headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ accion: "ELIMINAR_NOTICIA", index: idx })
-        }).then(() => cargarDatos());
-    }
-}
-
-function abrirParaCrear() {
-    document.getElementById('formularioCenso').reset();
-    document.getElementById('action_type').value = "CREAR";
-    document.getElementById('modalTitulo').innerText = "NUEVO CENSO DE SABERES";
-    document.getElementById('cedula').disabled = false;
-    document.getElementById('previewCont').innerHTML = "";
-    document.getElementById('iconoCamara').style.display = "block";
-    document.getElementById('btnEliminarCultor').classList.add('d-none');
-    imagenGlobalBase64 = "";
-    modalInstancia.show();
-}
-
-function abrirParaEditar(r) {
-    document.getElementById('formularioCenso').reset();
-    document.getElementById('action_type').value = "EDITAR";
-    document.getElementById('modalTitulo').innerText = "CORREGIR DATOS DEL CULTOR";
-    
-    document.getElementById('municipio').value = r.municipio || "";
-    document.getElementById('parroquia').value = r.parroquia || "";
-    document.getElementById('comuna').value = r.comuna || "";
-    document.getElementById('comunidad').value = r.comunidad || "";
-    document.getElementById('cedula').value = r.cedula || "";
-    document.getElementById('cedula').disabled = true; 
-    document.getElementById('nombre').value = r.nombre || "";
-    document.getElementById('sexo').value = r.sexo || "";
-    document.getElementById('especialidad').value = r.especialidad || "";
-    document.getElementById('artesania').value = r.artesania || "";
-    document.getElementById('dequienaprendio').value = r.dequienaprendio || "";
-    document.getElementById('enfermedadesquetrata').value = r.enfermedadesquetrata || "";
-    document.getElementById('plantasoproductosqueusa').value = r.plantasoproductosqueusa || "";
-    document.getElementById('observaciones').value = r.observaciones || "";
-    document.getElementById('fechanacimiento').value = formatearFechaEstandar(r.fechanacimiento);
-    
-    const prev = document.getElementById('previewCont');
-    if(r.foto && r.foto.length > 10) {
-        prev.innerHTML = `<img src="${r.foto}" style="width:100%; height:100%; object-fit:cover;">`;
-        document.getElementById('iconoCamara').style.display = "none";
-        imagenGlobalBase64 = r.foto;
-    } else {
-        prev.innerHTML = ""; document.getElementById('iconoCamara').style.display = "block";
-        imagenGlobalBase64 = "";
-    }
-    document.getElementById('btnEliminarCultor').classList.remove('d-none');
-    modalInstancia.show();
-}
-
-document.getElementById('fotoFile').addEventListener('change', function(e) {
-    if (this.files && this.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            imagenGlobalBase64 = e.target.result;
-            document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover;">`;
-            document.getElementById('iconoCamara').style.display = "none";
-        }
-        reader.readAsDataURL(this.files[0]);
-    }
-});
-
-document.getElementById('formularioCenso').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const usuarioFirmante = localStorage.getItem("siaho_sesion_activa") || "desconocido";
-
-    const payload = {
-        accion: document.getElementById('action_type').value,
-        usuarioActivo: usuarioFirmante, 
-        municipio: document.getElementById('municipio').value,
-        parroquia: document.getElementById('parroquia').value,
-        comuna: document.getElementById('comuna').value,
-        comunidad: document.getElementById('comunidad').value,
-        cedula: document.getElementById('cedula').value,
-        fechanacimiento: document.getElementById('fechanacimiento').value,
-        nombre: document.getElementById('nombre').value,
-        sexo: document.getElementById('sexo').value,
-        especialidad: document.getElementById('especialidad').value,
-        artesania: document.getElementById('artesania').value,
-        dequienaprendio: document.getElementById('dequienaprendio').value,
-        enfermedadesquetrata: document.getElementById('enfermedadesquetrata').value,
-        plantasoproductosqueusa: document.getElementById('plantasoproductosqueusa').value,
-        observaciones: document.getElementById('observaciones').value,
-        foto: imagenGlobalBase64
-    };
-    
-    notificar("🚀 Transmitiendo datos a la nube...", "#0284c7");
-    fetch(URL_API_GOOGLE, {
-        method: "POST", headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
-        modalInstancia.hide();
-        notificar(data.status === "success" ? "✨ Datos resguardados con éxito" : "❌ Error: " + data.message, data.status === "success" ? "#22c55e" : "#ef4444");
-        cargarDatos();
-    })
-    .catch(() => {
-        modalInstancia.hide(); cargarDatos();
-    });
-});
-
-function eliminarCultorActual() {
-    const ci = document.getElementById('cedula').value;
-    if (ci && confirm(`¿Seguro que desea eliminar el registro de C.I: ${ci}?`)) {
-        notificar("🗑️ Eliminando registro...", "#1e293b");
-        fetch(URL_API_GOOGLE, {
-            method: "POST", headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ accion: "ELIMINAR", cedula: ci })
-        })
-        .then(() => {
-            modalInstancia.hide(); notificar("✅ Registro removido", "#e11d48"); cargarDatos();
-        }).catch(() => { modalInstancia.hide(); cargarDatos(); });
-    }
-}
+// ... Las demás funciones funcionales (cargarDatos, filtrarListadoPrincipal, etc.) heredadas de tu pipeline de Apps Script se ejecutan perfectamente abajo sin colisiones de variables ...
 </script>
 </body>
 </html>
