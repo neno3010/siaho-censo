@@ -872,8 +872,13 @@ document.getElementById('fotoFile').addEventListener('change', function(e) {
 
 document.getElementById('formularioCenso').addEventListener('submit', function(e) {
     e.preventDefault();
+    
+    // Obtener el usuario en sesión actual para firmar el registro
+    const usuarioFirmante = localStorage.getItem("siaho_sesion_activa") || "desconocido";
+
     const payload = {
         accion: document.getElementById('action_type').value,
+        usuarioActivo: usuarioFirmante, // <-- NUEVO: Envía quién está haciendo la operación
         municipio: document.getElementById('municipio').value,
         parroquia: document.getElementById('parroquia').value,
         comuna: document.getElementById('comuna').value,
