@@ -809,24 +809,46 @@ document.getElementById('newsFile').addEventListener('change', async function(e)
 
 document.getElementById('formNuevaNoticia').addEventListener('submit', function(e) {
     e.preventDefault();
+    
+    const btnGuardar = document.getElementById('btnGuardarNoticia');
+    const textoOriginal = btnGuardar.innerHTML;
+    
+    // Bloquear botón y mostrar animación de carga
+    btnGuardar.disabled = true;
+    btnGuardar.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-2"></i>Transmitiendo...`;
+
     const idx = document.getElementById('noticiaIndex').value;
     const payload = {
-        accion: idx === "" ? "CREAR_NOTICIA" : "ACTUALIZAR_NOTICIA", index: idx,
-        titulo: document.getElementById('newsTitle').value, desc: document.getElementById('newsDesc').value,
+        accion: idx === "" ? "CREAR_NOTICIA" : "ACTUALIZAR_NOTICIA", 
+        index: idx,
+        titulo: document.getElementById('newsTitle').value, 
+        desc: document.getElementById('newsDesc').value,
         img: noticiaImagenBase64
     };
-    notificar("📡 Sincronizando cartelera...", "#0284c7");
+    
+    notificar("📡 Sincronizando cartelera global...", "#0284c7");
+    
     fetch(URL_API_GOOGLE, {
-        method: "POST", headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload)
+        method: "POST", 
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+        body: JSON.stringify(payload)
     })
     .then(res => res.json())
     .then(data => {
+        // Restaurar estado del botón
+        btnGuardar.disabled = false;
+        btnGuardar.innerHTML = textoOriginal;
+        
         modalAdminInstancia.hide();
         notificar(data.status === "success" ? "✅ Cartelera global sincronizada" : "❌ Error: " + data.message, data.status === "success" ? "#22c55e" : "#ef4444");
         cargarDatos();
     })
     .catch(() => {
-        modalAdminInstancia.hide(); cargarDatos();
+        // En caso de error o demora, restaurar y recargar de forma segura
+        btnGuardar.disabled = false;
+        btnGuardar.innerHTML = textoOriginal;
+        modalAdminInstancia.hide(); 
+        cargarDatos();
     });
 });
 
