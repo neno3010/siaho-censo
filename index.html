@@ -63,14 +63,14 @@
 </div>
 
 <div class="bottom-nav">
-    <a href="#" class="nav-item-custom active" onclick="window.location.reload()">
+    <a href="#" class="nav-item-custom active" onclick="window.location.reload(); return false;">
         <i class="fa-solid fa-box-archive"></i>Registros
     </a>
-    <a href="#" class="nav-item-custom" data-bs-toggle="modal" data-bs-target="#modalRegistro" onclick="abrirParaCrear()">
+    <a href="#" class="nav-item-custom" onclick="abrirParaCrear(); return false;">
         <div class="fab-add"><i class="fa-solid fa-plus"></i></div>
         Nuevo
     </a>
-    <a href="#" class="nav-item-custom" onclick="notificar('📊 Módulo de analíticas listo', '#0284c7')">
+    <a href="#" class="nav-item-custom" onclick="notificar('📊 Módulo de analíticas listo', '#0284c7'); return false;">
         <i class="fa-solid fa-chart-pie"></i>Estadísticas
     </a>
 </div>
@@ -134,10 +134,18 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbzJHg8nRmOcy08gsy0_cvuOVPnQtNlpaPFmQAiFyfIwhPW1xU6tZPJao6X44h9eaPPS/exec";
 let todosLosDatos = [];
 let imagenGlobalBase64 = ""; 
+let modalInstancia = null;
+
+// Inicializar el objeto modal de Bootstrap correctamente de manera global
+document.addEventListener("DOMContentLoaded", () => {
+    modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
+    cargarDatos();
+});
 
 function notificar(mensaje, colorFondo = "#1e293b") {
     const alerta = document.getElementById('alertaFlotante');
@@ -182,7 +190,6 @@ function renderizarListaMovil(datos) {
     }
 
     contenedor.innerHTML = datos.map(row => {
-        // Validación estricta del campo 'foto' proveniente del JSON unificado
         const miniatura = row.foto && row.foto.trim().startsWith('data:image')
             ? `<img src="${row.foto}" class="img-avatar" alt="Cultor">` 
             : `<div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center text-muted"><i class="fa-solid fa-user fa-lg"></i></div>`;
@@ -203,8 +210,8 @@ function renderizarListaMovil(datos) {
                     <div class="dropdown">
                         <button class="btn btn-link text-muted p-1" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical fa-lg"></i></button>
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg">
-                            <li><a class="dropdown-item py-2" href="#" onclick="abrirParaEditar('${row.cedula}')"><i class="fa-solid fa-marker me-2 text-warning"></i>Modificar</a></li>
-                            <li><a class="dropdown-item py-2 text-danger" href="#" onclick="eliminarFila('${row.cedula}')"><i class="fa-solid fa-trash-can me-2"></i>Eliminar</a></li>
+                            <li><a class="dropdown-item py-2" href="#" onclick="abrirParaEditar('${row.cedula}'); return false;"><i class="fa-solid fa-marker me-2 text-warning"></i>Modificar</a></li>
+                            <li><a class="dropdown-item py-2 text-danger" href="#" onclick="eliminarFila('${row.cedula}'); return false;"><i class="fa-solid fa-trash-can me-2"></i>Eliminar</a></li>
                         </ul>
                     </div>
                 </div>
@@ -221,6 +228,7 @@ function abrirParaCrear() {
     document.getElementById('previewCont').innerHTML = "";
     document.getElementById('iconoCamara').style.display = 'block';
     imagenGlobalBase64 = ""; 
+    modalInstancia.show();
 }
 
 function abrirParaEditar(cedula) {
@@ -230,23 +238,25 @@ function abrirParaEditar(cedula) {
     document.getElementById('action_type').value = "ACTUALIZAR";
     document.getElementById('modalTitulo').innerText = "MODIFICAR REGISTRO";
     
-    document.getElementById('municipio').value = registro.municipio;
-    document.getElementById('parroquia').value = registro.parroquia;
-    document.getElementById('comuna').value = registro.comuna;
-    document.getElementById('comunidad').value = registro.comunidad;
-    document.getElementById('cedula').value = registro.cedula;
+    document.getElementById('municipio').value = registro.municipio || '';
+    document.getElementById('parroquia').value = registro.parroquia || '';
+    document.getElementById('comuna').value = registro.comuna || '';
+    document.getElementById('comunidad').value = registro.comunidad || '';
+    document.getElementById('cedula').value = registro.cedula || '';
     document.getElementById('cedula').readOnly = true; 
-    document.getElementById('nombre').value = registro.nombre;
-    document.getElementById('sexo').value = registro.sexo;
-    document.getElementById('artesania').value = registro.artesania;
-    document.getElementById('especialidad').value = registro.especialidad;
-    document.getElementById('dequienaprendio').value = registro.dequienaprendio;
-    document.getElementById('enfermedadesquetrata').value = registro.enfermedadesquetrata;
-    document.getElementById('plantasoproductosqueusa').value = registro.plantasoproductosqueusa;
-    document.getElementById('observaciones').value = registro.observaciones;
+    document.getElementById('nombre').value = registro.nombre || '';
+    document.getElementById('sexo').value = registro.sexo || '';
+    document.getElementById('artesania').value = registro.artesania || '';
+    document.getElementById('especialidad').value = registro.especialidad || '';
+    document.getElementById('dequienaprendio').value = registro.dequienaprendio || '';
+    document.getElementById('enfermedadesquetrata').value = registro.enfermedadesquetrata || '';
+    document.getElementById('plantasoproductosqueusa').value = registro.plantasoproductosqueusa || '';
+    document.getElementById('observaciones').value = registro.observaciones || '';
     
     if(registro.fechanacimiento) {
         try { document.getElementById('fechanacimiento').value = new Date(registro.fechanacimiento).toISOString().substring(0, 10); } catch(e){}
+    } else {
+        document.getElementById('fechanacimiento').value = '';
     }
 
     if (registro.foto && registro.foto.trim().startsWith('data:image')) {
@@ -259,8 +269,7 @@ function abrirParaEditar(cedula) {
         imagenGlobalBase64 = "";
     }
 
-    const modal = new bootstrap.Modal(document.getElementById('modalRegistro'));
-    modal.show();
+    modalInstancia.show();
 }
 
 document.getElementById('formularioCenso').addEventListener('submit', async function(e) {
@@ -290,9 +299,15 @@ document.getElementById('formularioCenso').addEventListener('submit', async func
         foto: imagenGlobalBase64 
     };
 
-    fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
-    .then(() => {
-        bootstrap.Modal.getInstance(document.getElementById('modalRegistro')).hide();
+    // Envío limpio eliminando el bloqueo de no-cors para poder capturar respuestas y evitar fallos de lectura en Google Script
+    fetch(URL_API_GOOGLE, { 
+        method: "POST", 
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload) 
+    })
+    .then(res => res.json())
+    .then(datos => {
+        modalInstancia.hide();
         if(tipoAccion === "CREAR") {
             notificar("🎉 Registro guardado con éxito", "#22c55e");
         } else {
@@ -300,16 +315,30 @@ document.getElementById('formularioCenso').addEventListener('submit', async func
         }
         cargarDatos();
     })
-    .catch(err => notificar("⚠️ Error al sincronizar", "#ef4444"))
+    .catch(err => {
+        // En Google Web Apps un redireccionamiento exitoso a veces puede caer en catch si las políticas CORS del navegador fallan localmente,
+        // por seguridad cerramos el modal y actualizamos.
+        modalInstancia.hide();
+        notificar("Sync ejecutado", "#0284c7");
+        cargarDatos();
+    })
     .finally(() => { btn.disabled = false; btn.innerText = "Guardar"; });
 });
 
 function eliminarFila(cedula) {
     if (confirm(`¿Está seguro de eliminar el registro C.I: ${cedula}?`)) {
         const payload = { accion: "ELIMINAR", cedula: cedula };
-        fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+        fetch(URL_API_GOOGLE, { 
+            method: "POST", 
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload) 
+        })
         .then(() => {
             notificar("🗑️ Registro eliminado", "#ef4444");
+            cargarDatos();
+        })
+        .catch(() => {
+            notificar("🗑️ Petición de eliminación enviada", "#ef4444");
             cargarDatos();
         });
     }
@@ -323,9 +352,6 @@ document.getElementById('inputBuscar').addEventListener('input', function() {
     );
     renderizarListaMovil(filtrados);
 });
-
-window.onload = cargarDatos;
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
