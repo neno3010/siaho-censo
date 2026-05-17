@@ -400,26 +400,34 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function comprobarEstadoSesion() {
-    const sesionActiva = localStorage.getItem("siaho_sesion_activa");
-    if (sesionActiva) {
-        document.getElementById('pantallaAuth').style.setProperty('display', 'none', 'important');
-        document.getElementById('appContenido').style.display = 'block';
+    try {
+        // Tolerancia a fallos: intenta leer localStorage, si falla usa sessionStorage o variable temporal
+        const sesionActiva = localStorage.getItem("siaho_sesion_activa") || sessionStorage.getItem("siaho_sesion_activa");
         
-        todosLosDatos = [];
-        const listaMovil = document.getElementById('listaMovil');
-        if (listaMovil) {
-            listaMovil.innerHTML = `
-                <div class="text-center py-5 text-muted">
-                    <i class="fa-solid fa-spinner fa-spin fa-2x text-primary mb-2"></i>
-                    <p class="small mb-0">Autenticando canal seguro y cargando tus registros...</p>
-                </div>`;
-        }
-        document.getElementById('statTotal').innerText = "0";
+        if (sesionActiva) {
+            document.getElementById('pantallaAuth').style.setProperty('display', 'none', 'important');
+            document.getElementById('appContenido').style.display = 'block';
+            
+            todosLosDatos = [];
+            const listaMovil = document.getElementById('listaMovil');
+            if (listaMovil) {
+                listaMovil.innerHTML = `
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+                        <p class="small mb-0">Autenticando canal seguro y cargando tus registros...</p>
+                    </div>`;
+            }
+            document.getElementById('statTotal').innerText = "0";
 
-        inicializarAplicacionCompleta();
-    } else {
+            inicializarAplicacionCompleta();
+        } else {
+            document.getElementById('pantallaAuth').style.setProperty('display', 'flex', 'important');
+            document.getElementById('appContenido').style.style.setProperty('display', 'none', 'important');
+        }
+    } catch (e) {
+        console.error("Error leyendo almacenamiento, aplicando fallback temporal:", e);
+        // Fallback para teléfonos con almacenamiento privado estricto
         document.getElementById('pantallaAuth').style.setProperty('display', 'flex', 'important');
-        document.getElementById('appContenido').style.display = 'none';
     }
 }
 
@@ -446,39 +454,73 @@ function conmutarModoAuth(e) {
 }
 
 function procesarAutenticacion(e) {
-    e.preventDefault();
-    const correo = document.getElementById('authCorreo').value.trim().toLowerCase();
-    const password = document.getElementById('authPassword').value;
+    if (e) e.preventDefault(); // Detiene el comportamiento nativo que congela el teléfono
     
-    let usuariosGuardados = JSON.parse(localStorage.getItem("siaho_usuarios_db")) || [];
-
-    if (modoAuthActual === "REGISTRO") {
-        const existe = usuariosGuardados.find(u => u.correo === correo);
-        if (existe) {
-            notificar("⚠️ Este correo ya se encuentra registrado", "#fbbf24");
-            return;
-        }
-        usuariosGuardados.push({ correo: correo, pass: password });
-        localStorage.setItem("siaho_usuarios_db", JSON.stringify(usuariosGuardados));
-        localStorage.setItem("siaho_sesion_activa", correo);
-        notificar("✨ Cuenta configurada exitosamente", "#22c55e");
-        comprobarEstadoSesion();
-    } else {
-        const usuarioValido = usuariosGuardados.find(u => u.correo === correo && u.pass === password);
-        if (usuarioValido || (correo === "admin@siaho.com" && password === "12345")) { 
-            localStorage.setItem("siaho_sesion_activa", correo);
-            if(!usuarioValido) {
-                usuariosGuardados.push({ correo: "admin@siaho.com", pass: "12345" });
-                localStorage.setItem("siaho_usuarios_db", JSON.stringify(usuariosGuardados));
-            }
-            notificar("🔒 Acceso autorizado", "#22c55e");
-            comprobarEstadoSesion();
-        } else {
-            notificar("❌ Credenciales incorrectas o usuario inexistente", "#ef4444");
-        }
+    const correoInput = document.getElementById('authCorreo');
+    const passInput = document.getElementById('authPassword');
+    
+    if (!correoInput || !passInput) return false;
+    
+    const correo = correoInput.value.trim().toLowerCase();
+    const password = passInput.value;
+    
+    if (!correo || !password) {
+        notificar("⚠️ Por favor, rellene todos los campos", "#fbbf24");
+        return false;
     }
-}
 
+    try {
+        let usuariosGuardados = [];
+        try {
+            usuariosGuardados = JSON.parse(localStorage.getItem("siaho_usuarios_db")) || [];
+        } catch (err) {
+            usuariosGuardados = [];
+        }
+
+        if (modoAuthActual === "REGISTRO") {
+            const existe = usuariosGuardados.find(u => u.correo === correo);
+            if (existe) {
+                notificar("⚠️ Este correo ya se encuentra registrado", "#fbbf24");
+                return false;
+            }
+            usuariosGuardados.push({ correo: correo, pass: password });
+            
+            try {
+                localStorage.setItem("siaho_usuarios_db", JSON.stringify(usuariosGuardados));
+                localStorage.setItem("siaho_sesion_activa", correo);
+            } catch (storageError) {
+                // Si el espacio del almacenamiento del teléfono está lleno, guardamos en la sesión actual
+                sessionStorage.setItem("siaho_sesion_activa", correo);
+            }
+            
+            notificar("✨ Cuenta configurada exitosamente", "#22c55e");
+            setTimeout(() => { comprobarEstadoSesion(); }, 400);
+        } else {
+            const usuarioValido = usuariosGuardados.find(u => u.correo === correo && u.pass === password);
+            if (usuarioValido || (correo === "admin@siaho.com" && password === "12345")) { 
+                
+                try {
+                    localStorage.setItem("siaho_sesion_activa", correo);
+                    if(!usuarioValido && correo === "admin@siaho.com") {
+                        usuariosGuardados.push({ correo: "admin@siaho.com", pass: "12345" });
+                        localStorage.setItem("siaho_usuarios_db", JSON.stringify(usuariosGuardados));
+                    }
+                } catch (storageError) {
+                    sessionStorage.setItem("siaho_sesion_activa", correo);
+                }
+                
+                notificar("🔒 Acceso autorizado", "#22c55e");
+                setTimeout(() => { comprobarEstadoSesion(); }, 400);
+            } else {
+                notificar("❌ Credenciales incorrectas", "#ef4444");
+            }
+        }
+    } catch (globalAuthError) {
+        console.error("Fallo general en login:", globalAuthError);
+        notificar("❌ Error interno de procesamiento", "#ef4444");
+    }
+    return false;
+}
 function cerrarSesionActual() {
     if (modalSalidaInstancia) {
         modalSalidaInstancia.show();
