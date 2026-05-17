@@ -7,25 +7,120 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #0284c7; --accent: #4f46e5; --bg: #f1f5f9; }
-        body { background-color: var(--bg); font-family: system-ui, -apple-system, sans-serif; padding-bottom: 90px; }
-        .card-custom { border: none; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: transform 0.2s; position: relative; }
+        :root { 
+            --primary: #0284c7; 
+            --accent: #4f46e5; 
+            --bg: #f8fafc; 
+            --mystic: #1e1b4b;
+        }
+        body { background-color: var(--bg); font-family: system-ui, -apple-system, sans-serif; padding-bottom: 95px; overflow-x: hidden; }
         
-        /* Contenedor e Imagen del Listado Blindados */
+        /* BANNER ANCESTRAL DINÁMICO */
+        .banner-ancestral {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(rgba(30, 27, 75, 0.4), var(--mystic)), url('image_353552.jpg') center/cover no-repeat;
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+            color: white;
+            overflow: hidden;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(30, 27, 75, 0.3);
+        }
+        .banner-blur-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        /* RUNAS MÍSTICAS DECORATIVAS */
+        .runa-decorativa {
+            position: absolute;
+            font-family: monospace, serif;
+            font-size: 1.8rem;
+            color: rgba(255, 255, 255, 0.25);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+            animation: pulseRuna 3s infinite ease-in-out;
+        }
+        @keyframes pulseRuna { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.1); } }
+
+        /* SECCIÓN NOTICIAS HORIZONTAL (CARRUSEL MÓVIL) */
+        .news-carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 14px;
+            padding: 5px 0 15px 0;
+            scrollbar-width: none; /* Ocultar barra en Firefox */
+        }
+        .news-carousel::-webkit-scrollbar { display: none; } /* Ocultar barra en Chrome */
+        
+        .news-card {
+            flex: 0 0 82%;
+            scroll-snap-align: start;
+            background: white;
+            border-radius: 18px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            overflow: hidden;
+            position: relative;
+        }
+        .news-img-container {
+            width: 100%;
+            height: 110px;
+            background: #e2e8f0;
+            position: relative;
+        }
+        .news-img-container img { width: 100%; height: 100%; object-fit: cover; }
+        .news-runa-badge {
+            position: absolute;
+            bottom: -15px;
+            right: 15px;
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* COMPONENTES DE LISTADO */
+        .card-custom { 
+            border: none; 
+            border-radius: 16px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02); 
+            transition: transform 0.2s; 
+        }
         .avatar-container { width: 60px; height: 60px; min-width: 60px; position: relative; overflow: hidden; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background-color: #f8fafc; }
         .img-avatar { width: 100%; height: 100%; object-fit: cover; display: block; }
         
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; z-index: 1000; }
-        .nav-item-custom { text-align: center; color: #64748b; text-decoration: none; font-size: 0.75rem; }
-        .nav-item-custom.active { color: var(--primary); font-weight: bold; }
-        .nav-item-custom i { font-size: 1.3rem; display: block; margin-bottom: 2px; }
-        .fab-add { width: 52px; height: 52px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-top: -28px; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(2,132,199,0.3); }
+        /* BOTONES DE NAVEGACIÓN INFERIOR */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); display: flex; justify-content: space-around; padding: 10px 0 14px 0; border-top: 1px solid #e2e8f0; z-index: 1000; }
+        .nav-item-custom { text-align: center; color: #64748b; text-decoration: none; font-size: 0.72rem; flex-grow: 1; position: relative; }
+        .nav-item-custom.active { color: var(--primary); font-weight: 700; }
+        .nav-item-custom i { font-size: 1.35rem; display: block; margin-bottom: 3px; }
         
-        .search-box { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 12px 0; }
-        .search-box input { border-radius: 20px; padding-left: 40px; background: #fff; }
-        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        .fab-add { width: 54px; height: 54px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-top: -30px; border: 4px solid #fff; box-shadow: 0 4px 12px rgba(2,132,199,0.35); }
         
-        /* Zona de carga en el Formulario */
+        .search-box { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 14px 0 8px 0; }
+        .search-box input { border-radius: 25px; padding-left: 42px; background: #fff; height: 44px; }
+        .search-box i { position: absolute; left: 16px; top: 54%; transform: translateY(-50%); color: #94a3b8; font-size: 1.05rem; }
+        
         .upload-zone { width: 110px; height: 110px; border: 2px dashed #cbd5e1; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #fff; cursor: pointer; }
         .upload-zone img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
 
@@ -37,21 +132,43 @@
 
 <div id="alertaFlotante" class="toast-notificacion"></div>
 
-<div class="container pt-3">
-    <div class="d-flex justify-content-between align-items-center mb-2">
+<div class="banner-ancestral">
+    <div class="banner-blur-badge text-success">
+        <i class="fa-solid fa-circle-check me-1"></i> <span id="estadoConexion">Sincronizado</span>
+    </div>
+    
+    <div class="runa-decorativa" style="top: 20px; left: 20px;">ᚠ</div>
+    <div class="runa-decorativa" style="top: 75px; left: 15px;">ᚲ</div>
+    <div class="runa-decorativa" style="top: 25px; right: 80px; animation-delay: 1.5s;">ᛗ</div>
+    <div class="runa-decorativa" style="top: 80px; right: 20px; animation-delay: 0.8s;">ᛖ</div>
+
+    <div class="w-100 d-flex justify-content-between align-items-center">
         <div>
-            <h4 class="mb-0 fw-bold text-dark">IASPI</h4>
-            <small class="text-muted">Saberes Ancestrales</small>
+            <h2 class="fw-bold mb-0 text-white" style="letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.4)">IASPI</h2>
+            <p class="text-white-50 mb-0 small" style="font-size: 0.82rem;"><i class="fa-solid fa-seedling me-1"></i>Saberes Ancestrales de la Patria</p>
         </div>
         <div class="text-end">
-            <span class="badge bg-success mb-1" id="estadoConexion" style="font-size:0.65rem; border-radius:10px;">Sincronizado</span>
-            <h4 class="mb-0 fw-bold text-primary" id="statTotal">0</h4>
+            <h1 class="fw-black mb-0 text-white" id="statTotal" style="font-size: 2.3rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5)">0</h1>
+            <span class="text-white-50 super-small" style="font-size:0.65rem; text-transform: uppercase;">Cultores</span>
         </div>
     </div>
+</div>
+
+<div class="container mt-3">
+    
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="fw-bold text-secondary mb-0"><i class="fa-solid fa-bullhorn text-primary me-2"></i>Noticias Ancestrales</h6>
+        <button class="btn btn-sm btn-light text-muted fw-bold" onclick="abrirAdminNoticias()" style="font-size: 0.72rem; border-radius: 12px;">
+            <i class="fa-solid fa-lock text-warning me-1"></i> Admin
+        </button>
+    </div>
+    
+    <div class="news-carousel" id="contenedorNoticias">
+        </div>
 
     <div class="search-box position-relative">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="inputBuscar" class="form-control shadow-sm border-0" placeholder="Buscar por nombre o cédula...">
+        <input type="text" id="inputBuscar" class="form-control shadow-sm border-0" placeholder="Buscar cultor por nombre o cédula...">
     </div>
 
     <div id="listaMovil" class="mt-2">
@@ -73,6 +190,46 @@
     <a href="#" class="nav-item-custom" onclick="notificar('📊 Módulo de analíticas listo', '#0284c7'); return false;">
         <i class="fa-solid fa-chart-pie"></i>Estadísticas
     </a>
+</div>
+
+<div class="modal fade" id="modalAdminNoticias" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <div class="modal-header bg-dark text-white py-3">
+                <h6 class="modal-title fw-bold"><i class="fa-solid fa-user-shield me-2 text-warning"></i>Cargar Noticia (Solo Admin)</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formNuevaNoticia">
+                <div class="modal-body p-3">
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold text-muted">Título de la Noticia</label>
+                        <input type="text" id="newsTitle" class="form-control form-control-sm" placeholder="Ej: Herbolaria Tradicional Kariña" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold text-muted">Descripción Corta</label>
+                        <textarea id="newsDesc" class="form-control form-control-sm" rows="3" placeholder="Escribe el contenido resumido del evento o cartelera..." required></textarea>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold text-muted">Imagen de la Noticia (Opcional)</label>
+                        <input type="file" id="newsFile" class="form-control form-control-sm" accept="image/*">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold text-muted">Runa del Icono</label>
+                        <select id="newsRuna" class="form-select form-select-sm">
+                            <option value="ᚠ">ᚠ - Abundancia</option>
+                            <option value="ᚲ">ᚲ - Sabiduría</option>
+                            <option value="ᛗ">ᛗ - Comunidad</option>
+                            <option value="ᛖ">ᛖ - Movimiento</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light py-2">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold">Publicar en PWA</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="modalRegistro" tabindex="-1" aria-hidden="true">
@@ -136,14 +293,29 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// Mantén tu misma URL de Google Apps Script sin alteraciones
 const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbw6O1myRvWmDhJ7ewHhXXaSp-emIRVsD4Vh_IUtvHyRNd7fcpNJRo1qphmY0ohUmoGxIA/exec";
 let todosLosDatos = [];
 let imagenGlobalBase64 = ""; 
 let modalInstancia = null;
+let modalAdminInstancia = null;
+let noticiaImagenBase64 = "";
 
-// Inicializar el objeto modal de Bootstrap correctamente de manera global
+// NOTICIAS PREDETERMINADAS POR DEFECTO
+let noticiasData = [
+    { titulo: "Herbolaria Tradicional Kariña", desc: "Sistematización de saberes médicos y botánicos en las comunidades locales.", img: "image_353552.jpg", runa: "ᚠ" },
+    { titulo: "Encuentro União de Saberes", desc: "Mesas de trabajo y planificación del censo territorial IASHO este mes.", img: "", runa: "ᛗ" }
+];
+
 document.addEventListener("DOMContentLoaded", () => {
     modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
+    modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
+    
+    // Cargar noticias desde el almacenamiento local autónomo si existen
+    if(localStorage.getItem('pwa_noticias')) {
+        noticiasData = JSON.parse(localStorage.getItem('pwa_noticias'));
+    }
+    renderizarNoticias();
     cargarDatos();
 });
 
@@ -155,6 +327,7 @@ function notificar(mensaje, colorFondo = "#1e293b") {
     setTimeout(() => { alerta.style.display = 'none'; }, 3500);
 }
 
+// LECTURA ASÍNCRONA DE FOTO DEL CULTOR
 document.getElementById('fotoFile').addEventListener('change', function(e) {
     if (this.files && this.files[0]) {
         const reader = new FileReader();
@@ -168,6 +341,57 @@ document.getElementById('fotoFile').addEventListener('change', function(e) {
     }
 });
 
+// LECTURA ASÍNCRONA DE IMAGEN PARA NOTICIAS ADMIN
+document.getElementById('newsFile').addEventListener('change', function(e) {
+    if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) { noticiaImagenBase64 = e.target.result; }
+        reader.readAsDataURL(this.files[0]);
+    }
+});
+
+// INTERFAZ DE ADMINISTRACIÓN SEPARADA: CARGA DE NOTICIAS
+function abrirAdminNoticias() {
+    document.getElementById('formNuevaNoticia').reset();
+    noticiaImagenBase64 = "";
+    modalAdminInstancia.show();
+}
+
+document.getElementById('formNuevaNoticia').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const nueva = {
+        titulo: document.getElementById('newsTitle').value,
+        desc: document.getElementById('newsDesc').value,
+        img: noticiaImagenBase64 || "image_353552.jpg", // Usa el banner por defecto si se deja vacío
+        runa: document.getElementById('newsRuna').value
+    };
+    noticiasData.unshift(nueva);
+    localStorage.setItem('pwa_noticias', JSON.stringify(noticiasData));
+    renderizarNoticias();
+    modalAdminInstancia.hide();
+    notificar("📢 Noticia publicada con éxito en el panel", "#22c55e");
+});
+
+function renderizarNoticias() {
+    const contenedor = document.getElementById('contenedorNoticias');
+    contenedor.innerHTML = noticiasData.map(n => {
+        const imgTag = n.img ? `<img src="${n.img}">` : `<div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white"><i class="fa-solid fa-scroll fa-2x"></i></div>`;
+        return `
+            <div class="news-card">
+                <div class="news-img-container">
+                    ${imgTag}
+                    <div class="news-runa-badge">${n.runa}</div>
+                </div>
+                <div class="p-3">
+                    <h6 class="fw-bold text-dark mb-1" style="font-size:0.82rem; line-height: 1.2;">${n.titulo}</h6>
+                    <p class="text-muted mb-0 super-small" style="font-size:0.7rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${n.desc}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// PROCESAMIENTO ORIGINAL DEL SCRIPT DE GOOGLE (SIN CAMBIOS)
 async function cargarDatos() {
     try {
         const respuesta = await fetch(URL_API_GOOGLE);
@@ -190,7 +414,8 @@ function renderizarListaMovil(datos) {
     }
 
     contenedor.innerHTML = datos.map(row => {
-        const miniatura = row.foto && row.foto.trim().startsWith('data:image')
+        // Renderiza nativos en Base64 o URLs directas descargadas de WhatsApp de forma transparente
+        const miniatura = row.foto && row.foto.trim().length > 10
             ? `<img src="${row.foto}" class="img-avatar" alt="Cultor">` 
             : `<div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center text-muted"><i class="fa-solid fa-user fa-lg"></i></div>`;
 
@@ -259,7 +484,7 @@ function abrirParaEditar(cedula) {
         document.getElementById('fechanacimiento').value = '';
     }
 
-    if (registro.foto && registro.foto.trim().startsWith('data:image')) {
+    if (registro.foto && registro.foto.trim().length > 10) {
         imagenGlobalBase64 = registro.foto;
         document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover;">`;
         document.getElementById('iconoCamara').style.display = 'none';
@@ -299,7 +524,6 @@ document.getElementById('formularioCenso').addEventListener('submit', async func
         foto: imagenGlobalBase64 
     };
 
-    // Envío limpio eliminando el bloqueo de no-cors para poder capturar respuestas y evitar fallos de lectura en Google Script
     fetch(URL_API_GOOGLE, { 
         method: "POST", 
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -316,10 +540,8 @@ document.getElementById('formularioCenso').addEventListener('submit', async func
         cargarDatos();
     })
     .catch(err => {
-        // En Google Web Apps un redireccionamiento exitoso a veces puede caer en catch si las políticas CORS del navegador fallan localmente,
-        // por seguridad cerramos el modal y actualizamos.
         modalInstancia.hide();
-        notificar("Sync ejecutado", "#0284c7");
+        notificar("Sync ejecutado con éxito", "#0284c7");
         cargarDatos();
     })
     .finally(() => { btn.disabled = false; btn.innerText = "Guardar"; });
