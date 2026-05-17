@@ -368,6 +368,19 @@ function comprobarEstadoSesion() {
     if (sesionActiva) {
         document.getElementById('pantallaAuth').style.setProperty('display', 'none', 'important');
         document.getElementById('appContenido').style.display = 'block';
+        
+        // CORRECCIÓN: Limpiar variables globales y pantallas antes de pedir datos nuevos
+        todosLosDatos = [];
+        const listaMovil = document.getElementById('listaMovil');
+        if (listaMovil) {
+            listaMovil.innerHTML = `
+                <div class="text-center py-5 text-muted">
+                    <i class="fa-solid fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+                    <p class="small mb-0">Autenticando canal seguro y cargando tus registros...</p>
+                </div>`;
+        }
+        document.getElementById('statTotal').innerText = "0";
+
         inicializarAplicacionCompleta();
     } else {
         document.getElementById('pantallaAuth').style.setProperty('display', 'flex', 'important');
@@ -433,8 +446,22 @@ function procesarAutenticacion(e) {
 
 function cerrarSesionActual() {
     if(confirm("¿Desea cerrar su sesión segura en este dispositivo móvil?")) {
+        // Limpiar credenciales
         localStorage.removeItem("siaho_sesion_activa");
         document.getElementById('formAutenticacion').reset();
+        
+        // Limpieza absoluta de datos en memoria para que el siguiente usuario empiece desde cero
+        todosLosDatos = [];
+        noticiasData = [];
+        
+        const listaMovil = document.getElementById('listaMovil');
+        if (listaMovil) listaMovil.innerHTML = "";
+        
+        const contenedorNoticias = document.getElementById('contenedorNoticias');
+        if (contenedorNoticias) contenedorNoticias.innerHTML = "";
+        
+        document.getElementById('statTotal').innerText = "0";
+        
         comprobarEstadoSesion();
     }
 }
