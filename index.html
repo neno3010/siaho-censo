@@ -9,25 +9,26 @@
     <style>
         :root { --primary: #0284c7; --accent: #4f46e5; --bg: #f1f5f9; }
         body { background-color: var(--bg); font-family: system-ui, -apple-system, sans-serif; padding-bottom: 90px; }
-        .card-custom { border: none; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: transform 0.2s; }
-        .card-custom:active { transform: scale(0.98); }
-        .img-avatar { width: 60px; height: 60px; object-fit: cover; border-radius: 14px; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card-custom { border: none; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: transform 0.2s; position: relative; }
+        
+        /* Contenedor e Imagen del Listado Blindados */
+        .avatar-container { width: 60px; height: 60px; min-width: 60px; position: relative; overflow: hidden; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background-color: #f8fafc; }
+        .img-avatar { width: 100%; height: 100%; object-fit: cover; display: block; }
+        
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; z-index: 1000; }
         .nav-item-custom { text-align: center; color: #64748b; text-decoration: none; font-size: 0.75rem; }
         .nav-item-custom.active { color: var(--primary); font-weight: bold; }
         .nav-item-custom i { font-size: 1.3rem; display: block; margin-bottom: 2px; }
         .fab-add { width: 52px; height: 52px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-top: -28px; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(2,132,199,0.3); }
+        
         .search-box { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 12px 0; }
         .search-box input { border-radius: 20px; padding-left: 40px; background: #fff; }
         .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
         
-        /* Contenedor de foto interactiva */
-        .upload-zone { width: 110px; height: 110px; border: 2px dashed #cbd5e1; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #fff; cursor: pointer; transition: all 0.3s; }
-        .upload-zone:hover { border-color: var(--primary); background: #f0f9ff; }
-        .upload-zone img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 2; }
-        .upload-zone i { position: relative; z-index: 1; }
+        /* Zona de carga en el Formulario */
+        .upload-zone { width: 110px; height: 110px; border: 2px dashed #cbd5e1; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #fff; cursor: pointer; }
+        .upload-zone img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
 
-        /* Alertas dinámicas flotantes */
         .toast-notificacion { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: none; background: #1e293b; color: #fff; padding: 12px 24px; border-radius: 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); font-weight: 500; font-size: 0.9rem; animation: slideDown 0.3s forwards; }
         @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
     </style>
@@ -69,7 +70,7 @@
         <div class="fab-add"><i class="fa-solid fa-plus"></i></div>
         Nuevo
     </a>
-    <a href="#" class="nav-item-custom" onclick="notificar('📊 Estadísticas en tiempo real actualizadas', '#0284c7')">
+    <a href="#" class="nav-item-custom" onclick="notificar('📊 Módulo de analíticas listo', '#0284c7')">
         <i class="fa-solid fa-chart-pie"></i>Estadísticas
     </a>
 </div>
@@ -95,30 +96,16 @@
                     </div>
 
                     <div class="row g-2">
-                        <p class="fw-bold text-secondary mb-1" style="font-size:0.75rem; letter-spacing:0.5px;">1. UBICACIÓN TERRICTORIAL</p>
-                        <div class="col-6">
-                            <input type="text" class="form-control form-control-sm" id="municipio" placeholder="Municipio" required>
-                        </div>
-                        <div class="col-6">
-                            <input type="text" class="form-control form-control-sm" id="parroquia" placeholder="Parroquia" required>
-                        </div>
-                        <div class="col-6">
-                            <input type="text" class="form-control form-control-sm" id="comuna" placeholder="Comuna" required>
-                        </div>
-                        <div class="col-6">
-                            <input type="text" class="form-control form-control-sm" id="comunidad" placeholder="Comunidad" required>
-                        </div>
+                        <p class="fw-bold text-secondary mb-1" style="font-size:0.75rem;">1. UBICACIÓN TERRITORIAL</p>
+                        <div class="col-6"><input type="text" class="form-control form-control-sm" id="municipio" placeholder="Municipio" required></div>
+                        <div class="col-6"><input type="text" class="form-control form-control-sm" id="parroquia" placeholder="Parroquia" required></div>
+                        <div class="col-6"><input type="text" class="form-control form-control-sm" id="comuna" placeholder="Comuna" required></div>
+                        <div class="col-6"><input type="text" class="form-control form-control-sm" id="comunidad" placeholder="Comunidad" required></div>
 
-                        <p class="fw-bold text-secondary mb-1 mt-3" style="font-size:0.75rem; letter-spacing:0.5px;">2. DATOS PERSONALES</p>
-                        <div class="col-6">
-                            <input type="text" class="form-control form-control-sm" id="cedula" placeholder="Cédula de Identidad" required>
-                        </div>
-                        <div class="col-6">
-                            <input type="date" class="form-control form-control-sm" id="fechaNac">
-                        </div>
-                        <div class="col-12">
-                            <input type="text" class="form-control form-control-sm" id="nombre" placeholder="Nombres y Apellidos" required>
-                        </div>
+                        <p class="fw-bold text-secondary mb-1 mt-3" style="font-size:0.75rem;">2. DATOS PERSONALES</p>
+                        <div class="col-6"><input type="text" class="form-control form-control-sm" id="cedula" placeholder="Cédula de Identidad" required></div>
+                        <div class="col-6"><input type="date" class="form-control form-control-sm" id="fechanacimiento"></div>
+                        <div class="col-12"><input type="text" class="form-control form-control-sm" id="nombre" placeholder="Nombres y Apellidos" required></div>
                         <div class="col-12">
                             <select class="form-select form-select-sm" id="sexo">
                                 <option value="" disabled selected>Seleccione Género</option>
@@ -128,25 +115,13 @@
                             </select>
                         </div>
 
-                        <p class="fw-bold text-secondary mb-1 mt-3" style="font-size:0.75rem; letter-spacing:0.5px;">3. SABERES Y DETALLES</p>
-                        <div class="col-6">
-                            <input type="text" class="form-control form-control-sm" id="especialidad" placeholder="Especialidad (Partera, Yerbero...)" required>
-                        </div>
-                        <div class="col-6">
-                            <input type="text" class="form-control form-control-sm" id="artesania" placeholder="Artesanía que realiza">
-                        </div>
-                        <div class="col-12">
-                            <input type="text" class="form-control form-control-sm" id="aprendio" placeholder="¿Cómo aprendió el saber?">
-                        </div>
-                        <div class="col-12">
-                            <input type="text" class="form-control form-control-sm" id="enfermedades" placeholder="Enfermedades que trata">
-                        </div>
-                        <div class="col-12">
-                            <input type="text" class="form-control form-control-sm" id="plantas" placeholder="Plantas o productos medicinales que usa">
-                        </div>
-                        <div class="col-12">
-                            <textarea class="form-control form-control-sm" id="observaciones" rows="2" placeholder="Observaciones generales..."></textarea>
-                        </div>
+                        <p class="fw-bold text-secondary mb-1 mt-3" style="font-size:0.75rem;">3. SABERES Y DETALLES ANCESTRALES</p>
+                        <div class="col-6"><input type="text" class="form-control form-control-sm" id="especialidad" placeholder="Especialidad" required></div>
+                        <div class="col-6"><input type="text" class="form-control form-control-sm" id="artesania" placeholder="Artesanía que realiza"></div>
+                        <div class="col-12"><input type="text" class="form-control form-control-sm" id="dequienaprendio" placeholder="¿De quién aprendió?"></div>
+                        <div class="col-12"><input type="text" class="form-control form-control-sm" id="enfermedadesquetrata" placeholder="Enfermedades que trata"></div>
+                        <div class="col-12"><input type="text" class="form-control form-control-sm" id="plantasoproductosqueusa" placeholder="Plantas o productos que usa"></div>
+                        <div class="col-12"><textarea class="form-control form-control-sm" id="observaciones" rows="2" placeholder="Observaciones generales..."></textarea></div>
                     </div>
 
                 </div>
@@ -162,9 +137,8 @@
 <script>
 const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbzJHg8nRmOcy08gsy0_cvuOVPnQtNlpaPFmQAiFyfIwhPW1xU6tZPJao6X44h9eaPPS/exec";
 let todosLosDatos = [];
-let imagenGlobalBase64 = ""; // Almacenará la foto actual en memoria
+let imagenGlobalBase64 = ""; 
 
-// Lógica de avisos dinámicos en pantalla
 function notificar(mensaje, colorFondo = "#1e293b") {
     const alerta = document.getElementById('alertaFlotante');
     alerta.innerText = mensaje;
@@ -173,15 +147,14 @@ function notificar(mensaje, colorFondo = "#1e293b") {
     setTimeout(() => { alerta.style.display = 'none'; }, 3500);
 }
 
-// Previsualización Dinámica de Foto al seleccionarla en tiempo real
 document.getElementById('fotoFile').addEventListener('change', function(e) {
     if (this.files && this.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            imagenGlobalBase64 = e.target.result; // Guardamos en memoria global
-            document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}">`;
-            document.getElementById('iconoCamara').style.display = 'none'; // Escondemos el icono gris
-            notificar("📸 Fotografía cargada en la App", "#4f46e5");
+            imagenGlobalBase64 = e.target.result; 
+            document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover;">`;
+            document.getElementById('iconoCamara').style.display = 'none'; 
+            notificar("📸 Fotografía cargada en el formulario", "#4f46e5");
         }
         reader.readAsDataURL(this.files[0]);
     }
@@ -201,7 +174,6 @@ async function cargarDatos() {
     }
 }
 
-// Vista de diseño móvil de la información mejorado
 function renderizarListaMovil(datos) {
     const contenedor = document.getElementById('listaMovil');
     if (datos.length === 0) {
@@ -210,15 +182,19 @@ function renderizarListaMovil(datos) {
     }
 
     contenedor.innerHTML = datos.map(row => {
-        // Validación de foto en base64 para el listado móvil
-        const miniatura = row.foto && row.foto.trim() !== ""
-            ? `<img src="${row.foto}" class="img-avatar" alt="Foto">` 
-            : `<div class="img-avatar bg-light d-flex align-items-center justify-content-center text-muted"><i class="fa-solid fa-user fa-lg"></i></div>`;
+        // Validación estricta del campo 'foto' proveniente del JSON unificado
+        const miniatura = row.foto && row.foto.trim().startsWith('data:image')
+            ? `<img src="${row.foto}" class="img-avatar" alt="Cultor">` 
+            : `<div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center text-muted"><i class="fa-solid fa-user fa-lg"></i></div>`;
 
         return `
             <div class="card card-custom p-3 mb-2 bg-white">
                 <div class="d-flex align-items-center">
-                    <div class="me-3">${miniatura}</div>
+                    <div class="me-3">
+                        <div class="avatar-container">
+                            ${miniatura}
+                        </div>
+                    </div>
                     <div class="flex-grow-1">
                         <h6 class="mb-0 fw-bold text-dark" style="font-size:0.9rem">${row.nombre}</h6>
                         <small class="text-muted d-block" style="font-size: 0.75rem; margin-top:2px;">C.I: ${row.cedula} • ${row.municipio}</small>
@@ -244,7 +220,7 @@ function abrirParaCrear() {
     document.getElementById('modalTitulo').innerText = "NUEVO CENSO";
     document.getElementById('previewCont').innerHTML = "";
     document.getElementById('iconoCamara').style.display = 'block';
-    imagenGlobalBase64 = ""; // Reset de foto anterior
+    imagenGlobalBase64 = ""; 
 }
 
 function abrirParaEditar(cedula) {
@@ -264,19 +240,18 @@ function abrirParaEditar(cedula) {
     document.getElementById('sexo').value = registro.sexo;
     document.getElementById('artesania').value = registro.artesania;
     document.getElementById('especialidad').value = registro.especialidad;
-    document.getElementById('aprendio').value = registro.aprendio;
-    document.getElementById('enfermedades').value = registro.enfermedades;
-    document.getElementById('plantas').value = registro.plantas;
+    document.getElementById('dequienaprendio').value = registro.dequienaprendio;
+    document.getElementById('enfermedadesquetrata').value = registro.enfermedadesquetrata;
+    document.getElementById('plantasoproductosqueusa').value = registro.plantasoproductosqueusa;
     document.getElementById('observaciones').value = registro.observaciones;
     
-    if(registro.fechaNac) {
-        try { document.getElementById('fechaNac').value = new Date(registro.fechaNac).toISOString().substring(0, 10); } catch(e){}
+    if(registro.fechanacimiento) {
+        try { document.getElementById('fechanacimiento').value = new Date(registro.fechanacimiento).toISOString().substring(0, 10); } catch(e){}
     }
 
-    // Si tiene foto en Google Sheet, la cargamos dinámicamente en el círculo
-    if (registro.foto && registro.foto.trim() !== "") {
+    if (registro.foto && registro.foto.trim().startsWith('data:image')) {
         imagenGlobalBase64 = registro.foto;
-        document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}">`;
+        document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover;">`;
         document.getElementById('iconoCamara').style.display = 'none';
     } else {
         document.getElementById('previewCont').innerHTML = "";
@@ -288,7 +263,6 @@ function abrirParaEditar(cedula) {
     modal.show();
 }
 
-// Guardar (Crear / Modificar)
 document.getElementById('formularioCenso').addEventListener('submit', async function(e) {
     e.preventDefault();
     const btn = document.getElementById('btnGuardar');
@@ -305,46 +279,42 @@ document.getElementById('formularioCenso').addEventListener('submit', async func
         comunidad: document.getElementById('comunidad').value,
         cedula: document.getElementById('cedula').value,
         nombre: document.getElementById('nombre').value,
-        fechaNac: document.getElementById('fechaNac').value,
+        fechanacimiento: document.getElementById('fechanacimiento').value,
         sexo: document.getElementById('sexo').value,
         artesania: document.getElementById('artesania').value,
         especialidad: document.getElementById('especialidad').value,
-        aprendio: document.getElementById('aprendio').value,
-        enfermedades: document.getElementById('enfermedades').value,
-        plantas: document.getElementById('plantas').value,
+        dequienaprendio: document.getElementById('dequienaprendio').value,
+        enfermedadesquetrata: document.getElementById('enfermedadesquetrata').value,
+        plantasoproductosqueusa: document.getElementById('plantasoproductosqueusa').value,
         observaciones: document.getElementById('observaciones').value,
-        foto: imagenGlobalBase64 // Enviamos la imagen guardada en memoria global
+        foto: imagenGlobalBase64 
     };
 
     fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
     .then(() => {
         bootstrap.Modal.getInstance(document.getElementById('modalRegistro')).hide();
-        
         if(tipoAccion === "CREAR") {
-            notificar("🎉 Registro guardado exitosamente", "#22c55e");
+            notificar("🎉 Registro guardado con éxito", "#22c55e");
         } else {
             notificar("✏️ Registro modificado correctamente", "#eab308");
         }
-        
         cargarDatos();
     })
     .catch(err => notificar("⚠️ Error al sincronizar", "#ef4444"))
     .finally(() => { btn.disabled = false; btn.innerText = "Guardar"; });
 });
 
-// Eliminar fila
 function eliminarFila(cedula) {
-    if (confirm(`¿Está seguro de eliminar permanentemente el registro con Cédula: ${cedula}?`)) {
+    if (confirm(`¿Está seguro de eliminar el registro C.I: ${cedula}?`)) {
         const payload = { accion: "ELIMINAR", cedula: cedula };
         fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
         .then(() => {
-            notificar("🗑️ Registro eliminado de la hoja", "#ef4444");
+            notificar("🗑️ Registro eliminado", "#ef4444");
             cargarDatos();
         });
     }
 }
 
-// Filtro instantáneo
 document.getElementById('inputBuscar').addEventListener('input', function() {
     const query = this.value.toLowerCase();
     const filtrados = todosLosDatos.filter(d => 
@@ -356,7 +326,6 @@ document.getElementById('inputBuscar').addEventListener('input', function() {
 
 window.onload = cargarDatos;
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
