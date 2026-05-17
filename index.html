@@ -153,7 +153,7 @@
     <div class="container mt-3" id="vistaPrincipal">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <h6 class="fw-bold text-secondary mb-0"><i class="fa-solid fa-bullhorn text-primary me-2"></i>Cartelera Informativa</h6>
-            <button class="btn btn-sm btn-light text-muted fw-bold" onclick="abrirAdminNoticias(true)" style="font-size: 0.72rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+            <button id="btnCrearNoticia" class="btn btn-sm btn-light text-muted fw-bold d-none" onclick="abrirAdminNoticias(true)" style="font-size: 0.72rem; border-radius: 12px; border: 1px solid #e2e8f0;">
                 <i class="fa-solid fa-plus-circle text-success me-1"></i> Noticia
             </button>
         </div>
@@ -335,30 +335,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-
-    
 <script>
- document.addEventListener("DOMContentLoaded", () => {
-    modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
-    modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
-    modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
-    
-    // === REGISTRO DEL SERVICE WORKER PARA PERMITIR INSTALACIÓN ===
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker registrado con éxito', reg))
-            .catch(err => console.warn('Error al registrar el Service Worker', err));
-    }
-    // ==============================================================
-
-    comprobarEstadoSesion();
-    document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
-    document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
-});
-
-    
-const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbwsG6oVj93VOmTPCihiWVdX9Hdi077HcGoERthJ2xhOl3ROaJ3qTvdhrmDrPjNEip-tjA/exec";
+const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbzQOmW_afeXjflP6oRiXXVLUxn3H708HXRDt1GkeXDX9xd5grESmbd6sC7FYOXWl75vAw/exec";
 let todosLosDatos = [];
 let imagenGlobalBase64 = ""; 
 let modalInstancia = null;
@@ -366,21 +344,25 @@ let modalAdminInstancia = null;
 let modalVerFichaInstancia = null;
 let noticiaImagenBase64 = "";
 let noticiasData = [];
-let modoAuthActual = "LOGIN"; // Modos: LOGIN o REGISTRO
+let modoAuthActual = "LOGIN"; 
 
 document.addEventListener("DOMContentLoaded", () => {
     modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
     modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
     modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
     
+    // === REGISTRO DEL SERVICE WORKER PARA PERMITIR INSTALACIÓN PWA ===
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker registrado con éxito', reg))
+            .catch(err => console.warn('Error al registrar el Service Worker', err));
+    }
+
     comprobarEstadoSesion();
     document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
     document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
 });
 
-/* ========================================== */
-/* LÓGICA DE LOGIN / REGISTRO LOCAL PWA        */
-/* ========================================== */
 function comprobarEstadoSesion() {
     const sesionActiva = localStorage.getItem("siaho_sesion_activa");
     if (sesionActiva) {
@@ -435,7 +417,7 @@ function procesarAutenticacion(e) {
         comprobarEstadoSesion();
     } else {
         const usuarioValido = usuariosGuardados.find(u => u.correo === correo && u.pass === password);
-        if (usuarioValido || (correo === "admin@siaho.com" && password === "12345")) { // Credenciales por defecto de respaldo
+        if (usuarioValido || (correo === "admin@siaho.com" && password === "12345")) { 
             localStorage.setItem("siaho_sesion_activa", correo);
             if(!usuarioValido) {
                 usuariosGuardados.push({ correo: "admin@siaho.com", pass: "12345" });
@@ -462,17 +444,12 @@ function inicializarAplicacionCompleta() {
     setInterval(cargarDatos, 12000); 
 }
 
-/* ========================================== */
-/* TRATAMIENTO SEGURO DE FECHAS DESDE SHEETS  */
-/* ========================================== */
 function formatearFechaEstandar(fechaRaw) {
     if (!fechaRaw) return "";
     let str = fechaRaw.toString().trim();
     if (!str) return "";
-
     if (str.includes('T')) return str.split('T')[0];
     if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
-
     if (str.includes(" de ")) {
         const meses = {
             "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
@@ -487,7 +464,6 @@ function formatearFechaEstandar(fechaRaw) {
             return `${anio}-${mes}-${dia}`;
         }
     }
-
     if (str.includes("/")) {
         let partes = str.split("/");
         if (partes.length === 3) {
@@ -542,13 +518,16 @@ function cargarDatos() {
             
             // === FILTRO DE SEGURIDAD BASADO EN EL ROL DE USUARIO ===
             if (emailLimpio === "admin@siaho.com") {
-                // El administrador ve la base de datos completa
                 todosLosDatos = datosBrutos;
+                if(document.getElementById('btnCrearNoticia')) {
+                    document.getElementById('btnCrearNoticia').classList.remove('d-none');
+                }
             } else {
-                // Los usuarios estándar solo ven lo que ellos han registrado
                 todosLosDatos = datosBrutos.filter(c => c.registradoPor === emailLimpio);
+                if(document.getElementById('btnCrearNoticia')) {
+                    document.getElementById('btnCrearNoticia').classList.add('d-none');
+                }
             }
-            // =======================================================
 
             document.getElementById('statTotal').innerText = todosLosDatos.length;
             renderizarListadoPrincipal(todosLosDatos);
@@ -703,20 +682,18 @@ function exportarFichaA_Imagen() {
     
     notificar("📷 Generando imagen de la ficha...", "#0284c7");
 
-    // Forzar que html2canvas use configuraciones de renderizado limpio
     html2canvas(elemento, {
-        useCORS: true,          // Permite cargar imágenes externas de Google
-        allowTaint: true,       // Permite capturar imágenes cross-origin
-        scale: 3,               // Aumenta la resolución para que se vea nítida en el teléfono
-        logging: false,         // Desactiva logs innecesarios
-        backgroundColor: "#ffffff" // Evita fondos transparentes erróneos
+        useCORS: true,          
+        allowTaint: true,       
+        scale: 3,               
+        logging: false,         
+        backgroundColor: "#ffffff" 
     }).then(canvas => {
         try {
             const enlace = document.createElement('a');
             enlace.download = `Ficha_Cultor_${ci}.png`;
             enlace.href = canvas.toDataURL('image/png');
             
-            // Simular clic compatible con navegadores móviles en PWA
             document.body.appendChild(enlace);
             enlace.click();
             document.body.removeChild(enlace);
@@ -787,10 +764,17 @@ function renderizarNoticias() {
         contenedor.innerHTML = `<p class="text-muted text-center py-3 small w-100">Sin novedades vigentes en cartelera.</p>`;
         return;
     }
+
+    const usuarioLogueado = localStorage.getItem("siaho_sesion_activa") || "";
+    const esAdmin = (usuarioLogueado.trim().toLowerCase() === "admin@siaho.com");
+
     contenedor.innerHTML = noticiasData.map((n, index) => {
         const imgTag = n.img ? `<img src="${n.img}">` : `<div class="p-3 text-center text-muted"><i class="fa-solid fa-newspaper fa-2x opacity-20"></i></div>`;
+        const accionClick = esAdmin ? `onclick="abrirAdminNoticias(false, ${index})"` : '';
+        const estiloCursor = esAdmin ? '' : 'style="cursor: default;"';
+
         return `
-            <div class="news-card" onclick="abrirAdminNoticias(false, ${index})">
+            <div class="news-card" ${accionClick} ${estiloCursor}>
                 <div class="news-img-container d-flex align-items-center justify-content-center overflow-hidden bg-light">${imgTag}</div>
                 <div class="p-2">
                     <b class="fw-bold text-dark d-block text-truncate" style="font-size:0.8rem;">${n.titulo}</b>
@@ -872,13 +856,11 @@ document.getElementById('fotoFile').addEventListener('change', function(e) {
 
 document.getElementById('formularioCenso').addEventListener('submit', function(e) {
     e.preventDefault();
-    
-    // Obtener el usuario en sesión actual para firmar el registro
     const usuarioFirmante = localStorage.getItem("siaho_sesion_activa") || "desconocido";
 
     const payload = {
         accion: document.getElementById('action_type').value,
-        usuarioActivo: usuarioFirmante, // <-- NUEVO: Envía quién está haciendo la operación
+        usuarioActivo: usuarioFirmante, 
         municipio: document.getElementById('municipio').value,
         parroquia: document.getElementById('parroquia').value,
         comuna: document.getElementById('comuna').value,
