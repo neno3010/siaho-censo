@@ -741,6 +741,40 @@ function exportarFichaA_Imagen() {
     });
 }
 
+// Función para reducir el tamaño y peso de cualquier imagen a un estándar óptimo para web
+function comprimirImagenNoticia(archivo, calidad = 0.6, anchoMax = 600) {
+    return new Promise((resolve, reject) => {
+        const lector = new FileReader();
+        lector.readAsDataURL(archivo);
+        lector.onload = (evento) => {
+            const img = new Image();
+            img.src = evento.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let ancho = img.width;
+                let alto = img.height;
+
+                // Redimensionar proporcionalmente si supera el ancho máximo
+                if (ancho > anchoMax) {
+                    alto = Math.round((alto * anchoMax) / ancho);
+                    ancho = anchoMax;
+                }
+
+                canvas.width = ancho;
+                canvas.height = alto;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, ancho, alto);
+
+                // Exportar como JPG comprimido (pesa hasta 90% menos que un PNG nativo)
+                const base64Comprimido = canvas.toDataURL('image/jpeg', calidad);
+                resolve(base64Comprimido);
+            };
+            img.onerror = (err) => reject(err);
+        };
+        lector.onerror = (err) => reject(err);
+    });
+}
+    
 function abrirAdminNoticias(esNueva, index = null) {
     const form = document.getElementById('formNuevaNoticia');
     form.reset(); noticiaImagenBase64 = "";
