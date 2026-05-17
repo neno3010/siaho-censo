@@ -250,6 +250,7 @@
                 <h6 class="modal-title fw-bold" id="tituloModalNoticia"><i class="fa-solid fa-newspaper me-2 text-warning"></i>Gestionar Noticia</h6>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
+            
             <form id="formNuevaNoticia">
                 <input type="hidden" id="noticiaIndex" value="">
                 <div class="modal-body p-3">
@@ -266,6 +267,24 @@
                         <input type="file" id="newsFile" class="form-control" accept="image/*">
                     </div>
                 </div>
+                
+                <div class="modal fade" id="modalConfirmarSalida" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg text-center p-3">
+            <div class="modal-body pt-4">
+                <div class="mb-3 text-warning">
+                    <i class="fa-solid fa-triangle-exclamation fa-3x opacity-75"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-2" style="font-size: 1.05rem;">¿Cerrar Sesión Segura?</h6>
+                <p class="text-muted small mb-0">Se limpiará la memoria temporal de cultores en este dispositivo móvil.</p>
+            </div>
+            <div class="d-flex gap-2 justify-content-center mt-3 pb-2">
+                <button type="button" class="btn btn-sm btn-light fw-bold px-3 text-muted" data-bs-dismiss="modal" style="border-radius: 10px; min-width: 90px;">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-danger fw-bold px-3 shadow-sm" onclick="confirmarCierreEfectivo()" style="border-radius: 10px; min-width: 90px; background: linear-gradient(135deg, #ef4444, #b91c1c);">Salir</button>
+            </div>
+        </div>
+    </div>
+</div>
                 <div class="modal-footer bg-light py-2">
                     <button type="button" class="btn btn-sm btn-danger d-none" id="btnBorrarNoticia" onclick="eliminarNoticiaActual()">Eliminar Noticia</button>
                     <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold" id="btnGuardarNoticia">Publicar en la Nube</button>
@@ -345,19 +364,19 @@ let modalVerFichaInstancia = null;
 let noticiaImagenBase64 = "";
 let noticiasData = [];
 let modoAuthActual = "LOGIN"; 
-
+let modalAdminInstancia = null;
+let modalVerFichaInstancia = null;
+let modalSalidaInstancia = null; // <- Agrega esta variable global
 document.addEventListener("DOMContentLoaded", () => {
     modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
     modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
     modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
+    modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida')); // <- Inicialízalo aquí
     
-    // === REGISTRO DEL SERVICE WORKER PARA PERMITIR INSTALACIÓN PWA ===
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker registrado con éxito', reg))
-            .catch(err => console.warn('Error al registrar el Service Worker', err));
+        // ... tu Service Worker
     }
-
+    
     comprobarEstadoSesion();
     document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
     document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
@@ -445,27 +464,34 @@ function procesarAutenticacion(e) {
 }
 
 function cerrarSesionActual() {
-    if(confirm("¿Desea cerrar su sesión segura en este dispositivo móvil?")) {
-        // Limpiar credenciales
-        localStorage.removeItem("siaho_sesion_activa");
-        document.getElementById('formAutenticacion').reset();
-        
-        // Limpieza absoluta de datos en memoria para que el siguiente usuario empiece desde cero
-        todosLosDatos = [];
-        noticiasData = [];
-        
-        const listaMovil = document.getElementById('listaMovil');
-        if (listaMovil) listaMovil.innerHTML = "";
-        
-        const contenedorNoticias = document.getElementById('contenedorNoticias');
-        if (contenedorNoticias) contenedorNoticias.innerHTML = "";
-        
-        document.getElementById('statTotal').innerText = "0";
-        
-        comprobarEstadoSesion();
+    if (modalSalidaInstancia) {
+        modalSalidaInstancia.show();
     }
 }
+function confirmarCierreEfectivo() {
+    if (modalSalidaInstancia) {
+        modalSalidaInstancia.hide(); // Oculta el modal de inmediato
+    }
 
+    // Limpieza absoluta de credenciales y caché
+    localStorage.removeItem("siaho_sesion_activa");
+    document.getElementById('formAutenticacion').reset();
+    
+    todosLosDatos = [];
+    noticiasData = [];
+    
+    const listaMovil = document.getElementById('listaMovil');
+    if (listaMovil) listaMovil.innerHTML = "";
+    
+    const contenedorNoticias = document.getElementById('contenedorNoticias');
+    if (contenedorNoticias) contenedorNoticias.innerHTML = "";
+    
+    document.getElementById('statTotal').innerText = "0";
+    
+    notificar("🔒 Sesión finalizada correctamente", "#64748b");
+    comprobarEstadoSesion();
+}
+    
 function inicializarAplicacionCompleta() {
     cargarDatos();
     setInterval(cargarDatos, 12000); 
