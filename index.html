@@ -3,201 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SIAHO Mobile</title>
+    <title>SIAHO Censo Móvil</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --accent-color: #7c3aed;
-            --bg-light: #f8fafc;
-        }
-
-        body { 
-            background-color: var(--bg-light); 
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            padding-bottom: 80px; /* Espacio para el menú inferior */
-        }
-
-        /* Estilo de Tarjetas */
-        .card-custom {
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-
-        /* Miniatura de Foto */
-        .img-avatar {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 12px;
-            border: 2px solid #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        /* Navegación Inferior Móvil */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0;
-            border-top: 1px solid #e2e8f0;
-            z-index: 1000;
-        }
-
-        .nav-item-custom {
-            text-align: center;
-            color: #64748b;
-            text-decoration: none;
-            font-size: 0.75rem;
-        }
-
-        .nav-item-custom.active { color: var(--primary-color); font-weight: bold; }
-        .nav-item-custom i { font-size: 1.4rem; display: block; margin-bottom: 2px; }
-
-        /* Botón Flotante Central */
-        .fab-add {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-            margin-top: -30px;
-            border: 4px solid #fff;
-        }
-
-        /* Buscador Moderno */
-        .search-container {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--bg-light);
-            padding: 15px 0;
-        }
-
-        .search-input {
-            border-radius: 25px;
-            padding-left: 45px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 30px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-        }
+        :root { --primary: #0284c7; --accent: #4f46e5; --bg: #f1f5f9; }
+        body { background-color: var(--bg); font-family: system-ui, -apple-system, sans-serif; padding-bottom: 90px; }
+        .card-custom { border: none; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .img-avatar { width: 55px; height: 55px; object-fit: cover; border-radius: 12px; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; z-index: 1000; }
+        .nav-item-custom { text-align: center; color: #64748b; text-decoration: none; font-size: 0.75rem; }
+        .nav-item-custom.active { color: var(--primary); font-weight: bold; }
+        .nav-item-custom i { font-size: 1.3rem; display: block; margin-bottom: 2px; }
+        .fab-add { width: 52px; height: 52px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-top: -28px; border: 4px solid #fff; box-shadow: 0 4px 10px rgba(2,132,199,0.3); }
+        .search-box { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 12px 0; }
+        .search-box input { border-radius: 20px; padding-left: 40px; }
+        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
     </style>
 </head>
 <body>
 
-<!-- Header Compacto -->
 <div class="container pt-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
         <div>
-            <h4 class="mb-0 fw-bold">SIAHO</h4>
-            <span class="badge bg-soft-success text-success" style="background:#dcfce7">Online</span>
+            <h4 class="mb-0 fw-bold text-dark">SIAHO Móvil</h4>
+            <small class="text-muted">Panel de Saberes Ancestrales</small>
         </div>
         <div class="text-end">
-            <h3 class="mb-0 fw-bold text-primary" id="statTotal">0</h3>
-            <small class="text-muted text-uppercase" style="font-size: 0.6rem; letter-spacing: 1px;">Registrados</small>
+            <span class="badge bg-success mb-1" id="estadoConexion">Sincronizado</span>
+            <h4 class="mb-0 fw-bold text-primary" id="statTotal">0</h4>
         </div>
     </div>
 
-    <!-- Buscador -->
-    <div class="search-container">
-        <div class="position-relative">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="inputBuscar" class="form-control search-input shadow-sm" placeholder="Buscar artesano o cédula...">
-        </div>
+    <div class="search-box position-relative">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="inputBuscar" class="form-control shadow-sm border-0" placeholder="Buscar por nombre o cédula...">
     </div>
 
-    <!-- Lista de Registros (Mobile Cards) -->
     <div id="listaMovil" class="mt-2">
-        <!-- Los datos se inyectarán aquí como tarjetas -->
         <div class="text-center py-5">
             <div class="spinner-border text-primary" role="status"></div>
-            <p class="mt-2 text-muted">Cargando saberes...</p>
+            <p class="text-muted mt-2">Sincronizando con Google Sheets...</p>
         </div>
     </div>
 </div>
 
-<!-- Menú Inferior -->
 <div class="bottom-nav">
-    <a href="#" class="nav-item-custom active">
-        <i class="fa-solid fa-house"></i> Inicio
+    <a href="#" class="nav-item-custom active" onclick="window.location.reload()">
+        <i class="fa-solid fa-box-archive"></i>Registros
     </a>
-    <a href="#" class="nav-item-custom" data-bs-toggle="modal" data-bs-target="#modalRegistro" onclick="limpiarFormulario()">
+    <a href="#" class="nav-item-custom" data-bs-toggle="modal" data-bs-target="#modalRegistro" onclick="abrirParaCrear()">
         <div class="fab-add"><i class="fa-solid fa-plus"></i></div>
-        Nuevo
+        Nuevo Censo
     </a>
-    <a href="#" class="nav-item-custom">
-        <i class="fa-solid fa-chart-line"></i> Reportes
+    <a href="#" class="nav-item-custom" onclick="alert('Sección de reportes gráficos en desarrollo')">
+        <i class="fa-solid fa-chart-pie"></i>Estadísticas
     </a>
 </div>
 
-<!-- Modal de Formulario (Adaptado a Pantalla Completa en Móvil) -->
-<div class="modal fade" id="modalRegistro" tabindex="-1">
-    <div class="modal-dialog modal-fullscreen-sm-down">
+<div class="modal fade" id="modalRegistro" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen-sm-down modal-lg">
         <div class="modal-content border-0">
-            <div class="modal-header border-0">
-                <h5 class="fw-bold"><i class="fa-solid fa-pen-to-square me-2"></i> Registro de Censo</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold" id="modalTitulo"><i class="fa-solid fa-file-signature me-2"></i>Nuevo Censo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="formularioCenso">
-                <input type="hidden" id="editMode" value="false">
-                <div class="modal-body p-4">
+                <input type="hidden" id="action_type" value="CREAR">
+                <div class="modal-body p-3">
                     
-                    <div class="text-center mb-4">
-                        <div id="imagePreviewContainer" class="mb-2">
-                             <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width:100px; height:100px;">
-                                <i class="fa-solid fa-camera fa-2x text-muted"></i>
-                             </div>
+                    <div class="card p-3 mb-3 text-center border-0 bg-light">
+                        <div id="previewCont" class="mb-2">
+                            <div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="fa-solid fa-camera fa-xl text-muted"></i>
+                            </div>
                         </div>
+                        <label class="form-label small fw-bold text-secondary">Fotografía del Cultor / Sabio</label>
                         <input type="file" class="form-control form-control-sm" id="fotoFile" accept="image/*">
                     </div>
 
-                    <div class="row g-3">
+                    <div class="row g-2">
+                        <p class="fw-bold text-primary mb-0 mt-2" style="font-size:0.85rem">1. UBICACIÓN TERRICTORIAL</p>
                         <div class="col-6">
-                            <label class="form-label small fw-bold">Municipio</label>
-                            <input type="text" class="form-control" id="municipio" required>
+                            <label class="form-label small mb-1">Municipio</label>
+                            <input type="text" class="form-control form-control-sm" id="municipio" required>
                         </div>
                         <div class="col-6">
-                            <label class="form-label small fw-bold">Cédula</label>
-                            <input type="text" class="form-control" id="cedula" required>
+                            <label class="form-label small mb-1">Parroquia</label>
+                            <input type="text" class="form-control form-control-sm" id="parroquia" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small mb-1">Comuna</label>
+                            <input type="text" class="form-control form-control-sm" id="comuna" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small mb-1">Comunidad</label>
+                            <input type="text" class="form-control form-control-sm" id="comunidad" required>
+                        </div>
+
+                        <p class="fw-bold text-primary mb-0 mt-3" style="font-size:0.85rem">2. DATOS PERSONALES</p>
+                        <div class="col-6">
+                            <label class="form-label small mb-1">Cédula de Identidad</label>
+                            <input type="text" class="form-control form-control-sm" id="cedula" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small mb-1">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control form-control-sm" id="fechaNac">
                         </div>
                         <div class="col-12">
-                            <label class="form-label small fw-bold">Nombre Completo</label>
-                            <input type="text" class="form-control" id="nombre" required>
+                            <label class="form-label small mb-1">Nombres y Apellidos</label>
+                            <input type="text" class="form-control form-control-sm" id="nombre" required>
                         </div>
                         <div class="col-12">
-                            <label class="form-label small fw-bold">Especialidad</label>
-                            <select class="form-select" id="especialidad">
-                                <option value="Artesano">Artesano</option>
-                                <option value="Partera">Partera</option>
-                                <option value="Yerber@">Yerbero/a</option>
-                                <option value="Otros">Otros</option>
+                            <label class="form-label small mb-1">Género</label>
+                            <select class="form-select form-select-sm" id="sexo">
+                                <option value="Masculino">Masculino</option>
+                                <option value="Femenino">Femenino</option>
+                                <option value="Otro">Otro / Prefiere no decir</option>
                             </select>
                         </div>
+
+                        <p class="fw-bold text-primary mb-0 mt-3" style="font-size:0.85rem">3. SABERES ANCESTRALES</p>
+                        <div class="col-6">
+                            <label class="form-label small mb-1">Especialidad principal</label>
+                            <input type="text" class="form-control form-control-sm" id="especialidad" placeholder="Ej: Partera, Yerbero" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small mb-1">Artesanía que realiza</label>
+                            <input type="text" class="form-control form-control-sm" id="artesania">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small mb-1">¿Cómo aprendió el saber?</label>
+                            <input type="text" class="form-control form-control-sm" id="aprendio" placeholder="Ej: Herencia familiar, autoaprendizaje">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small mb-1">Enfermedades que trata (Si aplica)</label>
+                            <input type="text" class="form-control form-control-sm" id="enfermedades">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small mb-1">Plantas o productos que utiliza</label>
+                            <input type="text" class="form-control form-control-sm" id="plantas">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small mb-1">Observaciones generales</label>
+                            <textarea class="form-control form-control-sm" id="observaciones" rows="2"></textarea>
+                        </div>
                     </div>
+
                 </div>
-                <div class="modal-footer border-0 p-4">
-                    <button type="submit" class="btn btn-primary w-100 py-3 rounded-4 fw-bold" id="btnGuardar">
-                        Sincronizar Datos
-                    </button>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary btn-sm" id="btnGuardar">Guardar en la Nube</button>
                 </div>
             </form>
         </div>
@@ -205,65 +161,181 @@
 </div>
 
 <script>
-// Mantén tu URL_API_GOOGLE anterior
-const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbzJHg8nRmOcy08gsy0_cvuOVPnQtNlpaPFmQAiFyfIwhPW1xU6tZPJao6X44h9eaPPS/exec"; 
+// =========================================================================
+// REEMPLAZA CON LA URL DE TU ENLACE DE GOOGLE APPS SCRIPT EJECUTABLE (/exec)
+// =========================================================================
+const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbzJHg8nRmOcy08gsy0_cvuOVPnQtNlpaPFmQAiFyfIwhPW1xU6tZPJao6X44h9eaPPS/exec";
+// =========================================================================
+
 let todosLosDatos = [];
 
-// Función para renderizar en formato "Mobile Cards" en lugar de tablas
-function renderizarListaMóvil(datos) {
+async function cargarDatos() {
+    try {
+        const respuesta = await fetch(URL_API_GOOGLE);
+        const resultado = await respuesta.json();
+        if (resultado.status === "success") {
+            todosLosDatos = resultado.data.reverse(); // Lo último creado sale primero
+            document.getElementById('statTotal').innerText = todosLosDatos.length;
+            renderizarListaMovil(todosLosDatos);
+        }
+    } catch (error) {
+        document.getElementById('listaMovil').innerHTML = `<div class="alert alert-danger text-center m-2">⚠️ Error de conexión con la base de datos de Google Sheets.</div>`;
+    }
+}
+
+function renderizarListaMovil(datos) {
     const contenedor = document.getElementById('listaMovil');
     if (datos.length === 0) {
-        contenedor.innerHTML = `<div class="text-center py-5 text-muted">No hay registros.</div>`;
+        contenedor.innerHTML = `<div class="text-center py-5 text-muted">No existen registros agregados.</div>`;
         return;
     }
 
-    contenedor.innerHTML = datos.map(row => `
-        <div class="card card-custom mb-3 p-3">
-            <div class="d-flex align-items-center">
-                <div class="me-3">
-                    ${row.foto ? `<img src="${row.foto}" class="img-avatar">` : `<div class="img-avatar bg-light d-flex align-items-center justify-content-center"><i class="fa-solid fa-user text-muted"></i></div>`}
-                </div>
-                <div class="flex-grow-1">
-                    <h6 class="mb-0 fw-bold">${row.nombre}</h6>
-                    <small class="text-muted">C.I: ${row.cedula} • ${row.municipio}</small><br>
-                    <span class="badge mt-1" style="background:#e0e7ff; color:#4338ca">${row.especialidad}</span>
-                </div>
-                <div class="dropdown">
-                    <button class="btn btn-link text-muted" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                        <li><a class="dropdown-item" href="#" onclick="prepararEdicion('${row.cedula}')"><i class="fa-solid fa-pen me-2"></i>Editar</a></li>
-                        <li><a class="dropdown-item text-danger" href="#" onclick="eliminarRegistro('${row.cedula}')"><i class="fa-solid fa-trash me-2"></i>Eliminar</a></li>
-                    </ul>
+    contenedor.innerHTML = datos.map(row => {
+        const miniatura = row.foto && row.foto.startsWith('data:image') 
+            ? `<img src="${row.foto}" class="img-avatar" alt="Foto">` 
+            : `<div class="img-avatar bg-secondary bg-opacity-20 d-flex align-items-center justify-content-center text-muted"><i class="fa-solid fa-user"></i></div>`;
+
+        return `
+            <div class="card card-custom p-3 mb-2 bg-white">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">${miniatura}</div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0 fw-bold text-dark">${row.nombre}</h6>
+                        <small class="text-muted d-block" style="font-size: 0.75rem">C.I: ${row.cedula} • ${row.municipio} (${row.parroquia})</small>
+                        <span class="badge mt-1" style="background-color:#e0f2fe; color:#0369a1">${row.especialidad}</span>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-link text-muted p-1" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical fa-lg"></i></button>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
+                            <li><a class="dropdown-item" href="#" onclick="abrirParaEditar('${row.cedula}')"><i class="fa-solid fa-marker me-2 text-warning"></i>Modificar</a></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="eliminarFila('${row.cedula}')"><i class="fa-solid fa-trash-can me-2"></i>Eliminar</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
-// Lógica para modificar (Cargar datos en el modal)
-function prepararEdicion(cedula) {
-    const registro = todosLosDatos.find(d => d.cedula == cedula);
+// Configurar Modal para crear nuevo registro
+function abrirParaCrear() {
+    document.getElementById('formularioCenso').reset();
+    document.getElementById('action_type').value = "CREAR";
+    document.getElementById('cedula').readOnly = false;
+    document.getElementById('modalTitulo').innerHTML = `<i class="fa-solid fa-user-plus me-2"></i>Nuevo Censo`;
+    document.getElementById('previewCont').innerHTML = `<div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;"><i class="fa-solid fa-camera fa-xl text-muted"></i></div>`;
+}
+
+// Configurar Modal con los datos cargados para editar
+function abrirParaEditar(cedula) {
+    const registro = todosLosDatos.find(d => d.cedula.toString().trim() === cedula.toString().trim());
     if (!registro) return;
 
-    document.getElementById('editMode').value = "true";
-    document.getElementById('cedula').value = registro.cedula;
-    document.getElementById('cedula').readOnly = true; // No permitir cambiar cédula al editar
-    document.getElementById('nombre').value = registro.nombre;
-    document.getElementById('municipio').value = registro.municipio;
-    document.getElementById('especialidad').value = registro.especialidad;
+    document.getElementById('action_type').value = "ACTUALIZAR";
+    document.getElementById('modalTitulo').innerHTML = `<i class="fa-solid fa-marker me-2"></i>Modificar Registro`;
     
+    // Inyección de todos los datos en el formulario móvil
+    document.getElementById('municipio').value = registro.municipio;
+    document.getElementById('parroquia').value = registro.parroquia;
+    document.getElementById('comuna').value = registro.comuna;
+    document.getElementById('comunidad').value = registro.comunidad;
+    document.getElementById('cedula').value = registro.cedula;
+    document.getElementById('cedula').readOnly = true; // No modificar llave primaria (Cédula)
+    document.getElementById('nombre').value = registro.nombre;
+    document.getElementById('sexo').value = registro.sexo;
+    document.getElementById('artesania').value = registro.artesania;
+    document.getElementById('especialidad').value = registro.especialidad;
+    document.getElementById('aprendio').value = registro.aprendio;
+    document.getElementById('enfermedades').value = registro.enfermedades;
+    document.getElementById('plantas').value = registro.plantas;
+    document.getElementById('observaciones').value = registro.observaciones;
+    
+    // Si tiene fecha guardada en formato legible por input tipo date
+    if(registro.fechaNac) {
+        try {
+            document.getElementById('fechaNac').value = new Date(registro.fechaNac).toISOString().substring(0, 10);
+        } catch(e){}
+    }
+
+    if (registro.foto) {
+        document.getElementById('previewCont').innerHTML = `<img src="${registro.foto}" class="rounded-circle" style="width:80px; height:80px; object-fit:cover;">`;
+    }
+
     const modal = new bootstrap.Modal(document.getElementById('modalRegistro'));
     modal.show();
 }
 
-function limpiarFormulario() {
-    document.getElementById('formularioCenso').reset();
-    document.getElementById('editMode').value = "false";
-    document.getElementById('cedula').readOnly = false;
+// Envío del Formulario (CREAR / ACTUALIZAR)
+document.getElementById('formularioCenso').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('btnGuardar');
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Guardando...`;
+
+    const fileInput = document.getElementById('fotoFile');
+    let base64Image = "";
+
+    if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        base64Image = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    const payload = {
+        accion: document.getElementById('action_type').value,
+        municipio: document.getElementById('municipio').value,
+        parroquia: document.getElementById('parroquia').value,
+        comuna: document.getElementById('comuna').value,
+        comunidad: document.getElementById('comunidad').value,
+        cedula: document.getElementById('cedula').value,
+        nombre: document.getElementById('nombre').value,
+        fechaNac: document.getElementById('fechaNac').value,
+        sexo: document.getElementById('sexo').value,
+        artesania: document.getElementById('artesania').value,
+        especialidad: document.getElementById('especialidad').value,
+        aprendio: document.getElementById('aprendio').value,
+        enfermedades: document.getElementById('enfermedades').value,
+        plantas: document.getElementById('plantas').value,
+        observaciones: document.getElementById('observaciones').value,
+        foto: base64Image
+    };
+
+    fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+    .then(() => {
+        alert("¡Datos sincronizados correctamente con Google Sheets!");
+        bootstrap.Modal.getInstance(document.getElementById('modalRegistro')).hide();
+        cargarDatos();
+    })
+    .catch(err => alert("Error al guardar: " + err))
+    .finally(() => { btn.disabled = false; btn.innerHTML = `Guardar en la Nube`; });
+});
+
+// Eliminar Registro
+function eliminarFila(cedula) {
+    if (confirm(`¿Está seguro de que desea eliminar permanentemente al cultor con Cédula: ${cedula}?`)) {
+        const payload = { accion: "ELIMINAR", cedula: cedula };
+        fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) })
+        .then(() => {
+            alert("Registro removido correctamente.");
+            cargarDatos();
+        });
+    }
 }
 
-// ... Mantener tus funciones cargarDatos(), eliminarRegistro() y filtrar() del código anterior ...
-// Pero asegúrate de que cargarDatos llame a renderizarListaMóvil(todosLosDatos)
+// Filtro en tiempo real
+document.getElementById('inputBuscar').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const filtrados = todosLosDatos.filter(d => 
+        (d.nombre || '').toLowerCase().includes(query) || 
+        (d.cedula || '').toString().includes(query)
+    );
+    renderizarListaMovil(filtrados);
+});
+
+window.onload = cargarDatos;
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
