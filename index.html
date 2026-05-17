@@ -793,11 +793,17 @@ function abrirAdminNoticias(esNueva, index = null) {
     modalAdminInstancia.show();
 }
 
-document.getElementById('newsFile').addEventListener('change', function(e) {
+document.getElementById('newsFile').addEventListener('change', async function(e) {
     if (this.files && this.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) { noticiaImagenBase64 = e.target.result; }
-        reader.readAsDataURL(this.files[0]);
+        notificar("⚡ Optimizando tamaño de portada...", "#0284c7");
+        try {
+            // Comprime la imagen a un ancho máximo de 600px y calidad de 60%
+            noticiaImagenBase64 = await comprimirImagenNoticia(this.files[0], 0.6, 600);
+            notificar("📸 Portada lista y optimizada", "#22c55e");
+        } catch (error) {
+            console.error("Error al procesar la imagen de noticia:", error);
+            notificar("❌ No se pudo optimizar la imagen", "#ef4444");
+        }
     }
 });
 
