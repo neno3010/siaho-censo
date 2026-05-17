@@ -60,7 +60,7 @@
         .news-carousel { display: flex; overflow-x: auto; gap: 14px; padding: 5px 2px 15px 2px; scrollbar-width: none; }
         .news-carousel::-webkit-scrollbar { display: none; }
         
-        .news-card { flex: 0 0 85%; background: white; border-radius: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); overflow: hidden; position: relative; }
+        .news-card { flex: 0 0 85%; background: white; border-radius: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); overflow: hidden; position: relative; border: 1px solid #e2e8f0; }
         .news-img-container { width: 100%; height: 120px; background: #e2e8f0; position: relative; }
         .news-img-container img { width: 100%; height: 100%; object-fit: cover; }
         
@@ -104,6 +104,7 @@
         .ficha-avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; margin: 0 auto 10px auto; display: block; }
 
         .toast-notificacion { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 6000; display: none; background: #1e293b; color: #fff; padding: 12px 24px; border-radius: 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); font-weight: 500; font-size: 0.9rem; }
+        .text-truncate-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
     </style>
 </head>
 <body>
@@ -181,7 +182,7 @@
             <div class="p-2 bg-primary text-white rounded-3 me-3"><i class="fa-solid fa-chart-pie fa-lg"></i></div>
             <div>
                 <h6 class="fw-bold text-dark mb-0">Distribución Territorial Fina</h6>
-                <small class="text-muted">Toca un territorio para ver los censados</small>
+                <small class="text-muted">Toca un territory para ver los censados</small>
             </div>
         </div>
 
@@ -275,7 +276,7 @@
                     </div>
                 </div>
                 <div class="modal-footer bg-light py-2" id="footerModalNoticia">
-                    <button type="button" class="btn btn-light btn-sm text-muted" data-bs-dismiss="modal">Cerrar</button>
+                     <button type="button" class="btn btn-light btn-sm text-muted" data-bs-dismiss="modal">Cerrar</button>
                      <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold" id="btnGuardarNoticia">Publicar en la Nube</button>
                 </div>
             </form>
@@ -360,7 +361,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbwsG6oVj93VOmTPCihiWVdX9Hdi077HcGoERthJ2xhOl3ROaJ3qTvdhrmDrPjNEip-tjA/exec";
+const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbz8DCxqdvunBHa-3Tyy8gli2CSbOyiAM5qLTF85qkKoFehqro2GyvsscqVoOcgii341Xg/exec";
 let todosLosDatos = [];
 let imagenGlobalBase64 = ""; 
 let modalInstancia = null;
@@ -373,35 +374,19 @@ let modoAuthActual = "LOGIN";
 
 document.addEventListener("DOMContentLoaded", () => {
     try {
-        if (document.getElementById('modalRegistro')) {
-            modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
-        }
-        if (document.getElementById('modalAdminNoticias')) {
-            modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
-        }
-        if (document.getElementById('modalVerFicha')) {
-            modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
-        }
-        if (document.getElementById('modalConfirmarSalida')) {
-            modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
-        }
-    } catch (error) {
-        console.error("Error inicializando modales de interfaz:", error);
-    }
+        if (document.getElementById('modalRegistro')) modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
+        if (document.getElementById('modalAdminNoticias')) modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
+        if (document.getElementById('modalVerFicha')) modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
+        if (document.getElementById('modalConfirmarSalida')) modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
+    } catch (e) { console.error("Error modales:", e); }
     
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker activo'))
-            .catch(err => console.warn('Error en Service Worker', err));
+        navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW Error', err));
     }
 
     comprobarEstadoSesion();
-    if (document.getElementById('inputBuscar')) {
-        document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
-    }
-    if (document.getElementById('formAutenticacion')) {
-        document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
-    }
+    if (document.getElementById('inputBuscar')) document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
+    if (document.getElementById('formAutenticacion')) document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
 });
 
 function verificarRolAdministrador() {
@@ -415,7 +400,6 @@ function comprobarEstadoSesion() {
         document.getElementById('pantallaAuth').style.setProperty('display', 'none', 'important');
         document.getElementById('appContenido').style.display = 'block';
         
-        // RESTRICCIÓN DE NOTICIAS: Solo el administrador ve el botón para crear noticias
         if(document.getElementById('btnCrearNoticia')) {
             if (verificarRolAdministrador()) {
                 document.getElementById('btnCrearNoticia').classList.remove('d-none');
@@ -491,29 +475,21 @@ function procesarAutenticacion(e) {
             notificar("🔒 Acceso autorizado", "#22c55e");
             comprobarEstadoSesion();
         } else {
-            notificar("❌ Credenciales incorrectas o usuario inexistente", "#ef4444");
+            notificar("❌ Credenciales incorrectas", "#ef4444");
         }
     }
 }
 
-function cerrarSesionActual() {
-    if (modalSalidaInstancia) {
-        modalSalidaInstancia.show();
-    }
-}
+function cerrarSesionActual() { if (modalSalidaInstancia) modalSalidaInstancia.show(); }
 
 function confirmarCierreEfectivo() {
-    if (modalSalidaInstancia) {
-        modalSalidaInstancia.hide();
-    }
+    if (modalSalidaInstancia) modalSalidaInstancia.hide();
     localStorage.removeItem("siaho_sesion_activa");
     document.getElementById('formAutenticacion').reset();
     todosLosDatos = [];
     noticiasData = [];
-    const listaMovil = document.getElementById('listaMovil');
-    if (listaMovil) listaMovil.innerHTML = "";
-    const contenedorNoticias = document.getElementById('contenedorNoticias');
-    if (contenedorNoticias) contenedorNoticias.innerHTML = "";
+    if (document.getElementById('listaMovil')) document.getElementById('listaMovil').innerHTML = "";
+    if (document.getElementById('contenedorNoticias')) document.getElementById('contenedorNoticias').innerHTML = "";
     document.getElementById('statTotal').innerText = "0";
     notificar("👋 Sesión finalizada correctamente", "#64748b");
     comprobarEstadoSesion();
@@ -521,7 +497,7 @@ function confirmarCierreEfectivo() {
 
 function inicializarAplicacionCompleta() {
     cargarDatos();
-    setInterval(cargarDatos, 25000); // Frecuencia de refresco prudencial para no saturar las cuotas de Google Apps Script
+    setInterval(cargarDatos, 25000); 
 }
 
 function formatearFechaEstandar(fechaRaw) {
@@ -530,27 +506,6 @@ function formatearFechaEstandar(fechaRaw) {
     if (!str) return "";
     if (str.includes('T')) return str.split('T')[0];
     if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
-    if (str.includes(" de ")) {
-        const meses = { "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06", "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12" };
-        if (str.includes(",")) str = str.split(",")[1].trim();
-        let partes = str.split(" de ");
-        if (partes.length === 3) {
-            let dia = partes[0].padStart(2, '0');
-            let mes = meses[partes[1].toLowerCase()] || "01";
-            let anio = partes[2];
-            return `${anio}-${mes}-${dia}`;
-        }
-    }
-    if (str.includes("/")) {
-        let partes = str.split("/");
-        if (partes.length === 3) {
-            let dia = partes[0].padStart(2, '0');
-            let mes = partes[1].padStart(2, '0');
-            let anio = partes[2];
-            if (anio.length === 2) anio = "19" + anio;
-            return `${anio}-${mes}-${dia}`;
-        }
-    }
     return "";
 }
 
@@ -591,27 +546,24 @@ function cargarDatos() {
     .then(res => {
         if (res.status === "success") {
             const datosBrutos = res.data || [];
-            noticiasData = res.noticias || [];
+            noticiasData = res.noticias || []; // Tu hoja Noticias en la nube mapeada aquí
             
             if (emailLimpio === "admin@siaho.com") {
                 todosLosDatos = datosBrutos;
             } else {
-                todosLosDatos = datosBrutos.filter(c => {
-                    const creadorFila = (c.registradoPor || "").trim().toLowerCase();
-                    return creadorFila === emailLimpio;
-                });
+                todosLosDatos = datosBrutos.filter(c => (c.registradoPor || "").trim().toLowerCase() === emailLimpio);
             }
             
             document.getElementById('statTotal').innerText = todosLosDatos.length;
             renderizarListadoPrincipal(todosLosDatos);
-            renderizarNoticias();
+            renderizarNoticias(); // Invoca la función corregida
             
             if (!document.getElementById('vistaEstadisticas').classList.contains('d-none')) {
                 procesarYRenderizarEstadisticasAvanzadas();
             }
         }
     })
-    .catch(err => console.error("Error en sincronización en la nube:", err));
+    .catch(err => console.error("Error sincronización:", err));
 }
 
 function abrirParaCrear() {
@@ -657,11 +609,9 @@ function renderizarListadoPrincipal(lista) {
                 <div class="flex-grow-1">
                     <h6 class="fw-bold mb-0 text-dark small text-uppercase">${c.nombre || 'Sin Nombre'}</h6>
                     <p class="text-muted mb-0 super-small" style="font-size:0.75rem;">C.I: ${c.cedula || '---'} | <span class="badge bg-light text-primary border">${c.especialidad || 'General'}</span></p>
-                    <p class="mb-0 text-secondary super-small" style="font-size:0.7rem;"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${c.municipio || '---'}, Parroquia ${c.parroquia || '---'}</p>
+                    <p class="mb-0 text-secondary super-small" style="font-size:0.7rem;"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${c.municipio || '---'}, ${c.parroquia || '---'}</p>
                 </div>
-                <div class="text-end text-muted">
-                    <i class="fa-solid fa-chevron-right fa-sm"></i>
-                </div>
+                <div class="text-end text-muted"><i class="fa-solid fa-chevron-right fa-sm"></i></div>
             </div>
         </div>`;
     });
@@ -685,13 +635,12 @@ function verDetallesFicha(idx) {
     document.getElementById('f-apre').innerText = c.dequienaprendio || '---';
     document.getElementById('f-enf').innerText = c.enfermedadesquetrata || '---';
     document.getElementById('f-pla').innerText = c.plantasoproductosqueusa || '---';
-    document.getElementById('f-obs').innerText = c.observaciones || 'Sin observaciones detalladas.';
+    document.getElementById('f-obs').innerText = c.observaciones || 'Sin observaciones.';
     
     document.getElementById('btnEditarDesdeFicha').onclick = () => {
         modalVerFichaInstancia.hide();
         abrirParaEditar(c);
     };
-    
     modalVerFichaInstancia.show();
 }
 
@@ -742,11 +691,9 @@ document.getElementById('fotoFile').addEventListener('change', function(e) {
 
 document.getElementById('formularioCenso').addEventListener('submit', function(e) {
     e.preventDefault();
-    const usuarioLogueado = localStorage.getItem("siaho_sesion_activa") || "desconocido";
-    
     const payload = {
-        action: document.getElementById('action_type').value, // Envía 'CREAR' o 'EDITAR'
-        registradoPor: usuarioLogueado,
+        action: document.getElementById('action_type').value,
+        registradoPor: localStorage.getItem("siaho_sesion_activa") || "desconocido",
         cedula: document.getElementById('cedula').value.trim(),
         nombre: document.getElementById('nombre').value.trim(),
         fechanacimiento: document.getElementById('fechanacimiento').value,
@@ -764,52 +711,73 @@ document.getElementById('formularioCenso').addEventListener('submit', function(e
         foto: imagenGlobalBase64
     };
     
-    notificar("🚀 Transmitiendo datos a la nube...", "#0284c7");
-    
-    fetch(URL_API_GOOGLE, {
-        method: "POST",
-        mode: "no-cors", // Evita problemas de bloqueo CORS locales
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
+    notificar("🚀 Guardando registro en la nube...", "#0284c7");
+    fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     .then(() => {
-        // Al usar no-cors no se puede leer la respuesta directo, forzamos cierre seguro y refresco continuo
         modalInstancia.hide();
-        notificar("✅ Datos enviados. Sincronizando cartelera...", "#22c55e");
-        setTimeout(cargarDatos, 1500);
-    })
-    .catch((err) => {
-        console.error(err);
-        modalInstancia.hide(); 
-        cargarDatos();
-    });
+        notificar("✅ Sincronizado exitosamente", "#22c55e");
+        setTimeout(cargarDatos, 1000);
+    }).catch(() => { modalInstancia.hide(); cargarDatos(); });
 });
 
 function eliminarCultorActual() {
     const ci = document.getElementById('cedula').value;
     if (ci && confirm(`¿Seguro que desea eliminar el registro de C.I: ${ci}?`)) {
         notificar("🗑️ Purgando registro...", "#1e293b");
-        const payload = { action: "ELIMINAR", cedula: ci.trim() };
-        fetch(URL_API_GOOGLE, {
-            method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-        })
-        .then(() => {
-            modalInstancia.hide();
-            notificar("💥 Orden ejecutada", "#ef4444");
-            setTimeout(cargarDatos, 1500);
-        }).catch(() => { modalInstancia.hide(); cargarDatos(); });
+        fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "ELIMINAR", cedula: ci.trim() }) })
+        .then(() => { modalInstancia.hide(); notificar("💥 Registro borrado", "#ef4444"); setTimeout(cargarDatos, 1000); })
+        .catch(() => { modalInstancia.hide(); cargarDatos(); });
     }
+}
+
+/* --- LOGICA EXCLUSIVA ASOCIADA A TU HOJA DE "NOTICIAS" --- */
+
+function renderizarNoticias() {
+    const contenedor = document.getElementById('contenedorNoticias');
+    if (!contenedor) return;
+
+    // ARREGLO FUNDAMENTAL: Si el listado de noticias viene vacío de la nube, limpia todo y muestra la plantilla vacía.
+    if (!noticiasData || noticiasData.length === 0) {
+        contenedor.innerHTML = `
+            <div class="w-100 text-center py-4 text-muted bg-white rounded-4 shadow-sm border" style="flex: 0 0 100%;">
+                <i class="fa-solid fa-face-dashed fa-2x mb-2 text-black-50"></i>
+                <p class="small mb-0 fw-bold">No hay novedades registradas en la cartelera</p>
+                <small class="text-secondary super-small">Las publicaciones del administrador aparecerán aquí.</small>
+            </div>`;
+        return;
+    }
+
+    // Si tiene datos, vacía y pinta las tarjetas frescas de la nube
+    contenedor.innerHTML = "";
+    
+    noticiasData.forEach((noticia, index) => {
+        const imagenCard = noticia.foto && noticia.foto.startsWith("data:image") 
+            ? noticia.foto 
+            : "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=400&q=80";
+
+        const card = document.createElement('div');
+        card.className = "news-card";
+        card.innerHTML = `
+            <div class="news-img-container" onclick="gestionarNoticiaExistente(${index})">
+                <img src="${imagenCard}">
+            </div>
+            <div class="p-2" onclick="gestionarNoticiaExistente(${index})">
+                <h6 class="fw-bold text-dark d-block text-truncate small text-uppercase mb-0" style="font-size:0.75rem;">${noticia.titulo || 'Sin Título'}</h6>
+                <p class="text-muted mb-0 super-small text-truncate-3" style="font-size:0.68rem; line-height:1.2;">${noticia.descripcion || 'Sin descripción'}</p>
+            </div>
+        `;
+        contenedor.appendChild(card);
+    });
 }
 
 function abrirAdminNoticias(esNueva) {
     if(!modalAdminInstancia) return;
     document.getElementById('formNuevaNoticia').reset();
     noticiaImagenBase64 = "";
-    
     const footer = document.getElementById('footerModalNoticia');
     
     if(esNueva) {
-        document.getElementById('tituloModalNoticia').innerText = "Nueva Publicación";
+        document.getElementById('tituloModalNoticia').innerText = "Nueva Publicación (Admin)";
         document.getElementById('noticiaIndex').value = "";
         footer.innerHTML = `
             <button type="button" class="btn btn-sm btn-light text-muted" data-bs-dismiss="modal">Cerrar</button>
@@ -831,9 +799,8 @@ document.getElementById('formNuevaNoticia').addEventListener('submit', function(
     e.preventDefault();
     const idx = document.getElementById('noticiaIndex').value;
     
-    // CONTROL DE SEGURIDAD EN FRONTEND: Si no es administrador, cancelar proceso
     if (!verificarRolAdministrador()) {
-        notificar("⚠️ Operación rechazada: Solo administradores pueden guardar noticias", "#ef4444");
+        notificar("⚠️ Operación rechazada: Solo administradores guardan noticias", "#ef4444");
         modalAdminInstancia.hide();
         return;
     }
@@ -846,44 +813,14 @@ document.getElementById('formNuevaNoticia').addEventListener('submit', function(
         foto: noticiaImagenBase64
     };
 
-    notificar("📢 Difundiendo noticia territorial...", "#4f46e5");
-    
-    fetch(URL_API_GOOGLE, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
+    notificar("📢 Sincronizando cartelera...", "#4f46e5");
+    fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     .then(() => {
         modalAdminInstancia.hide();
-        notificar("✨ Cartelera informativa actualizada", "#22c55e");
-        setTimeout(cargarDatos, 1500);
+        notificar("✨ Cartelera actualizada", "#22c55e");
+        setTimeout(cargarDatos, 1000);
     }).catch(() => { modalAdminInstancia.hide(); });
 });
-
-function renderizarNoticias() {
-    const contenedor = document.getElementById('contenedorNoticias');
-    if(!contenedor) return;
-    if(noticiasData.length === 0) {
-        contenedor.innerHTML = `<div class="p-3 text-center text-muted w-100 small bg-white rounded-4 border">No hay acontecimientos informativos vigentes el día de hoy.</div>`;
-        return;
-    }
-    let html = "";
-    noticiasData.forEach((n, idx) => {
-        const foto = n.foto ? n.foto : "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=400&q=80";
-        html += `
-        <div class="news-card border" onclick="gestionarNoticiaExistente(${idx})">
-            <div class="news-img-container">
-                <img src="${foto}">
-            </div>
-            <div class="p-2">
-                <h7 class="fw-bold text-dark d-block text-truncate small text-uppercase" style="font-size:0.75rem;">${n.titulo}</h7>
-                <p class="text-muted mb-0 super-small text-truncate-2" style="font-size:0.68rem; line-height:1.2;">${n.descripcion}</p>
-            </div>
-        </div>`;
-    });
-    contenedor.innerHTML = html;
-}
 
 function gestionarNoticiaExistente(idx) {
     const n = noticiasData[idx];
@@ -896,40 +833,29 @@ function gestionarNoticiaExistente(idx) {
     
     const footer = document.getElementById('footerModalNoticia');
 
-    // CONTROL DE VISUALIZACIÓN: Si es Administrador puede modificar/eliminar, si es usuario común solo lee
     if (verificarRolAdministrador()) {
         document.getElementById('tituloModalNoticia').innerText = "Modificar Noticia (Admin)";
         footer.innerHTML = `
             <button type="button" class="btn btn-sm btn-danger me-auto" onclick="eliminarNoticiaActual()">Eliminar Noticia</button>
             <button type="button" class="btn btn-sm btn-light text-muted" data-bs-dismiss="modal">Cerrar</button>
-            <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold">Actualizar Cambios</button>
+            <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold">Actualizar</button>
         `;
     } else {
         document.getElementById('tituloModalNoticia').innerText = "Ver Noticia Informativa";
-        footer.innerHTML = `
-            <button type="button" class="btn btn-sm btn-secondary w-100" data-bs-dismiss="modal">Volver a la Cartelera</button>
-        `;
+        footer.innerHTML = `<button type="button" class="btn btn-sm btn-secondary w-100" data-bs-dismiss="modal">Volver a la Cartelera</button>`;
     }
-    
     modalAdminInstancia.show();
 }
 
 function eliminarNoticiaActual() {
     const idx = document.getElementById('noticiaIndex').value;
-    if (!verificarRolAdministrador()) {
-        notificar("⚠️ Acción denegada", "#ef4444");
-        return;
-    }
+    if (!verificarRolAdministrador()) return;
     
-    if (idx !== "" && confirm("¿Desea dar de baja permanentemente esta noticia de la cartelera?")) {
-        notificar("🗑️ Removiendo de la cartelera...", "#ef4444");
-        fetch(URL_API_GOOGLE, {
-            method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "ELIMINAR_NOTICIA", index: idx })
-        })
-        .then(() => { 
-            modalAdminInstancia.hide(); 
-            setTimeout(cargarDatos, 1500); 
-        }).catch(() => { modalAdminInstancia.hide(); });
+    if (idx !== "" && confirm("¿Desea dar de baja esta noticia?")) {
+        notificar("🗑️ Removiendo noticia...", "#ef4444");
+        fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "ELIMINAR_NOTICIA", index: idx }) })
+        .then(() => { modalAdminInstancia.hide(); notificar("💥 Noticia eliminada", "#ef4444"); setTimeout(cargarDatos, 1000); })
+        .catch(() => { modalAdminInstancia.hide(); });
     }
 }
 
@@ -937,14 +863,12 @@ function procesarYRenderizarEstadisticasAvanzadas() {
     const mCont = document.getElementById('desgloseMunicipios');
     const pCont = document.getElementById('desgloseParroquias');
     const cCont = document.getElementById('desgloseComunas');
-    
     let mun = {}, par = {}, com = {};
     todosLosDatos.forEach(c => {
         if(c.municipio) mun[c.municipio] = (mun[c.municipio] || 0) + 1;
         if(c.parroquia) par[c.parroquia] = (par[c.parroquia] || 0) + 1;
         if(c.comuna) com[c.comuna] = (com[c.comuna] || 0) + 1;
     });
-    
     mCont.innerHTML = armarAccordionDinamico(mun, "mun");
     pCont.innerHTML = armarAccordionDinamico(par, "par");
     cCont.innerHTML = armarAccordionDinamico(com, "com");
@@ -962,23 +886,19 @@ function armarAccordionDinamico(objeto, prefijo) {
             <div class="stat-details-box" id="box-${prefijo}-${i}"></div>
         </div>`;
     });
-    return html || `<div class="text-center py-3 text-muted small">Sin vectores geográficos computados.</div>`;
+    return html || `<div class="text-center py-3 text-muted small">Sin datos computados.</div>`;
 }
 
 function conmutarAccordionInterno(idBox, territorialKey, tipo) {
     const el = document.getElementById(`box-${idBox}`);
     if(el.style.display === "block") { el.style.display = "none"; return; }
-    
     let filtrados = todosLosDatos.filter(c => {
         if(tipo === "mun") return (c.municipio || '') === territorialKey;
         if(tipo === "par") return (c.parroquia || '') === territorialKey;
         return (c.comuna || '') === territorialKey;
     });
-    
     let subHtml = '<ul class="list-group list-group-flush rounded-3 border-0" style="font-size:0.75rem;">';
-    filtrados.forEach(c => {
-        subHtml += `<li class="list-group-item bg-transparent py-2 px-1 text-secondary text-uppercase fw-semibold"><i class="fa-solid fa-user me-2 text-primary"></i>${c.nombre} (C.I: ${c.cedula})</li>`;
-    });
+    filtrados.forEach(c => { subHtml += `<li class="list-group-item bg-transparent py-2 px-1 text-secondary text-uppercase fw-semibold"><i class="fa-solid fa-user me-2 text-primary"></i>${c.nombre}</li>`; });
     subHtml += '</ul>';
     el.innerHTML = subHtml;
     el.style.display = "block";
@@ -986,24 +906,12 @@ function conmutarAccordionInterno(idBox, territorialKey, tipo) {
 
 function exportarFichaA_PDF() {
     const elemento = document.getElementById('areaDescargaFicha');
-    const nombre = document.getElementById('f-nombre').innerText;
-    const opciones = {
-        margin: 0.3, filename: `Ficha_SIAHO_${nombre}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-    html2pdf().set(opciones).from(elemento).save();
+    html2pdf().set({ margin: 0.3, filename: 'Ficha_SIAHO.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(elemento).save();
 }
 
 function exportarFichaA_Imagen() {
-    const elemento = document.getElementById('areaDescargaFicha');
-    const nombre = document.getElementById('f-nombre').innerText;
-    html2canvas(elemento, { scale: 2, useCORS: true }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `Ficha_SIAHO_${nombre}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
+    html2canvas(document.getElementById('areaDescargaFicha'), { scale: 2, useCORS: true }).then(canvas => {
+        const link = document.createElement('a'); link.download = 'Ficha_SIAHO.png'; link.href = canvas.toDataURL(); link.click();
     });
 }
 </script>
