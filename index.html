@@ -24,7 +24,6 @@
         }
         body { background-color: var(--bg); font-family: system-ui, -apple-system, sans-serif; padding-bottom: 100px; overflow-x: hidden; }
         
-        /* BANNER ANCESTRAL REDISEÑADO CON ESTILO MÍSTICO PWA */
         .banner-ancestral {
             position: relative;
             width: 100%;
@@ -35,15 +34,11 @@
             border-bottom-left-radius: 24px;
             border-bottom-right-radius: 24px;
             box-shadow: 0 10px 25px -5px rgba(30, 27, 75, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-            
-            /* Degradado profundo basado en los colores de la patria y saberes */
             background: linear-gradient(135deg, #130f2b 0%, #1e1b4b 45%, #312e81 100%);
-            /* Línea dorada sutil que simboliza la raíz u oro chamánico */
             border-bottom: 3.5px solid #d97706;
             overflow: hidden;
         }
 
-        /* Aura/Destello brillante de fondo (Simula los destellos del árbol ancestral de saberes) */
         .banner-ancestral::before {
             content: "";
             position: absolute;
@@ -57,7 +52,6 @@
             pointer-events: none;
         }
 
-        /* Segundo destello sutil para balancear la iluminación móvil */
         .banner-ancestral::after {
             content: "";
             position: absolute;
@@ -71,19 +65,16 @@
             pointer-events: none;
         }
 
-        /* Forzar a que el contenedor de texto flote sobre los efectos CSS de fondo */
         .banner-ancestral > div {
             position: relative;
             z-index: 2;
         }
 
-        /* Resalte oro/amarillo para el icono de árbol ancestral */
         .banner-ancestral p i {
             color: #fbbf24;
             text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
         }
         
-        /* NOTICIAS HORIZONTALES */
         .news-carousel {
             display: flex;
             overflow-x: auto;
@@ -104,7 +95,6 @@
         .news-img-container { width: 100%; height: 120px; background: #e2e8f0; position: relative; }
         .news-img-container img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* BOTÓN DE NUEVO REGISTRO PERFECTAMENTE CENTRADO */
         .bottom-nav { 
             position: fixed;
             bottom: 0; 
@@ -143,24 +133,20 @@
         }
         .fab-add:active { transform: scale(0.92); }
 
-        /* LISTADOS INTERACTIVOS */
         .card-custom { border: none; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s; cursor: pointer; }
         .card-custom:active { transform: scale(0.98); }
         .avatar-container { width: 55px; height: 55px; min-width: 55px; overflow: hidden; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         
-        /* FORMULARIO AVANZADO INTERACTIVO */
         .section-title-custom { background: linear-gradient(90deg, #0284c7, #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.5px; margin-top: 15px; margin-bottom: 8px; display: flex; align-items: center; }
         .section-title-custom::after { content: ''; flex-grow: 1; background: linear-gradient(90deg, #cbd5e1, transparent); height: 2px; margin-left: 10px; }
         .form-control-interactive { border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; transition: all 0.25s ease; background-color: #ffffff; font-size: 0.85rem; }
         .form-control-interactive:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); }
         
-        /* EXPANSIONES TERRITORIALES ACCORDION */
         .stat-accordion-item { background: white; border-radius: 14px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; overflow: hidden; }
         .stat-header-trigger { width: 100%; padding: 14px; border: none; background: white; display: flex; justify-content: space-between; align-items: center; text-align: left; }
         .stat-count-badge { background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; }
         .stat-details-box { background: #f8fafc; padding: 10px 14px; border-top: 1px solid #f1f5f9; display: none; }
 
-        /* VISTA FORMATO EXPORTABLE */
         .ficha-exportable { background: #fff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; position: relative; }
         .ficha-header { border-bottom: 3px double #0284c7; padding-bottom: 12px; margin-bottom: 15px; text-align: center; }
         .ficha-avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; margin: 0 auto 10px auto; display: block; }
@@ -382,11 +368,9 @@ document.addEventListener("DOMContentLoaded", () => {
     modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
     modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
     
-    // Carga inicial y listeners de búsqueda
     cargarDatos();
     document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
     
-    // Polling controlado en segundo plano cada 12 segundos
     setInterval(cargarDatos, 12000); 
 });
 
@@ -418,9 +402,6 @@ function cambiarVista(vista) {
     }
 }
 
-/* ==========================================================
-   CARGAR DATOS DESDE GOOGLE (GET)
-   ========================================================== */
 function cargarDatos() {
     fetch(URL_API_GOOGLE)
     .then(res => res.json())
@@ -429,10 +410,8 @@ function cargarDatos() {
             todosLosDatos = res.data || [];
             noticiasData = res.noticias || [];
             
-            // Actualizar contador del banner superior sin interferencia
             document.getElementById('statTotal').innerText = todosLosDatos.length;
             
-            // Renderizar componentes principales
             renderizarListadoPrincipal(todosLosDatos);
             renderizarNoticias();
             
@@ -444,9 +423,6 @@ function cargarDatos() {
     .catch(err => console.error("Error al sincronizar datos:", err));
 }
 
-/* ==========================================================
-   GESTIÓN Y RENDERIZADO DEL LISTADO DE CULTORES
-   ========================================================== */
 function renderizarListadoPrincipal(lista) {
     const contenedor = document.getElementById('listaMovil');
     if (lista.length === 0) {
@@ -463,7 +439,7 @@ function renderizarListadoPrincipal(lista) {
                         <img src="${fotoSrc}" style="width:100%; height:100%; object-fit:cover;">
                     </div>
                     <div class="flex-grow-1">
-                        <h6 class="fw-bold text-dark mb-0 style='font-size:0.9rem;'">${c.nombre}</h6>
+                        <h6 class="fw-bold text-dark mb-0" style="font-size:0.9rem;">${c.nombre}</h6>
                         <small class="text-muted d-block" style="font-size:0.75rem;"><i class="fa-solid fa-id-card me-1"></i>C.I: ${c.cedula}</small>
                         <small class="text-primary fw-medium" style="font-size:0.75rem;"><i class="fa-solid fa-feather me-1"></i>${c.especialidad}</small>
                     </div>
@@ -483,9 +459,6 @@ function filtrarListadoPrincipal() {
     renderizarListadoPrincipal(filtrados);
 }
 
-/* ==========================================================
-   DESGLOSE INTERACTIVO POR TERRITORIO
-   ========================================================== */
 function procesarYRenderizarEstadisticasAvanzadas() {
     const contenedorM = document.getElementById('desgloseMunicipios');
     const contenedorP = document.getElementById('desgloseParroquias');
@@ -544,9 +517,6 @@ function conmutarAcordeon(id) {
     el.style.display = (el.style.display === 'block') ? 'none' : 'block';
 }
 
-/* ==========================================================
-   VISUALIZACIÓN Y EXPORTACIÓN DE FICHA INDIVIDUAL
-   ========================================================== */
 function verFilaFicha(cedula) {
     const r = todosLosDatos.find(d => d.cedula.toString().trim() === cedula.toString().trim());
     if(!r) return;
@@ -601,9 +571,6 @@ function exportarFichaA_Imagen() {
     });
 }
 
-/* ==========================================================
-   ADMINISTRACIÓN DE NOTICIAS REALTIME (CORREGIDO)
-   ========================================================== */
 function abrirAdminNoticias(esNueva, index = null) {
     const form = document.getElementById('formNuevaNoticia');
     form.reset();
@@ -680,7 +647,7 @@ function renderizarNoticias() {
                     ${imgTag}
                 </div>
                 <div class="p-2">
-                    <hbf class="fw-bold text-dark d-block text-truncate" style="font-size:0.8rem;">${n.titulo}</hbf>
+                    <b class="fw-bold text-dark d-block text-truncate" style="font-size:0.8rem;">${n.titulo}</b>
                     <p class="text-muted small text-truncate mb-0" style="font-size:0.72rem;">${n.desc}</p>
                 </div>
             </div>
@@ -702,9 +669,6 @@ function eliminarNoticiaActual() {
     }
 }
 
-/* ==========================================================
-   ALTAS Y MODIFICACIONES DE CULTORES (FORM)
-   ========================================================== */
 function abrirParaCrear() {
     document.getElementById('formularioCenso').reset();
     document.getElementById('action_type').value = "CREAR";
@@ -717,18 +681,20 @@ function abrirParaCrear() {
     modalInstancia.show();
 }
 
+/* ==========================================================
+   MODIFICACIÓN CONTROLADA: APERTURA DE FORMULARIO DE EDICIÓN
+   ========================================================== */
 function abrirParaEditar(r) {
     document.getElementById('formularioCenso').reset();
     document.getElementById('action_type').value = "EDITAR";
-    document.getElementById('modalTitulo').innerText = "CORREGIR DATOS DEL CULTORES";
+    document.getElementById('modalTitulo').innerText = "CORREGIR DATOS DEL CULTOR";
     
     document.getElementById('municipio').value = r.municipio || "";
     document.getElementById('parroquia').value = r.parroquia || "";
     document.getElementById('comuna').value = r.comuna || "";
     document.getElementById('comunidad').value = r.comunidad || "";
     document.getElementById('cedula').value = r.cedula || "";
-    document.getElementById('cedula').disabled = true; // C.I actúa como llave primaria unívoca
-    document.getElementById('fechanacimiento').value = r.fechanacimiento || "";
+    document.getElementById('cedula').disabled = true; 
     document.getElementById('nombre').value = r.nombre || "";
     document.getElementById('sexo').value = r.sexo || "";
     document.getElementById('especialidad').value = r.especialidad || "";
@@ -737,6 +703,21 @@ function abrirParaEditar(r) {
     document.getElementById('enfermedadesquetrata').value = r.enfermedadesquetrata || "";
     document.getElementById('plantasoproductosqueusa').value = r.plantasoproductosqueusa || "";
     document.getElementById('observaciones').value = r.observaciones || "";
+    
+    // Tratamiento seguro de la fecha de nacimiento para el input date
+    const inputFecha = document.getElementById('fechanacimiento');
+    if (r.fechanacimiento) {
+        // Cortamos si viene con formato de hora ISO completo (ej: 1985-04-12T04:00:00.000Z)
+        let fechaLimpia = r.fechanacimiento.toString().split('T')[0];
+        // Validamos si cumple el patrón de fecha AAAA-MM-DD
+        if (/^\d{4}-\d{2}-\d{2}$/.test(fechaLimpia)) {
+            inputFecha.value = fechaLimpia;
+        } else {
+            inputFecha.value = ""; // Previene que rompa la consola si el formato es inválido
+        }
+    } else {
+        inputFecha.value = "";
+    }
     
     const prev = document.getElementById('previewCont');
     if(r.foto && r.foto.length > 10) {
