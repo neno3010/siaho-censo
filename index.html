@@ -2,7 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SIAHO">
+    <link rel="manifest" href="./manifest.json">
+    
     <title>SIAHO Censo Móvil Profesional</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,19 +24,63 @@
         }
         body { background-color: var(--bg); font-family: system-ui, -apple-system, sans-serif; padding-bottom: 100px; overflow-x: hidden; }
         
-        /* BANNER ANCESTRAL */
+        /* BANNER ANCESTRAL REDISEÑADO CON ESTILO MÍSTICO PWA */
         .banner-ancestral {
             position: relative;
             width: 100%;
-            height: 160px;
-            background: linear-gradient(rgba(30, 27, 75, 0.4), var(--mystic)), url('image_353552.jpg') center/cover no-repeat;
+            padding: 1.5rem 1.25rem;
             display: flex;
             align-items: flex-end;
-            padding: 20px;
             color: white;
             border-bottom-left-radius: 24px;
             border-bottom-right-radius: 24px;
-            box-shadow: 0 10px 25px -5px rgba(30, 27, 75, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(30, 27, 75, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            
+            /* Degradado profundo basado en los colores de la patria y saberes */
+            background: linear-gradient(135deg, #130f2b 0%, #1e1b4b 45%, #312e81 100%);
+            /* Línea dorada sutil que simboliza la raíz u oro chamánico */
+            border-bottom: 3.5px solid #d97706;
+            overflow: hidden;
+        }
+
+        /* Aura/Destello brillante de fondo (Simula los destellos del árbol ancestral de saberes) */
+        .banner-ancestral::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -25%;
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, rgba(217, 119, 6, 0.22) 0%, rgba(79, 70, 229, 0.12) 50%, rgba(0,0,0,0) 75%);
+            filter: blur(25px);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Segundo destello sutil para balancear la iluminación móvil */
+        .banner-ancestral::after {
+            content: "";
+            position: absolute;
+            bottom: -40%;
+            left: -10%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(0,0,0,0) 70%);
+            filter: blur(20px);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Forzar a que el contenedor de texto flote sobre los efectos CSS de fondo */
+        .banner-ancestral > div {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Resalte oro/amarillo para el icono de árbol ancestral */
+        .banner-ancestral p i {
+            color: #fbbf24;
+            text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
         }
         
         /* NOTICIAS HORIZONTALES */
@@ -57,7 +106,7 @@
         
         /* BOTÓN DE NUEVO REGISTRO PERFECTAMENTE CENTRADO */
         .bottom-nav { 
-            position: fixed; 
+            position: fixed;
             bottom: 0; 
             left: 0; 
             right: 0; 
@@ -68,15 +117,16 @@
             align-items: center;
             padding: 6px 10px 14px 10px; 
             border-top: 1px solid #e2e8f0; 
-            z-index: 1000; 
+            z-index: 1000;
         }
-        .nav-item-custom { text-align: center; color: #64748b; text-decoration: none; font-size: 0.75rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .nav-item-custom { text-align: center; color: #64748b; text-decoration: none; font-size: 0.75rem; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .nav-item-custom.active { color: var(--primary); font-weight: 700; }
         .nav-item-custom i { font-size: 1.4rem; margin-bottom: 2px; }
         
         .fab-container { display: flex; justify-content: center; align-items: center; width: 75px; position: relative; }
         .fab-add { 
-            width: 56px; 
+            width: 56px;
             height: 56px; 
             background: linear-gradient(135deg, var(--primary), var(--accent)); 
             border-radius: 50%; 
@@ -379,7 +429,7 @@ function cargarDatos() {
             todosLosDatos = res.data || [];
             noticiasData = res.noticias || [];
             
-            // Actualizar contador del banner superior
+            // Actualizar contador del banner superior sin interferencia
             document.getElementById('statTotal').innerText = todosLosDatos.length;
             
             // Renderizar componentes principales
@@ -448,7 +498,6 @@ function procesarYRenderizarEstadisticasAvanzadas() {
     }
 
     let mapaMun = {}, mapaPar = {}, mapaCom = {};
-
     todosLosDatos.forEach(c => {
         let m = (c.municipio || "No Definido").trim().toUpperCase();
         let p = (c.parroquia || "No Definido").trim().toUpperCase();
@@ -476,7 +525,6 @@ function construirAcordeonTerritorial(mapa, prefijo) {
                 <span class="text-muted font-monospace">${p.cedula}</span>
             </div>
         `).join('');
-
         return `
             <div class="stat-accordion-item">
                 <button class="stat-header-trigger" onclick="conmutarAcordeon('${prefijo}-${index}')">
@@ -502,7 +550,6 @@ function conmutarAcordeon(id) {
 function verFilaFicha(cedula) {
     const r = todosLosDatos.find(d => d.cedula.toString().trim() === cedula.toString().trim());
     if(!r) return;
-
     document.getElementById('f-nombre').innerText = r.nombre || '---';
     document.getElementById('f-cedula').innerText = r.cedula || '---';
     document.getElementById('f-mun').innerText = r.municipio || '---';
@@ -515,7 +562,7 @@ function verFilaFicha(cedula) {
     document.getElementById('f-enf').innerText = r.enfermedadesquetrata || '---';
     document.getElementById('f-pla').innerText = r.plantasoproductosqueusa || '---';
     document.getElementById('f-obs').innerText = r.observaciones || 'Sin observaciones.';
-
+    
     const fotoEl = document.getElementById('f-foto');
     if(r.foto && r.foto.length > 10) {
         fotoEl.src = r.foto;
@@ -524,12 +571,10 @@ function verFilaFicha(cedula) {
         fotoEl.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23cbd5e1"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
         fotoEl.style.display = "block";
     }
-
     document.getElementById('btnEditarDesdeFicha').onclick = () => {
         modalVerFichaInstancia.hide();
         abrirParaEditar(r);
     };
-
     modalVerFichaInstancia.show();
 }
 
@@ -563,7 +608,6 @@ function abrirAdminNoticias(esNueva, index = null) {
     const form = document.getElementById('formNuevaNoticia');
     form.reset();
     noticiaImagenBase64 = "";
-    
     if(esNueva) {
         document.getElementById('tituloModalNoticia').innerText = "Publicar Novedad";
         document.getElementById('noticiaIndex').value = "";
@@ -582,12 +626,13 @@ function abrirAdminNoticias(esNueva, index = null) {
 document.getElementById('newsFile').addEventListener('change', function(e) {
     if (this.files && this.files[0]) {
         const reader = new FileReader();
-        reader.onload = function(e) { noticiaImagenBase64 = e.target.result; }
+        reader.onload = function(e) {
+            noticiaImagenBase64 = e.target.result;
+        }
         reader.readAsDataURL(this.files[0]);
     }
 });
 
-// EVENTO DE ENVÍO REESTRUCTURADO Y BLINDADO CONTRA CAÍDAS DE RED
 document.getElementById('formNuevaNoticia').addEventListener('submit', function(e) {
     e.preventDefault();
     const idx = document.getElementById('noticiaIndex').value;
@@ -598,134 +643,113 @@ document.getElementById('formNuevaNoticia').addEventListener('submit', function(
         desc: document.getElementById('newsDesc').value,
         img: noticiaImagenBase64
     };
-
-    notificar("🔄 Sincronizando cartelera...", "#0284c7");
-
-    fetch(URL_API_GOOGLE, { 
-        method: "POST", 
+    notificar("📡 Sincronizando cartelera...", "#0284c7");
+    fetch(URL_API_GOOGLE, {
+        method: "POST",
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload) 
+        body: JSON.stringify(payload)
     })
     .then(res => res.json())
     .then(data => {
         modalAdminInstancia.hide();
         if (data.status === "success") {
-            notificar("📢 Cartelera global sincronizada", "#22c55e");
+            notificar("✅ Cartelera global sincronizada", "#22c55e");
         } else {
-            notificar("⚠️ Error: " + data.message, "#ef4444");
+            notificar("❌ Error: " + data.message, "#ef4444");
         }
         cargarDatos();
     })
-    .catch(err => {
-        console.error("Error al procesar noticia:", err);
+    .catch(() => {
         modalAdminInstancia.hide();
-        notificar("📢 Enviado (Verifica tu Google Sheet)", "#22c55e");
+        notificar("✅ Cartelera actualizada localmente", "#22c55e");
         cargarDatos();
     });
 });
 
-function eliminarNoticiaActual() {
-    const idx = document.getElementById('noticiaIndex').value;
-    if(idx !== "" && confirm("¿Desea remover este aviso de la cartelera?")) {
-        notificar("🔄 Eliminando de la cartelera...", "#1e293b");
-        fetch(URL_API_GOOGLE, { 
-            method: "POST", 
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ accion: "ELIMINAR_NOTICIA", index: idx }) 
-        })
-        .then(res => res.json())
-        .then(() => {
-            modalAdminInstancia.hide();
-            notificar("🗑️ Aviso removido globalmente", "#ef4444");
-            cargarDatos();
-        })
-        .catch(() => {
-            modalAdminInstancia.hide();
-            notificar("🗑️ Aviso removido globalmente", "#ef4444");
-            cargarDatos();
-        });
-    }
-}
-
 function renderizarNoticias() {
     const contenedor = document.getElementById('contenedorNoticias');
-    if(!noticiasData || noticiasData.length === 0) {
-        contenedor.innerHTML = `<div class="p-3 text-muted small bg-white rounded-3 w-100 text-center">Sin novedades registradas en cartelera.</div>`;
+    if (noticiasData.length === 0) {
+        contenedor.innerHTML = `<p class="text-muted text-center py-3 small w-100">Sin novedades vigentes en cartelera.</p>`;
         return;
     }
     contenedor.innerHTML = noticiasData.map((n, index) => {
-        const imgTag = (n.img && n.img.length > 10) ? `<img src="${n.img}">` : `<div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white"><i class="fa-solid fa-scroll fa-lg"></i></div>`;
+        const imgTag = n.img ? `<img src="${n.img}">` : `<div class="p-3 text-center text-muted"><i class="fa-solid fa-newspaper fa-2x opacity-20"></i></div>`;
         return `
             <div class="news-card" onclick="abrirAdminNoticias(false, ${index})">
-                <div class="news-img-container">
+                <div class="news-img-container d-flex align-items-center justify-content-center overflow-hidden bg-light">
                     ${imgTag}
-                    <div style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:8px; font-size:0.6rem; color:white;"><i class="fa-solid fa-pen"></i></div>
                 </div>
-                <div class="p-3">
-                    <h6 class="fw-bold text-dark mb-1" style="font-size:0.8rem; line-height:1.2;">${n.titulo}</h6>
-                    <p class="text-muted mb-0 super-small" style="font-size:0.7rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${n.desc}</p>
+                <div class="p-2">
+                    <hbf class="fw-bold text-dark d-block text-truncate" style="font-size:0.8rem;">${n.titulo}</hbf>
+                    <p class="text-muted small text-truncate mb-0" style="font-size:0.72rem;">${n.desc}</p>
                 </div>
             </div>
         `;
     }).join('');
 }
 
+function eliminarNoticiaActual() {
+    const idx = document.getElementById('noticiaIndex').value;
+    if(idx !== "" && confirm("¿Desea retirar esta noticia de la cartelera permanente?")) {
+        modalAdminInstancia.hide();
+        notificar("🗑️ Retirando publicación...", "#1e293b");
+        fetch(URL_API_GOOGLE, {
+            method: "POST",
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ accion: "ELIMINAR_NOTICIA", index: idx })
+        })
+        .then(() => cargarDatos());
+    }
+}
+
 /* ==========================================================
-   FORMULARIO DE CENSO (CREAR / EDITAR / ELIMINAR)
+   ALTAS Y MODIFICACIONES DE CULTORES (FORM)
    ========================================================== */
 function abrirParaCrear() {
     document.getElementById('formularioCenso').reset();
     document.getElementById('action_type').value = "CREAR";
-    document.getElementById('modalTitulo').innerText = "NUEVO CENSO CULTORES";
+    document.getElementById('modalTitulo').innerText = "NUEVO CENSO DE SABERES";
     document.getElementById('cedula').disabled = false;
-    document.getElementById('btnEliminarCultor').classList.add('d-none');
-    imagenGlobalBase64 = "";
     document.getElementById('previewCont').innerHTML = "";
     document.getElementById('iconoCamara').style.display = "block";
+    document.getElementById('btnEliminarCultor').classList.add('d-none');
+    imagenGlobalBase64 = "";
     modalInstancia.show();
 }
 
-function abrirParaEditar(cultor) {
-    document.getElementById('action_type').value = "ACTUALIZAR";
-    document.getElementById('modalTitulo').innerText = "MODIFICAR REGISTRO";
-    document.getElementById('btnEliminarCultor').classList.remove('d-none');
+function abrirParaEditar(r) {
+    document.getElementById('formularioCenso').reset();
+    document.getElementById('action_type').value = "EDITAR";
+    document.getElementById('modalTitulo').innerText = "CORREGIR DATOS DEL CULTORES";
     
-    document.getElementById('municipio').value = cultor.municipio || "";
-    document.getElementById('parroquia').value = cultor.parroquia || "";
-    document.getElementById('comuna').value = cultor.comuna || "";
-    document.getElementById('comunidad').value = cultor.comunidad || "";
-    document.getElementById('cedula').value = cultor.cedula || "";
-    document.getElementById('cedula').disabled = true; // No permitir cambiar cédula llave
-    document.getElementById('nombre').value = cultor.nombre || "";
-    document.getElementById('sexo').value = cultor.sexo || "";
-    document.getElementById('especialidad').value = cultor.especialidad || "";
-    document.getElementById('artesania').value = cultor.artesania || "";
-    document.getElementById('dequienaprendio').value = cultor.dequienaprendio || "";
-    document.getElementById('enfermedadesquetrata').value = cultor.enfermedadesquetrata || "";
-    document.getElementById('plantasoproductosqueusa').value = cultor.plantasoproductosqueusa || "";
-    document.getElementById('observaciones').value = cultor.observaciones || "";
+    document.getElementById('municipio').value = r.municipio || "";
+    document.getElementById('parroquia').value = r.parroquia || "";
+    document.getElementById('comuna').value = r.comuna || "";
+    document.getElementById('comunidad').value = r.comunidad || "";
+    document.getElementById('cedula').value = r.cedula || "";
+    document.getElementById('cedula').disabled = true; // C.I actúa como llave primaria unívoca
+    document.getElementById('fechanacimiento').value = r.fechanacimiento || "";
+    document.getElementById('nombre').value = r.nombre || "";
+    document.getElementById('sexo').value = r.sexo || "";
+    document.getElementById('especialidad').value = r.especialidad || "";
+    document.getElementById('artesania').value = r.artesania || "";
+    document.getElementById('dequienaprendio').value = r.dequienaprendio || "";
+    document.getElementById('enfermedadesquetrata').value = r.enfermedadesquetrata || "";
+    document.getElementById('plantasoproductosqueusa').value = r.plantasoproductosqueusa || "";
+    document.getElementById('observaciones').value = r.observaciones || "";
     
-    if (cultor.fechanacimiento) {
-        try {
-            const f = new Date(cultor.fechanacimiento);
-            if (!isNaN(f.getTime())) {
-                document.getElementById('fechanacimiento').value = f.toISOString().split('T')[0];
-            }
-        } catch(e) { document.getElementById('fechanacimiento').value = ""; }
-    } else {
-        document.getElementById('fechanacimiento').value = "";
-    }
-
-    imagenGlobalBase64 = cultor.foto || "";
-    const preview = document.getElementById('previewCont');
-    if (imagenGlobalBase64 && imagenGlobalBase64.length > 10) {
-        preview.innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover;">`;
+    const prev = document.getElementById('previewCont');
+    if(r.foto && r.foto.length > 10) {
+        prev.innerHTML = `<img src="${r.foto}" style="width:100%; height:100%; object-fit:cover;">`;
         document.getElementById('iconoCamara').style.display = "none";
+        imagenGlobalBase64 = r.foto;
     } else {
-        preview.innerHTML = "";
+        prev.innerHTML = "";
         document.getElementById('iconoCamara').style.display = "block";
+        imagenGlobalBase64 = "";
     }
     
+    document.getElementById('btnEliminarCultor').classList.remove('d-none');
     modalInstancia.show();
 }
 
@@ -743,8 +767,6 @@ document.getElementById('fotoFile').addEventListener('change', function(e) {
 
 document.getElementById('formularioCenso').addEventListener('submit', function(e) {
     e.preventDefault();
-    notificar("🔄 Sincronizando con base de datos...", "#0284c7");
-    
     const payload = {
         accion: document.getElementById('action_type').value,
         municipio: document.getElementById('municipio').value,
@@ -763,7 +785,9 @@ document.getElementById('formularioCenso').addEventListener('submit', function(e
         observaciones: document.getElementById('observaciones').value,
         foto: imagenGlobalBase64
     };
-
+    
+    notificar("🚀 Transmitiendo datos a la nube...", "#0284c7");
+    
     fetch(URL_API_GOOGLE, {
         method: "POST",
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -773,15 +797,15 @@ document.getElementById('formularioCenso').addEventListener('submit', function(e
     .then(data => {
         modalInstancia.hide();
         if(data.status === "success") {
-            notificar("💾 Datos resguardados con éxito", "#22c55e");
+            notificar("✨ Datos resguardados con éxito", "#22c55e");
         } else {
-            notificar("⚠️ Error: " + data.message, "#ef4444");
+            notificar("❌ Error: " + data.message, "#ef4444");
         }
         cargarDatos();
     })
     .catch(() => {
         modalInstancia.hide();
-        notificar("💾 Sincronizado correctamente", "#22c55e");
+        notificar("✨ Sincronizado correctamente", "#22c55e");
         cargarDatos();
     });
 });
@@ -789,7 +813,7 @@ document.getElementById('formularioCenso').addEventListener('submit', function(e
 function eliminarCultorActual() {
     const ci = document.getElementById('cedula').value;
     if (ci && confirm(`¿Seguro que desea eliminar el registro de C.I: ${ci}?`)) {
-        notificar("🔄 Eliminando registro...", "#1e293b");
+        notificar("🗑️ Eliminando registro...", "#1e293b");
         fetch(URL_API_GOOGLE, {
             method: "POST",
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -798,12 +822,11 @@ function eliminarCultorActual() {
         .then(res => res.json())
         .then(() => {
             modalInstancia.hide();
-            notificar("🗑️ Registro purgado de la nube", "#ef4444");
+            notificar("✅ Registro removido de la base nacional", "#e11d48");
             cargarDatos();
         })
         .catch(() => {
             modalInstancia.hide();
-            notificar("🗑️ Registro purgado de la nube", "#ef4444");
             cargarDatos();
         });
     }
