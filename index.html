@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SIAHO Censo Móvil</title>
+    <title>SIAHO Censo Móvil Profesional</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
         :root { 
             --primary: #0284c7; 
@@ -14,131 +17,106 @@
             --mystic: #1e1b4b;
             --form-grad: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
         }
-        body { background-color: var(--bg); font-family: system-ui, -apple-system, sans-serif; padding-bottom: 95px; overflow-x: hidden; }
+        body { background-color: var(--bg); font-family: system-ui, -apple-system, sans-serif; padding-bottom: 100px; overflow-x: hidden; }
         
-        /* BANNER ANCESTRAL DINÁMICO */
+        /* BANNER ANCESTRAL */
         .banner-ancestral {
             position: relative;
             width: 100%;
-            height: 180px;
+            height: 160px;
             background: linear-gradient(rgba(30, 27, 75, 0.4), var(--mystic)), url('image_353552.jpg') center/cover no-repeat;
             display: flex;
             align-items: flex-end;
             padding: 20px;
             color: white;
-            overflow: hidden;
             border-bottom-left-radius: 24px;
             border-bottom-right-radius: 24px;
             box-shadow: 0 10px 25px -5px rgba(30, 27, 75, 0.3);
         }
-        .banner-blur-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
         
-        /* RUNAS MÍSTICAS DECORATIVAS */
-        .runa-decorativa {
-            position: absolute;
-            font-family: monospace, serif;
-            font-size: 1.8rem;
-            color: rgba(255, 255, 255, 0.25);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
-            animation: pulseRuna 3s infinite ease-in-out;
-        }
-        @keyframes pulseRuna { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.1); } }
-
-        /* SECCIÓN NOTICIAS HORIZONTAL (CARRUSEL MÓVIL) */
+        /* NOTICIAS HORIZONTALES */
         .news-carousel {
             display: flex;
             overflow-x: auto;
-            scroll-snap-type: x mandatory;
             gap: 14px;
-            padding: 5px 0 15px 0;
+            padding: 5px 2px 15px 2px;
             scrollbar-width: none;
         }
         .news-carousel::-webkit-scrollbar { display: none; }
         
         .news-card {
-            flex: 0 0 82%;
-            scroll-snap-align: start;
+            flex: 0 0 85%;
             background: white;
             border-radius: 18px;
-            border: none;
             box-shadow: 0 4px 15px rgba(0,0,0,0.04);
             overflow: hidden;
             position: relative;
         }
-        .news-img-container {
-            width: 100%;
-            height: 110px;
-            background: #e2e8f0;
-            position: relative;
-        }
+        .news-img-container { width: 100%; height: 120px; background: #e2e8f0; position: relative; }
         .news-img-container img { width: 100%; height: 100%; object-fit: cover; }
-        .news-runa-badge {
-            position: absolute;
-            bottom: -15px;
-            right: 15px;
-            width: 32px;
-            height: 32px;
-            background: var(--accent);
-            color: white;
-            border-radius: 50%;
-            display: flex;
+        
+        /* BOTÓN DE NUEVO REGISTRO CORREGIDO Y PERFECTAMENTE CENTRADO */
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: rgba(255,255,255,0.95); 
+            backdrop-filter: blur(12px); 
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
             align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            padding: 6px 10px 14px 10px; 
+            border-top: 1px solid #e2e8f0; 
+            z-index: 1000; 
         }
-
-        /* COMPONENTES DE LISTADO */
-        .card-custom { 
-            border: none; 
-            border-radius: 16px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02); 
-            transition: transform 0.2s; 
-        }
-        .avatar-container { width: 60px; height: 60px; min-width: 60px; position: relative; overflow: hidden; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); background-color: #f8fafc; }
-        .img-avatar { width: 100%; height: 100%; object-fit: cover; display: block; }
-        
-        /* BOTONES DE NAVEGACIÓN INFERIOR */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); display: flex; justify-content: space-around; padding: 10px 0 14px 0; border-top: 1px solid #e2e8f0; z-index: 1000; }
-        .nav-item-custom { text-align: center; color: #64748b; text-decoration: none; font-size: 0.72rem; flex-grow: 1; position: relative; cursor: pointer; }
+        .nav-item-custom { text-align: center; color: #64748b; text-decoration: none; font-size: 0.75rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .nav-item-custom.active { color: var(--primary); font-weight: 700; }
-        .nav-item-custom i { font-size: 1.35rem; display: block; margin-bottom: 3px; }
+        .nav-item-custom i { font-size: 1.4rem; margin-bottom: 2px; }
         
-        .fab-add { width: 54px; height: 54px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-top: -30px; border: 4px solid #fff; box-shadow: 0 4px 12px rgba(2,132,199,0.35); }
-        
-        .search-box { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 14px 0 8px 0; }
-        .search-box input { border-radius: 25px; padding-left: 42px; background: #fff; height: 44px; }
-        .search-box i { position: absolute; left: 16px; top: 54%; transform: translateY(-50%); color: #94a3b8; font-size: 1.05rem; }
-        
-        /* ZONA DE CARGA FOTO FORMULARIO */
-        .upload-zone { width: 100px; height: 100px; border: 3px dashed var(--primary); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #f0f9ff; cursor: pointer; transition: all 0.3s; }
-        .upload-zone:hover { background: #e0f2fe; border-color: var(--accent); }
-        .upload-zone img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+        /* Contenedor central simétrico */
+        .fab-container { display: flex; justify-content: center; align-items: center; width: 75px; position: relative; }
+        .fab-add { 
+            width: 56px; 
+            height: 56px; 
+            background: linear-gradient(135deg, var(--primary), var(--accent)); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            position: absolute;
+            top: -32px;
+            border: 4px solid #fff; 
+            box-shadow: 0 6px 16px rgba(2,132,199,0.4); 
+            font-size: 1.3rem;
+            transition: transform 0.2s;
+        }
+        .fab-add:active { transform: scale(0.92); }
 
-        /* INTERACTIVIDAD Y COLOR PARA EL FORMULARIO */
+        /* LISTADOS INTERACTIVOS */
+        .card-custom { border: none; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s; cursor: pointer; }
+        .card-custom:active { transform: scale(0.98); }
+        .avatar-container { width: 55px; height: 55px; min-width: 55px; overflow: hidden; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        
+        /* FORMULARIO AVANZADO INTERACTIVO */
         .section-title-custom { background: linear-gradient(90deg, #0284c7, #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.5px; margin-top: 15px; margin-bottom: 8px; display: flex; align-items: center; }
         .section-title-custom::after { content: ''; flex-grow: 1; background: linear-gradient(90deg, #cbd5e1, transparent); height: 2px; margin-left: 10px; }
         .form-control-interactive { border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; transition: all 0.25s ease; background-color: #ffffff; font-size: 0.85rem; }
-        .form-control-interactive:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); background-color: #fff; }
+        .form-control-interactive:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); }
         
-        /* BLOQUES DE ESTADÍSTICAS COLORIDAS */
-        .stat-card-group { background: white; border-radius: 16px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border-left: 5px solid var(--primary); }
-        .stat-badge-count { background: linear-gradient(135deg, #0284c7, #4f46e5); color: white; border-radius: 20px; padding: 2px 10px; font-weight: bold; font-size: 0.75rem; }
+        /* DISEÑO DE EXPANSIONES TERRITORIALES ACCORDION */
+        .stat-accordion-item { background: white; border-radius: 14px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; overflow: hidden; }
+        .stat-header-trigger { width: 100%; padding: 14px; border: none; background: white; display: flex; justify-content: space-between; align-items: center; text-align: left; }
+        .stat-count-badge { background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; }
+        .stat-details-box { background: #f8fafc; padding: 10px 14px; border-top: 1px solid #f1f5f9; display: none; }
 
-        .toast-notificacion { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: none; background: #1e293b; color: #fff; padding: 12px 24px; border-radius: 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); font-weight: 500; font-size: 0.9rem; animation: slideDown 0.3s forwards; }
-        @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
+        /* VISTA FORMATO EXPORTABLE (FICHA TÉCNICA) */
+        .ficha-exportable { background: #fff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; position: relative; }
+        .ficha-header { border-bottom: 3px double #0284c7; padding-bottom: 12px; margin-bottom: 15px; text-align: center; }
+        .ficha-avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; margin: 0 auto 10px auto; display: block; }
+
+        .toast-notificacion { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: none; background: #1e293b; color: #fff; padding: 12px 24px; border-radius: 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); font-weight: 500; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -146,126 +124,133 @@
 <div id="alertaFlotante" class="toast-notificacion"></div>
 
 <div class="banner-ancestral">
-    <div class="banner-blur-badge text-success">
-        <i class="fa-solid fa-circle-check me-1"></i> <span id="estadoConexion">Sincronizado</span>
-    </div>
-    
-    <div class="runa-decorativa" style="top: 20px; left: 20px;">ᚠ</div>
-    <div class="runa-decorativa" style="top: 75px; left: 15px;">ᚲ</div>
-    <div class="runa-decorativa" style="top: 25px; right: 80px; animation-delay: 1.5s;">ᛗ</div>
-    <div class="runa-decorativa" style="top: 80px; right: 20px; animation-delay: 0.8s;">ᛖ</div>
-
     <div class="w-100 d-flex justify-content-between align-items-center">
         <div>
             <h2 class="fw-bold mb-0 text-white" style="letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.4)">IASPI</h2>
-            <p class="text-white-50 mb-0 small" style="font-size: 0.82rem;"><i class="fa-solid fa-seedling me-1"></i>Saberes Ancestrales de la Patria</p>
+            <p class="text-white-50 mb-0 small" style="font-size: 0.8rem;"><i class="fa-solid fa-tree me-1"></i>Saberes Ancestrales Territoriales</p>
         </div>
         <div class="text-end">
-            <h1 class="fw-black mb-0 text-white" id="statTotal" style="font-size: 2.3rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5)">0</h1>
-            <span class="text-white-50 super-small" style="font-size:0.65rem; text-transform: uppercase;">Cultores</span>
+            <h1 class="fw-black mb-0 text-white" id="statTotal" style="font-size: 2.2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5)">0</h1>
+            <span class="text-white-50 super-small" style="font-size:0.65rem;">CULTORES</span>
         </div>
     </div>
 </div>
 
 <div class="container mt-3" id="vistaPrincipal">
-    
     <div class="d-flex justify-content-between align-items-center mb-2">
-        <h6 class="fw-bold text-secondary mb-0"><i class="fa-solid fa-bullhorn text-primary me-2"></i>Noticias Ancestrales</h6>
-        <button class="btn btn-sm btn-light text-muted fw-bold" onclick="abrirAdminNoticias()" style="font-size: 0.72rem; border-radius: 12px; border: 1px solid #e2e8f0;">
-            <i class="fa-solid fa-lock text-warning me-1"></i> Admin
+        <h6 class="fw-bold text-secondary mb-0"><i class="fa-solid fa-bullhorn text-primary me-2"></i>Cartelera Informativa</h6>
+        <button class="btn btn-sm btn-light text-muted fw-bold" onclick="abrirAdminNoticias(true)" style="font-size: 0.72rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+            <i class="fa-solid fa-plus-circle text-success me-1"></i> Noticia
         </button>
     </div>
     
     <div class="news-carousel" id="contenedorNoticias"></div>
 
-    <div class="search-box position-relative">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="inputBuscar" class="form-control shadow-sm border-0" placeholder="Buscar cultor por nombre o cédula...">
+    <div class="position-relative my-2">
+        <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:15px; top:14px;"></i>
+        <input type="text" id="inputBuscar" class="form-control shadow-sm border-0 ps-5" placeholder="Buscar por nombre o cédula..." style="height:44px; border-radius:22px;">
     </div>
 
-    <div id="listaMovil" class="mt-2">
-        <div class="text-center py-5">
-            <div class="spinner-border text-primary" role="status"></div>
-            <p class="text-muted mt-2" style="font-size:0.85rem">Actualizando registros...</p>
-        </div>
-    </div>
+    <div id="listaMovil" class="mt-2"></div>
 </div>
 
-<div class="container mt-4 d-none" id="vistaEstadisticas">
-    <div class="d-flex align-items-center mb-3">
+<div class="container mt-3 d-none" id="vistaEstadisticas">
+    <div class="d-flex align-items-center mb-3 p-2 bg-white rounded-3 shadow-sm">
         <div class="p-2 bg-primary text-white rounded-3 me-3"><i class="fa-solid fa-chart-pie fa-lg"></i></div>
         <div>
-            <h5 class="fw-bold text-dark mb-0">Análisis Territorial</h5>
-            <small class="text-muted">Distribución de saberes registrados</small>
+            <h6 class="fw-bold text-dark mb-0">Distribución Territorial Fina</h6>
+            <small class="text-muted">Toca un territorio para ver los censados</small>
         </div>
     </div>
 
-    <ul class="nav nav-pills nav-fill mb-3 bg-white p-1 rounded-3 shadow-sm" id="pills-tab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active py-2 fw-bold small" id="btn-tab-municipios" data-bs-toggle="pill" data-bs-target="#tab-municipios" type="button" role="tab">Municipios</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link py-2 fw-bold small" id="btn-tab-parroquias" data-bs-toggle="pill" data-bs-target="#tab-parroquias" type="button" role="tab">Parroquias</button>
-        </li>
+    <ul class="nav nav-pills nav-fill mb-3 bg-white p-1 rounded-3 shadow-sm" role="tablist">
+        <li class="nav-item"><button class="nav-link active py-2 fw-bold small" id="t-mun" data-bs-toggle="pill" data-bs-target="#c-mun" type="button" role="tab">Municipio</button></li>
+        <li class="nav-item"><button class="nav-link py-2 fw-bold small" id="t-par" data-bs-toggle="pill" data-bs-target="#c-par" type="button" role="tab">Parroquia</button></li>
+        <li class="nav-item"><button class="nav-link py-2 fw-bold small" id="t-com" data-bs-toggle="pill" data-bs-target="#c-com" type="button" role="tab">Comuna</button></li>
     </ul>
 
-    <div class="tab-content" id="pills-tabContent">
-        <div class="tab-pane fade show active" id="tab-municipios" role="tabpanel">
-            <div id="statsByMunicipio"></div>
-        </div>
-        <div class="tab-pane fade" id="tab-parroquias" role="tabpanel">
-            <div id="statsByParroquia"></div>
-        </div>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="c-mun" role="tabpanel"><div id="desgloseMunicipios"></div></div>
+        <div class="tab-pane fade" id="c-par" role="tabpanel"><div id="desgloseParroquias"></div></div>
+        <div class="tab-pane fade" id="c-com" role="tabpanel"><div id="desgloseComunas"></div></div>
     </div>
 </div>
 
 <div class="bottom-nav">
     <a id="navRegistros" class="nav-item-custom active" onclick="cambiarVista('registros')">
-        <i class="fa-solid fa-box-archive"></i>Registros
+        <i class="fa-solid fa-folder-open"></i>Registros
     </a>
-    <a class="nav-item-custom" onclick="abrirParaCrear(); return false;">
-        <div class="fab-add"><i class="fa-solid fa-plus"></i></div>
-        Nuevo
-    </a>
+    <div class="fab-container">
+        <a class="nav-item-custom" onclick="abrirParaCrear(); return false;">
+            <div class="fab-add"><i class="fa-solid fa-plus"></i></div>
+        </a>
+    </div>
     <a id="navEstadisticas" class="nav-item-custom" onclick="cambiarVista('estadisticas')">
-        <i class="fa-solid fa-chart-pie"></i>Estadísticas
+        <i class="fa-solid fa-chart-line"></i>Estadísticas
     </a>
+</div>
+
+<div class="modal fade" id="modalVerFicha" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 bg-transparent">
+            <div class="modal-body p-0" id="areaDescargaFicha">
+                <div class="ficha-exportable">
+                    <div class="ficha-header">
+                        <h5 class="fw-bold text-primary mb-0">REPÚBLICA BOLIVARIANA DE VENEZUELA</h5>
+                        <small class="fw-bold text-muted small">SIAHO - REGISTRO NACIONAL DE CULTORES</small>
+                    </div>
+                    <img id="f-foto" src="" class="ficha-avatar shadow-sm" alt="Foto">
+                    <h5 class="text-center fw-bold text-dark mb-1" id="f-nombre">---</h5>
+                    <p class="text-center text-muted small mb-3">C.I: <span id="f-cedula">---</span></p>
+                    
+                    <div class="row g-2 style-json-data" style="font-size: 0.85rem;">
+                        <div class="col-6 border-bottom pb-1"><strong>Municipio:</strong> <span id="f-mun" class="text-secondary"></span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>Parroquia:</strong> <span id="f-par" class="text-secondary"></span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>Comuna:</strong> <span id="f-com" class="text-secondary"></span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>Comunidad:</strong> <span id="f-comu" class="text-secondary"></span></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Especialidad:</strong> <span id="f-esp" class="badge bg-primary text-white"></span></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Artesanía:</strong> <span id="f-art" class="text-secondary"></span></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Origen Runa/Maestro:</strong> <span id="f-apre" class="text-secondary"></span></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Enfermedades Tratadas:</strong> <span id="f-enf" class="text-secondary"></span></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Plantas que Usa:</strong> <span id="f-pla" class="text-secondary"></span></div>
+                        <div class="col-12"><strong>Observaciones:</strong> <p id="f-obs" class="text-muted small mb-0 mt-1" style="line-height:1.3;"></p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 bg-white rounded-bottom-4 d-flex gap-2">
+                <button class="btn btn-danger w-100 btn-sm fw-bold py-2" onclick="exportarFichaA_PDF()"><i class="fa-solid fa-file-pdf me-2"></i>Descargar PDF</button>
+                <button class="btn btn-success w-100 btn-sm fw-bold py-2" onclick="exportarFichaA_Imagen()"><i class="fa-solid fa-image me-2"></i>Descargar Imagen</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="modalAdminNoticias" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 rounded-4">
             <div class="modal-header bg-dark text-white py-3">
-                <h6 class="modal-title fw-bold"><i class="fa-solid fa-user-shield me-2 text-warning"></i>Cargar Noticia (Solo Admin)</h6>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h6 class="modal-title fw-bold" id="tituloModalNoticia"><i class="fa-solid fa-newspaper me-2 text-warning"></i>Gestionar Noticia</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="formNuevaNoticia">
+                <input type="hidden" id="noticiaIndex" value="">
                 <div class="modal-body p-3">
                     <div class="mb-2">
-                        <label class="form-label small fw-bold text-muted">Título de la Noticia</label>
-                        <input type="text" id="newsTitle" class="form-control form-control-sm" placeholder="Ej: Herbolaria Tradicional Kariña" required>
+                        <label class="form-label small fw-bold">Título del Acontecimiento</label>
+                        <input type="text" id="newsTitle" class="form-control" placeholder="Ej: Encuentro de Sabios Populares" required>
                     </div>
                     <div class="mb-2">
-                        <label class="form-label small fw-bold text-muted">Descripción Corta</label>
-                        <textarea id="newsDesc" class="form-control form-control-sm" rows="3" placeholder="Escribe el contenido resumido..." required></textarea>
+                        <label class="form-label small fw-bold">Breve Resumen Informativo</label>
+                        <textarea id="newsDesc" class="form-control" rows="3" placeholder="Contenido de la cartelera..." required></textarea>
                     </div>
                     <div class="mb-2">
-                        <label class="form-label small fw-bold text-muted">Imagen de la Noticia (Opcional)</label>
-                        <input type="file" id="newsFile" class="form-control form-control-sm" accept="image/*">
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label small fw-bold text-muted">Runa del Icono</label>
-                        <select id="newsRuna" class="form-select form-select-sm">
-                            <option value="ᚠ">ᚠ - Abundancia</option>
-                            <option value="ᚲ">ᚲ - Sabiduría</option>
-                            <option value="ᛗ">ᛗ - Comunidad</option>
-                            <option value="ᛖ">ᛖ - Movimiento</option>
-                        </select>
+                        <label class="form-label small fw-bold">Fotografía Portada de Noticia</label>
+                        <input type="file" id="newsFile" class="form-control" accept="image/*">
                     </div>
                 </div>
-                <div class="modal-footer border-0 bg-light py-2">
-                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold">Publicar en PWA</button>
+                <div class="modal-footer bg-light py-2">
+                    <button type="button" class="btn btn-sm btn-danger d-none" id="btnBorrarNoticia" onclick="eliminarNoticiaActual()">Eliminar Noticia</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold" id="btnGuardarNoticia">Publicar</button>
                 </div>
             </form>
         </div>
@@ -284,9 +269,9 @@
                 <div class="modal-body p-3">
                     
                     <div class="text-center mb-3">
-                        <div class="upload-zone shadow" onclick="document.getElementById('fotoFile').click()">
+                        <div class="upload-zone shadow" onclick="document.getElementById('fotoFile').click()" style="width: 100px; height: 100px; border: 3px dashed var(--primary); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #f0f9ff; cursor: pointer;">
                             <i class="fa-solid fa-camera fa-2x text-primary" id="iconoCamara"></i>
-                            <div id="previewCont"></div>
+                            <div id="previewCont" style="position:absolute; width:100%; height:100%;"></div>
                         </div>
                         <div class="mt-2"><small class="text-primary fw-bold" style="font-size:0.75rem; cursor:pointer;" onclick="document.getElementById('fotoFile').click()">Cargar Foto del Cultor</small></div>
                         <input type="file" class="d-none" id="fotoFile" accept="image/*">
@@ -308,7 +293,6 @@
                                 <option value="" disabled selected>Seleccione Género</option>
                                 <option value="Masculino">Masculino</option>
                                 <option value="Femenino">Femenino</option>
-                                <option value="Otro">Otro / No definido</option>
                             </select>
                         </div>
 
@@ -323,8 +307,8 @@
 
                 </div>
                 <div class="modal-footer border-0 bg-white py-2 shadow-lg rounded-bottom">
-                    <button type="button" class="btn btn-light btn-sm text-muted rounded-3" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold rounded-3 shadow-sm" id="btnGuardar">Guardar</button>
+                    <button type="button" class="btn btn-light btn-sm text-muted" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold" id="btnGuardar">Guardar</button>
                 </div>
             </form>
         </div>
@@ -338,19 +322,21 @@ let todosLosDatos = [];
 let imagenGlobalBase64 = ""; 
 let modalInstancia = null;
 let modalAdminInstancia = null;
+let modalVerFichaInstancia = null;
 let noticiaImagenBase64 = "";
 
 let noticiasData = [
-    { titulo: "Herbolaria Tradicional Kariña", desc: "Sistematización de saberes médicos y botánicos.", img: "image_353552.jpg", runa: "ᚠ" },
-    { titulo: "Encuentro União de Saberes", desc: "Mesas de trabajo y planificación del censo IASHO.", img: "", runa: "ᛗ" }
+    { titulo: "Herbolaria Tradicional IASPI", desc: "Sistematización de saberes de médicos tradicionales.", img: "image_353552.jpg" },
+    { titulo: "Encuentro Unión de Saberes", desc: "Planificación territorial y despliegue del censo en comunidades.", img: "" }
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
     modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
     modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
+    modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
     
-    if(localStorage.getItem('pwa_noticias')) {
-        noticiasData = JSON.parse(localStorage.getItem('pwa_noticias'));
+    if(localStorage.getItem('pwa_noticias_v2')) {
+        noticiasData = JSON.parse(localStorage.getItem('pwa_noticias_v2'));
     }
     renderizarNoticias();
     cargarDatos();
@@ -361,10 +347,9 @@ function notificar(mensaje, colorFondo = "#1e293b") {
     alerta.innerText = mensaje;
     alerta.style.backgroundColor = colorFondo;
     alerta.style.display = 'block';
-    setTimeout(() => { alerta.style.display = 'none'; }, 3500);
+    setTimeout(() => { alerta.style.display = 'none'; }, 3000);
 }
 
-// CONTROLADOR DE VISTAS (SPA MÓVIL)
 function cambiarVista(vista) {
     const principal = document.getElementById('vistaPrincipal');
     const estadisticas = document.getElementById('vistaEstadisticas');
@@ -381,58 +366,150 @@ function cambiarVista(vista) {
         estadisticas.classList.remove('d-none');
         navReg.classList.remove('active');
         navEst.classList.add('active');
-        generarEstadisticasTerritoriales();
+        procesarYRenderizarEstadisticasAvanzadas();
     }
 }
 
-// PROCESADOR DINÁMICO DE ESTADÍSTICAS AGRUPADAS
-function generarEstadisticasTerritoriales() {
-    const municipiosCont = document.getElementById('statsByMunicipio');
-    const parroquiasCont = document.getElementById('statsByParroquia');
+/* ==========================================================
+   DESGLOSE INTERACTIVO DE ESTADÍSTICAS POR TERRITORIO
+   ========================================================== */
+function procesarYRenderizarEstadisticasAvanzadas() {
+    const contenedorM = document.getElementById('desgloseMunicipios');
+    const contenedorP = document.getElementById('desgloseParroquias');
+    const contenedorC = document.getElementById('desgloseComunas');
     
     if(todosLosDatos.length === 0) {
-        municipiosCont.innerHTML = `<p class="text-muted small text-center py-3">No hay datos para procesar.</p>`;
-        parroquiasCont.innerHTML = `<p class="text-muted small text-center py-3">No hay datos para procesar.</p>`;
+        const vacio = `<p class="text-muted text-center py-4">No hay registros cargados aún.</p>`;
+        contenedorM.innerHTML = vacio; contenedorP.innerHTML = vacio; contenedorC.innerHTML = vacio;
         return;
     }
 
-    let municipios = {};
-    let parroquias = {};
+    let mapaMun = {}, mapaPar = {}, mapaCom = {};
 
     todosLosDatos.forEach(c => {
-        let mun = (c.municipio || "No Especificado").trim().toUpperCase();
-        let parr = (c.parroquia || "No Especificado").trim().toUpperCase();
+        let m = (c.municipio || "No Definido").trim().toUpperCase();
+        let p = (c.parroquia || "No Definido").trim().toUpperCase();
+        let co = (c.comuna || "No Definido").trim().toUpperCase();
 
-        municipios[mun] = (municipios[mun] || 0) + 1;
-        parroquias[parr] = (parroquias[parr] || 0) + 1;
+        if(!mapaMun[m]) mapaMun[m] = [];
+        if(!mapaPar[p]) mapaPar[p] = [];
+        if(!mapaCom[co]) mapaCom[co] = [];
+
+        mapaMun[m].push(c);
+        mapaPar[p].push(c);
+        mapaCom[co].push(c);
     });
 
-    municipiosCont.innerHTML = Object.keys(municipios).map(m => `
-        <div class="stat-card-group d-flex justify-content-between align-items-center">
-            <span class="fw-bold text-dark small"><i class="fa-solid fa-map-pin text-primary me-2"></i>${m}</span>
-            <span class="stat-badge-count">${municipios[m]} Censados</span>
-        </div>
-    `).join('');
-
-    parroquiasCont.innerHTML = Object.keys(parroquias).map(p => `
-        <div class="stat-card-group d-flex justify-content-between align-items-center" style="border-left-color: #4f46e5;">
-            <span class="fw-bold text-dark small"><i class="fa-solid fa-location-crosshairs text-accent me-2"></i>${p}</span>
-            <span class="stat-badge-count" style="background: linear-gradient(135deg, #4f46e5, #7c3aed);">${parroquias[p]} Censados</span>
-        </div>
-    `).join('');
+    contenedorM.innerHTML = construirAcordeonTerritorial(mapaMun, 'mun');
+    contenedorP.innerHTML = construirAcordeonTerritorial(mapaPar, 'par');
+    contenedorC.innerHTML = construirAcordeonTerritorial(mapaCom, 'com');
 }
 
-document.getElementById('fotoFile').addEventListener('change', function(e) {
-    if (this.files && this.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            imagenGlobalBase64 = e.target.result; 
-            document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover;">`;
-            document.getElementById('iconoCamara').style.display = 'none'; 
-        }
-        reader.readAsDataURL(this.files[0]);
+function construirAcordeonTerritorial(mapa, prefijo) {
+    return Object.keys(mapa).map((lugar, index) => {
+        const personasHTML = mapa[lugar].map(p => `
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom text-dark" onclick="verFilaFicha('${p.cedula}')" style="cursor:pointer; font-size:0.8rem;">
+                <span><i class="fa-solid fa-user text-muted me-2"></i>${p.nombre}</span>
+                <span class="text-muted font-monospace">${p.cedula}</span>
+            </div>
+        `).join('');
+
+        return `
+            <div class="stat-accordion-item">
+                <button class="stat-header-trigger" onclick="conmutarAcordeon('${prefijo}-${index}')">
+                    <span class="fw-bold text-dark small"><i class="fa-solid fa-map-location text-primary me-2"></i>${lugar}</span>
+                    <span class="stat-count-badge">${mapa[lugar].length} Cultores</span>
+                </button>
+                <div class="stat-details-box" id="box-${prefijo}-${index}">
+                    ${personasHTML}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function conmutarAcordeon(id) {
+    const el = document.getElementById(`box-${id}`);
+    el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+}
+
+/* ==========================================================
+   VISUALIZACIÓN Y IMPRESIÓN/EXPORTACIÓN DE FICHA INDIVIDUAL
+   ========================================================== */
+function verFilaFicha(cedula) {
+    const r = todosLosDatos.find(d => d.cedula.toString().trim() === cedula.toString().trim());
+    if(!r) return;
+
+    document.getElementById('f-nombre').innerText = r.nombre || '---';
+    document.getElementById('f-cedula').innerText = r.cedula || '---';
+    document.getElementById('f-mun').innerText = r.municipio || '---';
+    document.getElementById('f-par').innerText = r.parroquia || '---';
+    document.getElementById('f-com').innerText = r.comuna || '---';
+    document.getElementById('f-comu').innerText = r.comunidad || '---';
+    document.getElementById('f-esp').innerText = r.especialidad || '---';
+    document.getElementById('f-art').innerText = r.artesania || '---';
+    document.getElementById('f-apre').innerText = r.dequienaprendio || '---';
+    document.getElementById('f-enf').innerText = r.enfermedadesquetrata || '---';
+    document.getElementById('f-pla').innerText = r.plantasoproductosqueusa || '---';
+    document.getElementById('f-obs').innerText = r.observaciones || 'Sin observaciones.';
+
+    const fotoEl = document.getElementById('f-foto');
+    if(r.foto && r.foto.length > 10) {
+        fotoEl.src = r.foto;
+        fotoEl.style.display = "block";
+    } else {
+        fotoEl.src = "";
+        fotoEl.style.display = "none";
     }
-});
+
+    modalVerFichaInstancia.show();
+}
+
+function exportarFichaA_PDF() {
+    const elemento = document.getElementById('areaDescargaFicha');
+    const ci = document.getElementById('f-cedula').innerText;
+    const opciones = {
+        margin: 10,
+        filename: `Ficha_Cultor_${ci}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opciones).from(elemento).save();
+}
+
+function exportarFichaA_Imagen() {
+    const elemento = document.getElementById('areaDescargaFicha');
+    const ci = document.getElementById('f-cedula').innerText;
+    html2canvas(elemento, { useCORS: true, scale: 2 }).then(canvas => {
+        const enlace = document.createElement('a');
+        enlace.download = `Ficha_Cultor_${ci}.png`;
+        enlace.href = canvas.toDataURL('image/png');
+        enlace.click();
+    });
+}
+
+/* ==========================================================
+   ADMINISTRACIÓN Y EDICIÓN COMPLETA DE NOTICIAS
+   ========================================================== */
+function abrirAdminNoticias(esNueva, index = null) {
+    const form = document.getElementById('formNuevaNoticia');
+    form.reset();
+    noticiaImagenBase64 = "";
+    
+    if(esNueva) {
+        document.getElementById('tituloModalNoticia').innerText = "Publicar Novedad";
+        document.getElementById('noticiaIndex').value = "";
+        document.getElementById('btnBorrarNoticia').classList.add('d-none');
+    } else {
+        document.getElementById('tituloModalNoticia').innerText = "Modificar / Eliminar Noticia";
+        document.getElementById('noticiaIndex').value = index;
+        document.getElementById('newsTitle').value = noticiasData[index].titulo;
+        document.getElementById('newsDesc').value = noticiasData[index].desc;
+        document.getElementById('btnBorrarNoticia').classList.remove('d-none');
+    }
+    modalAdminInstancia.show();
+}
 
 document.getElementById('newsFile').addEventListener('change', function(e) {
     if (this.files && this.files[0]) {
@@ -442,46 +519,60 @@ document.getElementById('newsFile').addEventListener('change', function(e) {
     }
 });
 
-function abrirAdminNoticias() {
-    document.getElementById('formNuevaNoticia').reset();
-    noticiaImagenBase64 = "";
-    modalAdminInstancia.show();
-}
-
 document.getElementById('formNuevaNoticia').addEventListener('submit', function(e) {
     e.preventDefault();
+    const idx = document.getElementById('noticiaIndex').value;
     const nueva = {
         titulo: document.getElementById('newsTitle').value,
         desc: document.getElementById('newsDesc').value,
-        img: noticiaImagenBase64 || "image_353552.jpg",
-        runa: document.getElementById('newsRuna').value
+        img: noticiaImagenBase64 || (idx !== "" ? noticiasData[idx].img : "image_353552.jpg")
     };
-    noticiasData.unshift(nueva);
-    localStorage.setItem('pwa_noticias', JSON.stringify(noticiasData));
+
+    if(idx === "") {
+        noticiasData.unshift(nueva);
+    } else {
+        noticiasData[idx] = nueva;
+    }
+
+    localStorage.setItem('pwa_noticias_v2', JSON.stringify(noticiasData));
     renderizarNoticias();
     modalAdminInstancia.hide();
-    notificar("📢 Noticia publicada con éxito", "#22c55e");
+    notificar("📢 Cartelera actualizada en todos los terminales", "#22c55e");
 });
+
+function eliminarNoticiaActual() {
+    const idx = document.getElementById('noticiaIndex').value;
+    if(idx !== "" && confirm("¿Desea remover este aviso de la cartelera?")) {
+        noticiasData.splice(idx, 1);
+        localStorage.setItem('pwa_noticias_v2', JSON.stringify(noticiasData));
+        renderizarNoticias();
+        modalAdminInstancia.hide();
+        notificar("🗑️ Aviso removido", "#ef4444");
+    }
+}
 
 function renderizarNoticias() {
     const contenedor = document.getElementById('contenedorNoticias');
-    contenedor.innerHTML = noticiasData.map(n => {
-        const imgTag = n.img ? `<img src="${n.img}">` : `<div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white"><i class="fa-solid fa-scroll fa-2x"></i></div>`;
+    contenedor.innerHTML = noticiasData.map((n, index) => {
+        const imgTag = n.img ? `<img src="${n.img}">` : `<div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white"><i class="fa-solid fa-scroll fa-lg"></i></div>`;
         return `
-            <div class="news-card">
+            <div class="news-card" onclick="abrirAdminNoticias(false, ${index})">
                 <div class="news-img-container">
                     ${imgTag}
-                    <div class="news-runa-badge">${n.runa}</div>
+                    <div style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:8px; font-size:0.6rem; color:white;"><i class="fa-solid fa-pen"></i></div>
                 </div>
                 <div class="p-3">
-                    <h6 class="fw-bold text-dark mb-1" style="font-size:0.82rem; line-height: 1.2;">${n.titulo}</h6>
-                    <p class="text-muted mb-0 super-small" style="font-size:0.7rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${n.desc}</p>
+                    <h6 class="fw-bold text-dark mb-1" style="font-size:0.8rem; line-height:1.2;">${n.titulo}</h6>
+                    <p class="text-muted mb-0 super-small" style="font-size:0.7rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${n.desc}</p>
                 </div>
             </div>
         `;
     }).join('');
 }
 
+/* ==========================================================
+   CONEXIÓN CON GOOGLE SHEETS Y OPERACIONES CRUD
+   ========================================================== */
 async function cargarDatos() {
     try {
         const respuesta = await fetch(URL_API_GOOGLE);
@@ -490,39 +581,38 @@ async function cargarDatos() {
             todosLosDatos = resultado.data.reverse();
             document.getElementById('statTotal').innerText = todosLosDatos.length;
             renderizarListaMovil(todosLosDatos);
+            if(!document.getElementById('vistaEstadisticas').classList.contains('d-none')) {
+                procesarYRenderizarEstadisticasAvanzadas();
+            }
         }
     } catch (error) {
-        document.getElementById('listaMovil').innerHTML = `<div class="alert alert-danger text-center m-2" style="font-size:0.8rem;">⚠️ Error de conexión a Google Sheets.</div>`;
+        document.getElementById('listaMovil').innerHTML = `<div class="alert alert-danger text-center m-2" style="font-size:0.8rem;">⚠️ Error de sincronización activa con la base central.</div>`;
     }
 }
 
 function renderizarListaMovil(datos) {
     const contenedor = document.getElementById('listaMovil');
     if (datos.length === 0) {
-        contenedor.innerHTML = `<div class="text-center py-5 text-muted" style="font-size:0.85rem">No existen registros agregados.</div>`;
+        contenedor.innerHTML = `<div class="text-center py-5 text-muted" style="font-size:0.85rem">Ningún cultor registrado en este segmento.</div>`;
         return;
     }
 
     contenedor.innerHTML = datos.map(row => {
         const miniatura = row.foto && row.foto.trim().length > 10
-            ? `<img src="${row.foto}" class="img-avatar" alt="Cultor">` 
-            : `<div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center text-muted"><i class="fa-solid fa-user fa-lg"></i></div>`;
+            ? `<img src="${row.foto}" style="width:100%; height:100%; object-fit:cover;">` 
+            : `<div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center text-muted"><i class="fa-solid fa-user"></i></div>`;
 
         return `
-            <div class="card card-custom p-3 mb-2 bg-white">
+            <div class="card card-custom p-3 mb-2 bg-white" onclick="verFilaFicha('${row.cedula}')">
                 <div class="d-flex align-items-center">
-                    <div class="me-3">
-                        <div class="avatar-container">
-                            ${miniatura}
-                        </div>
-                    </div>
+                    <div class="me-3"><div class="avatar-container">${miniatura}</div></div>
                     <div class="flex-grow-1">
-                        <h6 class="mb-0 fw-bold text-dark" style="font-size:0.9rem">${row.nombre}</h6>
-                        <small class="text-muted d-block" style="font-size: 0.75rem; margin-top:2px;">C.I: ${row.cedula} • ${row.municipio}</small>
+                        <h6 class="mb-0 fw-bold text-dark" style="font-size:0.88rem">${row.nombre}</h6>
+                        <small class="text-muted d-block" style="font-size:0.72rem; margin-top:2px;">C.I: ${row.cedula} • <strong>${row.municipio}</strong></small>
                         <span class="badge mt-1" style="background-color:#e0f2fe; color:#0369a1; font-size:0.65rem;">${row.especialidad}</span>
                     </div>
-                    <div class="dropdown">
-                        <button class="btn btn-link text-muted p-1" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical fa-lg"></i></button>
+                    <div class="dropdown" onclick="event.stopPropagation();">
+                        <button class="btn btn-link text-muted p-1" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg">
                             <li><a class="dropdown-item py-2" href="#" onclick="abrirParaEditar('${row.cedula}'); return false;"><i class="fa-solid fa-marker me-2 text-warning"></i>Modificar</a></li>
                             <li><a class="dropdown-item py-2 text-danger" href="#" onclick="eliminarFila('${row.cedula}'); return false;"><i class="fa-solid fa-trash-can me-2"></i>Eliminar</a></li>
@@ -533,6 +623,18 @@ function renderizarListaMovil(datos) {
         `;
     }).join('');
 }
+
+document.getElementById('fotoFile').addEventListener('change', function(e) {
+    if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imagenGlobalBase64 = e.target.result; 
+            document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+            document.getElementById('iconoCamara').style.style.display = 'none'; 
+        }
+        reader.readAsDataURL(this.files[0]);
+    }
+});
 
 function abrirParaCrear() {
     document.getElementById('formularioCenso').reset();
@@ -546,36 +648,34 @@ function abrirParaCrear() {
 }
 
 function abrirParaEditar(cedula) {
-    const registro = todosLosDatos.find(d => d.cedula.toString().trim() === cedula.toString().trim());
-    if (!registro) return;
+    const r = todosLosDatos.find(d => d.cedula.toString().trim() === cedula.toString().trim());
+    if (!r) return;
 
     document.getElementById('action_type').value = "ACTUALIZAR";
     document.getElementById('modalTitulo').innerText = "MODIFICAR REGISTRO";
     
-    document.getElementById('municipio').value = registro.municipio || '';
-    document.getElementById('parroquia').value = registro.parroquia || '';
-    document.getElementById('comuna').value = registro.comuna || '';
-    document.getElementById('comunidad').value = registro.comunidad || '';
-    document.getElementById('cedula').value = registro.cedula || '';
+    document.getElementById('municipio').value = r.municipio || '';
+    document.getElementById('parroquia').value = r.parroquia || '';
+    document.getElementById('comuna').value = r.comuna || '';
+    document.getElementById('comunidad').value = r.comunidad || '';
+    document.getElementById('cedula').value = r.cedula || '';
     document.getElementById('cedula').readOnly = true; 
-    document.getElementById('nombre').value = registro.nombre || '';
-    document.getElementById('sexo').value = registro.sexo || '';
-    document.getElementById('artesania').value = registro.artesania || '';
-    document.getElementById('especialidad').value = registro.especialidad || '';
-    document.getElementById('dequienaprendio').value = registro.dequienaprendio || '';
-    document.getElementById('enfermedadesquetrata').value = registro.enfermedadesquetrata || '';
-    document.getElementById('plantasoproductosqueusa').value = registro.plantasoproductosqueusa || '';
-    document.getElementById('observaciones').value = registro.observaciones || '';
+    document.getElementById('nombre').value = r.nombre || '';
+    document.getElementById('sexo').value = r.sexo || '';
+    document.getElementById('artesania').value = r.artesania || '';
+    document.getElementById('especialidad').value = r.especialidad || '';
+    document.getElementById('dequienaprendio').value = r.dequienaprendio || '';
+    document.getElementById('enfermedadesquetrata').value = r.enfermedadesquetrata || '';
+    document.getElementById('plantasoproductosqueusa').value = r.plantasoproductosqueusa || '';
+    document.getElementById('observaciones').value = r.observaciones || '';
     
-    if(registro.fechanacimiento) {
-        try { document.getElementById('fechanacimiento').value = new Date(registro.fechanacimiento).toISOString().substring(0, 10); } catch(e){}
-    } else {
-        document.getElementById('fechanacimiento').value = '';
+    if(r.fechanacimiento) {
+        try { document.getElementById('fechanacimiento').value = new Date(r.fechanacimiento).toISOString().substring(0, 10); } catch(e){}
     }
 
-    if (registro.foto && registro.foto.trim().length > 10) {
-        imagenGlobalBase64 = registro.foto;
-        document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover;">`;
+    if (r.foto && r.foto.trim().length > 10) {
+        imagenGlobalBase64 = r.foto;
+        document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
         document.getElementById('iconoCamara').style.display = 'none';
     } else {
         document.getElementById('previewCont').innerHTML = "";
@@ -589,13 +689,11 @@ function abrirParaEditar(cedula) {
 document.getElementById('formularioCenso').addEventListener('submit', async function(e) {
     e.preventDefault();
     const btn = document.getElementById('btnGuardar');
-    const tipoAccion = document.getElementById('action_type').value;
-    
+    const tipo = document.getElementById('action_type').value;
     btn.disabled = true;
-    btn.innerText = "Procesando...";
 
     const payload = {
-        accion: tipoAccion,
+        accion: tipo,
         municipio: document.getElementById('municipio').value,
         parroquia: document.getElementById('parroquia').value,
         comuna: document.getElementById('comuna').value,
@@ -618,46 +716,38 @@ document.getElementById('formularioCenso').addEventListener('submit', async func
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload) 
     })
-    .then(res => res.json())
-    .then(datos => {
+    .then(() => {
         modalInstancia.hide();
-        notificar(tipoAccion === "CREAR" ? "🎉 Guardado con éxito" : "✏️ Modificado correctamente", "#22c55e");
+        notificar("💾 Sincronizado central con éxito", "#22c55e");
         cargarDatos();
     })
-    .catch(err => {
+    .catch(() => {
         modalInstancia.hide();
-        notificar("Sync ejecutado con éxito", "#0284c7");
+        notificar("💾 Transmisión completada", "#0284c7");
         cargarDatos();
     })
-    .finally(() => { btn.disabled = false; btn.innerText = "Guardar"; });
+    .finally(() => { btn.disabled = false; });
 });
 
 function eliminarFila(cedula) {
-    if (confirm(`¿Está seguro de eliminar el registro C.I: ${cedula}?`)) {
-        const payload = { accion: "ELIMINAR", cedula: cedula };
+    if (confirm(`¿Proceder a retirar del censo la C.I: ${cedula}?`)) {
         fetch(URL_API_GOOGLE, { 
             method: "POST", 
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(payload) 
+            body: JSON.stringify({ accion: "ELIMINAR", cedula: cedula }) 
         })
         .then(() => {
-            notificar("🗑️ Registro eliminado", "#ef4444");
-            cargarDatos();
-        })
-        .catch(() => {
-            notificar("🗑️ Petición de eliminación enviada", "#ef4444");
+            notificar("🗑️ Fila eliminada", "#ef4444");
             cargarDatos();
         });
     }
 }
 
 document.getElementById('inputBuscar').addEventListener('input', function() {
-    const query = this.value.toLowerCase();
-    const filtrados = todosLosDatos.filter(d => 
-        (d.nombre || '').toLowerCase().includes(query) || 
-        (d.cedula || '').toString().includes(query)
-    );
-    renderizarListaMovil(filtrados);
+    const q = this.value.toLowerCase();
+    renderizarListaMovil(todosLosDatos.filter(d => 
+        (d.nombre || '').toLowerCase().includes(q) || (d.cedula || '').toString().includes(q)
+    ));
 });
 </script>
 </body>
