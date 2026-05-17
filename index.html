@@ -370,22 +370,14 @@ let modalSalidaInstancia = null; // <- Agrega esta variable global
 document.addEventListener("DOMContentLoaded", () => {
     // Inicialización segura de componentes visuales de Bootstrap
     try {
-        if (document.getElementById('modalRegistro')) {
-            modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
-        }
-        if (document.getElementById('modalAdminNoticias')) {
-            modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
-        }
-        if (document.getElementById('modalVerFicha')) {
-            modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
-        }
-        if (document.getElementById('modalConfirmarSalida')) {
-            modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
-        }
+        // CORRECTO: Se les asigna valor, NO se vuelven a declarar con 'let'
+        modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
+        modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
+        modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
+        modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
     } catch (error) {
-        console.error("Error inicializando modales de interfaz:", error);
+        console.error("Error cargando modales estructurales Bootstrap:", error);
     }
-    
     // Registro del Service Worker para PWA
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js')
