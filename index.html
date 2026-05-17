@@ -358,12 +358,12 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bundle.min.js"></script>
 <script>
 // =========================================================================
-// VARIABLES GLOBALES Y CONFIGURACIÓN CRÍTICA (DECLARADAS UNA SOLA VEZ)
+// VARIABLES GLOBALES Y CONFIGURACIÓN CRÍTICA
 // =========================================================================
-const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbzeT2gtFTSg-00CkvvfuLXBU8gAJPaOLF5_ZjTZxRaN9Ser9ZPevaIF1IEXRirYv10snw/exec";
+const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbz8DCxqdvunBHa-3Tyy8gli2CSbOyiAM5qLTF85qkKoFehqro2GyvsscqVoOcgii341Xg/exec";
 let todosLosDatos = [];
 let imagenGlobalBase64 = ""; 
 let modalInstancia = null;
@@ -395,14 +395,12 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Error inicializando modales de interfaz:", error);
     }
     
-    // Registro del Service Worker para PWA
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js')
             .then(reg => console.log('Service Worker activo'))
             .catch(err => console.warn('Error en Service Worker', err));
     }
 
-    // Estado de sesión y escuchadores
     comprobarEstadoSesion();
     if (document.getElementById('inputBuscar')) {
         document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
@@ -411,7 +409,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
     }
     
-    // Escuchador para procesamiento de imágenes de cultores
     if (document.getElementById('fotoFile')) {
         document.getElementById('fotoFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -427,7 +424,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Escuchador para imagen de cartelera informativa
     if (document.getElementById('newsFile')) {
         document.getElementById('newsFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -441,12 +437,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Manejo de envío del formulario de censo
     if (document.getElementById('formularioCenso')) {
         document.getElementById('formularioCenso').addEventListener('submit', procesarEnvioCenso);
     }
 
-    // Manejo de envío de noticias
     if (document.getElementById('formNuevaNoticia')) {
         document.getElementById('formNuevaNoticia').addEventListener('submit', procesarEnvioNoticia);
     }
@@ -471,7 +465,6 @@ function comprobarEstadoSesion() {
         }
         document.getElementById('statTotal').innerText = "0";
         
-        // Habilitar botón de noticias si el administrador inicia sesión
         if(sesionActiva === "admin@siaho.com") {
             document.getElementById('btnCrearNoticia').classList.remove('d-none');
         } else {
@@ -481,7 +474,7 @@ function comprobarEstadoSesion() {
         inicializarAplicacionCompleta();
     } else {
         document.getElementById('pantallaAuth').style.setProperty('display', 'flex', 'important');
-        document.getElementById('appContenido').style.display = 'none';
+        document.getElementById('appContenido').style.none = 'none';
     }
 }
 
@@ -560,18 +553,16 @@ function confirmarCierreEfectivo() {
 }
 
 function inicializarAplicacionCompleta() {
-    cargarDatos();
+    cargarDatos(); 
     setInterval(cargarDatos, 15000);
 }
 
 // =========================================================================
-// PIPELINE DE SINCRONIZACIÓN Y RENDERIZADO DE DATOS (NUBE DE GOOGLE)
+// PIPELINE DE SINCRONIZACIÓN (FILTRADO SEGÚN USUARIO LOGUEADO)
 // =========================================================================
 function cargarDatos() {
-    // Obtener el usuario activo actualmente
     const usuarioActivo = localStorage.getItem("siaho_sesion_activa") || "";
     
-    // Agregamos ?usuario=correo@correo.com al final de la URL
     fetch(`${URL_API_GOOGLE}?usuario=${encodeURIComponent(usuarioActivo)}`)
         .then(res => res.json())
         .then(data => {
@@ -593,6 +584,7 @@ function cargarDatos() {
             console.error("Error en sincronización en la nube:", err);
         });
 }
+
 function renderizarListado(datos) {
     const listaMovil = document.getElementById('listaMovil');
     if (!listaMovil) return;
@@ -725,13 +717,16 @@ function abrirAdminNoticias(esNueva, index = null) {
 function procesarEnvioNoticia(e) {
     e.preventDefault();
     const index = document.getElementById('noticiaIndex').value;
+    const usuarioActivo = localStorage.getItem("siaho_sesion_activa") || "";
+    
     const payload = {
         scope: "NOTICIA",
         action: index === "NUEVO" ? "CREAR" : "EDITAR",
         index: index,
         titulo: document.getElementById('newsTitle').value.trim(),
         descripcion: document.getElementById('newsDesc').value.trim(),
-        foto: noticiaImagenBase64
+        foto: noticiaImagenBase64,
+        registradoPor: usuarioActivo // <-- PARÁMETRO MANDATORIO CORREGIDO AQUÍ
     };
 
     notificar("📡 Transmitiendo noticia a cartelera...", "#4f46e5");
@@ -754,11 +749,19 @@ function procesarEnvioNoticia(e) {
 
 function eliminarNoticiaActual() {
     const index = document.getElementById('noticiaIndex').value;
+    const usuarioActivo = localStorage.getItem("siaho_sesion_activa") || "";
+    
     if (index !== "NUEVO" && confirm("¿Está totalmente seguro de remover esta noticia de la cartelera nacional?")) {
         modalAdminInstancia.hide();
         notificar("🗑️ Removiendo noticia...", "#1e293b");
         
-        const payload = { scope: "NOTICIA", action: "ELIMINAR", index: index };
+        const payload = { 
+            scope: "NOTICIA", 
+            action: "ELIMINAR", 
+            index: index,
+            registradoPor: usuarioActivo 
+        };
+        
         fetch(URL_API_GOOGLE, {
             method: "POST",
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -885,7 +888,7 @@ function procesarEnvioCenso(e) {
         plantasoproductosqueusa: document.getElementById('plantasoproductosqueusa').value.trim(),
         observaciones: document.getElementById('observaciones').value.trim(),
         foto: imagenGlobalBase64,
-        registradoPor: usuarioActivo // <-- Enviamos quién está guardando el censo
+        registradoPor: usuarioActivo
     };
     
     notificar("🚀 Transmitiendo datos a la nube...", "#0284c7");
@@ -906,16 +909,22 @@ function procesarEnvioCenso(e) {
         cargarDatos();
     });
 }
-// =========================================================================
-// ACCIÓN DE ELIMINAR CULTORE ACTUAL
-// =========================================================================
+
 function eliminarCultorActual() {
     const ci = document.getElementById('cedula').value;
+    const usuarioActivo = localStorage.getItem("siaho_sesion_activa") || "";
+    
     if (ci && confirm(`¿Seguro que desea eliminar por completo el registro de C.I: ${ci}?`)) {
         modalInstancia.hide();
         notificar("🗑️ Eliminando registro...", "#1e293b");
         
-        const payload = { scope: "CENSO", action: "ELIMINAR", cedula: ci };
+        const payload = { 
+            scope: "CENSO", 
+            action: "ELIMINAR", 
+            cedula: ci,
+            registradoPor: usuarioActivo
+        };
+        
         fetch(URL_API_GOOGLE, {
             method: "POST",
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -990,7 +999,7 @@ function conmutarDespliegueEstadistico(idBox) {
 }
 
 // =========================================================================
-// EXPORTADOR MULTIFORMATO AUTOMATIZADO (PDF/IMAGEN)
+// EXPORTADORES (PDF/IMAGEN)
 // =========================================================================
 function exportarFichaA_PDF() {
     const elemento = document.getElementById('areaDescargaFicha');
@@ -1039,10 +1048,6 @@ function cambiarVista(vista) {
         navReg.classList.remove('active');
         navEst.classList.add('active');
     }
-}
-
-function formattedFechaEstandar(fechaRaw) {
-    return formatearFechaEstandar(fechaRaw);
 }
 
 function formatearFechaEstandar(fechaRaw) {
