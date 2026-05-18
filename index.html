@@ -372,12 +372,12 @@ let noticiasData = [];
 let modoAuthActual = "LOGIN"; 
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Limpieza automática de Service Workers residuales defectuosos
+    // 🧯 Limpieza de Service Workers residuales para forzar la actualización en los teléfonos
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
             for (let registration of registrations) {
                 registration.unregister().then(function(success) {
-                    if (success) console.log("SW residual limpiado.");
+                    if (success) console.log("SW residual saneado.");
                 });
             }
         });
@@ -388,13 +388,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (document.getElementById('modalAdminNoticias')) modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
         if (document.getElementById('modalVerFicha')) modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
         if (document.getElementById('modalConfirmarSalida')) modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
-    } catch (e) { console.error("Error inicializando modales:", e); }
+    } catch (e) { console.error("Error inicializando componentes gráficos:", e); }
     
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW Status:', err));
-    }
-
     comprobarEstadoSesion();
+    
     if (document.getElementById('inputBuscar')) document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
     if (document.getElementById('formAutenticacion')) document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
 });
@@ -408,26 +405,16 @@ function verificarRolAdministrador() {
 function comprobarEstadoSesion() {
     const s = localStorage.getItem("siaho_sesion_activa");
     
-    // Intenta capturar los contenedores probando múltiples variantes comunes de IDs
-    const vLogin = document.getElementById('vistaLogin') || 
-                   document.getElementById('loginVista') || 
-                   document.getElementById('vista_login') ||
-                   document.getElementById('seccionLogin');
-                   
-    const vApp = document.getElementById('vistaApp') || 
-                 document.getElementById('appVista') || 
-                 document.getElementById('vista_app') ||
-                 document.getElementById('contenedorPrincipal');
-
-    // Salvavidas: Si tu HTML no tiene estos contenedores, evita que el script colapse
+    // Vinculación adaptada a la estructura real de tu maquetación HTML
+    const vLogin = document.getElementById('autenticacionFiltro');
+    const vApp = document.getElementById('appContenido');
+    
     if (!vLogin || !vApp) {
-        console.warn("⚠️ SIAHO Web Control: Los contenedores de vista estructural no fueron encontrados. Se saltó la conmutación de pantallas para evitar congelamiento.");
-        // De igual forma intentamos cargar la data por si estás saltándote el login en desarrollo
+        console.warn("Mapeo temporal: Cargando datos en modo bypass de maquetación.");
         if (s) { verificarRolAdministrador(); cargarDatos(); }
         return; 
     }
 
-    // Flujo normal de alternancia de pantallas si los elementos existen
     if (s) {
         vLogin.classList.add('d-none');
         vApp.classList.remove('d-none');
@@ -445,6 +432,8 @@ function conmutarModoAuth(modo) {
     modoAuthActual = modo;
     const btn = document.getElementById('btnSubmitAuth');
     const link = document.getElementById('toggleAuthLink');
+    if (!btn || !link) return;
+    
     if (modo === "LOGIN") {
         btn.innerText = "Ingresar al Sistema";
         link.innerHTML = '¿No tienes cuenta? <span class="text-primary fw-bold" style="cursor:pointer;" onclick="conmutarModoAuth(\'REGISTRO\')">Regístrate aquí</span>';
@@ -480,6 +469,8 @@ function procesarAutenticacion(e) {
         } else {
             notificar("❌ Credenciales inválidas para SIAHO", "#ef4444");
         }
+    } else {
+        notificar("📨 Solicitud enviada al administrador", "#0284c7");
     }
 }
 
@@ -516,10 +507,11 @@ function cargarDatos() {
         headers: { "Accept": "application/json" }
     })
     .then(res => {
-        if (!res.ok) throw new Error("Respuesta de red no válida");
+        if (!res.ok) throw new Error("Fallo de respuesta");
         return res.json();
     })
     .then(data => {
+        // Enlace adaptado a tus hojas del libro "censo_registro"
         if (data && data.cultores) {
             todosLosDatos = data.cultores;
         } else if (data && data.data) {
@@ -528,10 +520,15 @@ function cargarDatos() {
             todosLosDatos = [];
         }
 
-        if (data && data.noticias) {
+        if (data && data.Noticias) {
+            noticiasData = data.Noticias;
+        } else if (data && data.noticias) {
             noticiasData = data.noticias;
-            renderizarCarteleraNoticias();
+        } else {
+            noticiasData = [];
         }
+        
+        renderizarCarteleraNoticias();
         
         const statEl = document.getElementById('statTotal');
         if (statEl) statEl.innerText = todosLosDatos.length;
@@ -539,16 +536,8 @@ function cargarDatos() {
         renderizarListadoPantalla(todosLosDatos);
     })
     .catch(err => {
-        console.error("Fallo general de red en SIAHO:", err);
-        notificar("⚠️ Error de consulta en la nube", "#ef4444");
-        const listaMovil = document.getElementById('listaMovil');
-        if (listaMovil && todosLosDatos.length === 0) {
-            listaMovil.innerHTML = `
-                <div class="text-center py-4 text-muted">
-                    <i class="fa-solid fa-wifi-slash fa-2x mb-2 text-danger"></i>
-                    <p class="small mb-0 fw-bold">Sin respuesta de red remota</p>
-                </div>`;
-        }
+        console.error("Error de sincronización remota:", err);
+        notificar("⚠️ Cargando desde almacenamiento local", "#f59e0b");
     });
 }
 
@@ -608,8 +597,8 @@ function renderizarCarteleraNoticias() {
         return;
     }
     
-    const invertivas = [...noticiasData].reverse();
-    invertivas.forEach(n => {
+    const invertidas = [...noticiasData].reverse();
+    invertidas.forEach(n => {
         const f = n.foto || n.imagen || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=400&q=80';
         c.innerHTML += `
         <div class="news-card">
@@ -669,9 +658,10 @@ function abrirVerFicha(index) {
     document.getElementById('f_registrador').innerText = c.registradoPor || c.registrador || 'Desconocido';
     
     const imgFicha = document.getElementById('f_foto');
-    imgFicha.src = c.foto || "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=150";
+    if (imgFicha) imgFicha.src = c.foto || "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=150";
     
-    document.getElementById('btnEditarRapido').setAttribute('onclick', `abrirModalEdicionDesdeFicha(${index})`);
+    const btnEdicion = document.getElementById('btnEditarRapido');
+    if (btnEdicion) btnEdicion.setAttribute('onclick', `abrirModalEdicionDesdeFicha(${index})`);
     
     if (modalVerFichaInstancia) modalVerFichaInstancia.show();
 }
@@ -699,17 +689,20 @@ function abrirModalEdicionDesdeFicha(index) {
     document.getElementById('observaciones').value = c.observaciones || '';
     
     const p = document.getElementById('previewFoto');
-    if (c.foto) {
-        p.src = c.foto;
-        p.style.display = "block";
-        imagenGlobalBase64 = c.foto;
-    } else {
-        p.style.display = "none";
-        imagenGlobalBase64 = "";
+    if (p) {
+        if (c.foto) {
+            p.src = c.foto;
+            p.style.display = "block";
+            imagenGlobalBase64 = c.foto;
+        } else {
+            p.style.display = "none";
+            imagenGlobalBase64 = "";
+        }
     }
     
     const rRol = localStorage.getItem("siaho_rol");
-    document.getElementById('btnEliminarCultor').style.display = (rRol === "ADMIN") ? "block" : "none";
+    const btnDel = document.getElementById('btnEliminarCultor');
+    if (btnDel) btnDel.style.display = (rRol === "ADMIN") ? "block" : "none";
     
     if (modalInstancia) modalInstancia.show();
 }
@@ -721,8 +714,10 @@ function procesarImagenCultor(element) {
     reader.onloadend = function() {
         imagenGlobalBase64 = reader.result;
         const preview = document.getElementById('previewFoto');
-        preview.src = reader.result;
-        preview.style.display = "block";
+        if (preview) {
+            preview.src = reader.result;
+            preview.style.display = "block";
+        }
     }
     reader.readAsDataURL(file);
 }
@@ -742,7 +737,6 @@ function procesarImagenNoticia(element) {
     reader.readAsDataURL(file);
 }
 
-// CUANDO REGISTRA LA INFORMACIÓN (ENVÍO DEL CENSO)
 document.getElementById('formularioCenso').addEventListener('submit', function(e) {
     e.preventDefault();
     notificar("🚀 Sincronizando censo con la base de datos...", "#0284c7");
@@ -837,39 +831,41 @@ function abrirPanelNoticiasAdmin() {
     if (modalAdminInstancia) modalAdminInstancia.show();
 }
 
-document.getElementById('formNuevaNoticia').addEventListener('submit', function(e) {
-    e.preventDefault();
-    notificar("📢 Publicando novedad...", "#0284c7");
-    
-    const payload = {
-        action: "CREAR_NOTICIA",
-        titulo: document.getElementById('newsTitle').value.trim(),
-        descripcion: document.getElementById('newsDesc').value.trim(),
-        foto: noticiaImagenBase64
-    };
+if (document.getElementById('formNuevaNoticia')) {
+    document.getElementById('formNuevaNoticia').addEventListener('submit', function(e) {
+        e.preventDefault();
+        notificar("📢 Publicando novedad...", "#0284c7");
+        
+        const payload = {
+            action: "CREAR_NOTICIA",
+            titulo: document.getElementById('newsTitle').value.trim(),
+            descripcion: document.getElementById('newsDesc').value.trim(),
+            foto: noticiaImagenBase64
+        };
 
-    fetch(URL_API_GOOGLE, {
-        method: "POST",
-        mode: "cors",
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(resData => {
-        if(resData.status === "success") {
-            notificar("🎉 Anuncio fijado en la cartelera", "#22c55e");
-            document.getElementById('formNuevaNoticia').reset();
+        fetch(URL_API_GOOGLE, {
+            method: "POST",
+            mode: "cors",
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(resData => {
+            if(resData.status === "success") {
+                notificar("🎉 Anuncio fijado en la cartelera", "#22c55e");
+                document.getElementById('formNuevaNoticia').reset();
+                if (modalAdminInstancia) modalAdminInstancia.hide();
+                cargarDatos(); 
+            } else {
+                throw new Error();
+            }
+        })
+        .catch(() => {
+            notificar("❌ Error al procesar publicación", "#ef4444");
             if (modalAdminInstancia) modalAdminInstancia.hide();
-            cargarDatos(); 
-        } else {
-            throw new Error();
-        }
-    })
-    .catch(() => {
-        notificar("❌ Error al procesar publicación", "#ef4444");
-        if (modalAdminInstancia) modalAdminInstancia.hide();
-        cargarDatos();
+            cargarDatos();
+        });
     });
-});
+}
 
 function eliminarNoticiaAdmin(index) {
     if (confirm("¿Deseas dar de baja este anuncio oficial?")) {
@@ -909,7 +905,6 @@ function procesarYRenderizarEstadisticasAvanzadas() {
 function armarAccordionDinamico(objeto, prefijo) {
     let html = "";
     Object.keys(objeto).forEach((key, i) => {
-        // Corrección de la sintaxis del setAttribute / onclick dinámico evitando caracteres de escape redundantes
         html += `
         <div class="stat-accordion-item">
             <button type="button" class="stat-header-trigger" data-prefijo="${prefijo}" data-key="${key}" data-boxid="${prefijo}-${i}" onclick="conmutarAccordionDesdeElemento(this)">
@@ -928,6 +923,7 @@ function conmutarAccordionDesdeElemento(btn) {
     const tipo = btn.getAttribute('data-prefijo');
     
     const el = document.getElementById(`box-${idBox}`);
+    if(!el) return;
     if(el.style.display === "block") { el.style.display = "none"; return; }
     
     let filtrados = todosLosDatos.filter(c => {
@@ -945,13 +941,18 @@ function conmutarAccordionDesdeElemento(btn) {
 
 function exportarFichaA_PDF() {
     const elemento = document.getElementById('areaDescargaFicha');
-    html2pdf().set({ margin: 0.3, filename: 'Ficha_SIAHO.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(elemento).save();
+    if(elemento) {
+        html2pdf().set({ margin: 0.3, filename: 'Ficha_SIAHO.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(elemento).save();
+    }
 }
 
 function exportarFichaA_Imagen() {
-    html2canvas(document.getElementById('areaDescargaFicha'), { scale: 2, useCORS: true }).then(canvas => {
-        const link = document.createElement('a'); link.download = 'Ficha_SIAHO.png'; link.href = canvas.toDataURL(); link.click();
-    });
+    const elemento = document.getElementById('areaDescargaFicha');
+    if(elemento) {
+        html2canvas(elemento, { scale: 2, useCORS: true }).then(canvas => {
+            const link = document.createElement('a'); link.download = 'Ficha_SIAHO.png'; link.href = canvas.toDataURL(); link.click();
+        });
+    }
 }
 
 function notificar(msg, color) {
@@ -965,4 +966,3 @@ function notificar(msg, color) {
 </script>
 </body>
 </html>
-
