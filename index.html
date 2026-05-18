@@ -409,10 +409,18 @@ function comprobarEstadoSesion() {
     const s = localStorage.getItem("siaho_sesion_activa");
     const vLogin = document.getElementById('vistaLogin');
     const vApp = document.getElementById('vistaApp');
+    
+    // Si falta alguno de los contenedores críticos en el HTML, lo registramos en consola sin romper el script
+    if (!vLogin || !vApp) {
+        console.warn("⚠️ Advertencia SIAHO: No se encontraron los contenedores HTML 'vistaLogin' o 'vistaApp'. Revisa tu estructura HTML.");
+        return; 
+    }
+
     if (s) {
         vLogin.classList.add('d-none');
         vApp.classList.remove('d-none');
-        document.getElementById('userEmailDisplay').innerText = s;
+        const userDisplay = document.getElementById('userEmailDisplay');
+        if (userDisplay) userDisplay.innerText = s;
         verificarRolAdministrador();
         cargarDatos();
     } else {
