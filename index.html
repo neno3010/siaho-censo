@@ -218,7 +218,7 @@
             <div class="p-2 bg-primary text-white rounded-3 me-3"><i class="fa-solid fa-chart-pie fa-lg"></i></div>
             <div>
                 <h6 class="fw-bold text-dark mb-0">Distribución Territorial Fina</h6>
-                 <small class="text-muted">Toca un territory para ver los censados</small>
+                 <small class="text-muted">Toca un territorio para ver los censados</small>
             </div>
         </div>
 
@@ -397,17 +397,17 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// PEGA AQUÍ TU NUEVA URL DE IMPLEMENTACIÓN DE GOOGLE APPS SCRIPT
 const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbzoPmQphGvZk4YMCr-3bj64BOcCH8EfwHDzfAiOOhOaYcKkwWw9hvzpQOFmPN6xSLpj9w/exec";
 let todosLosDatos = [];
 let imagenGlobalBase64 = ""; 
-modalInstancia = null;
+let modalInstancia = null;
 let modalAdminInstancia = null;
 let modalVerFichaInstancia = null;
 let modalSalidaInstancia = null; 
 let noticiaImagenBase64 = "";
 let noticiasData = [];
 let modoAuthActual = "LOGIN";
+
 document.addEventListener("DOMContentLoaded", () => {
     try {
         if (document.getElementById('modalRegistro')) modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
@@ -424,6 +424,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById('inputBuscar')) document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
     if (document.getElementById('formAutenticacion')) document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
 });
+
 function verificarRolAdministrador() {
     const usuarioLogueado = localStorage.getItem("siaho_sesion_activa") || "";
     return usuarioLogueado.trim().toLowerCase() === "admin@siaho.com";
@@ -479,6 +480,535 @@ function conmutarModoAuth(e) {
         btnSubmit.innerText = "Entrar al Sistema";
         btnModo.innerText = "¿No tienes cuenta? Regístrate aquí";
     }
+}
+
+function procesarAutenticacion(e) {
+    e.preventDefault();
+    const correo = document.getElementById('authCorreo').value.trim();
+    const pass = document.getElementById('authPassword').value.trim();
+    
+    if(!correo || !pass){
+        mostrarAlertaFlotante("Por favor rellene todos los campos.");
+        return;
+    }
+    
+    if(modoAuthActual === "LOGIN") {
+        let dbUsuarios = JSON.parse(localStorage.getItem("siaho_db_usuarios") || "[]");
+        let existe = dbUsuarios.find(u => u.correo.toLowerCase() === correo.toLowerCase() && u.password === pass);
+        
+        if(correo.toLowerCase() === "admin@siaho.com" && pass === "12345") {
+            existe = { correo: "admin@siaho.com" };
+        }
+        
+        if(existe) {
+            localStorage.setItem("siaho_sesion_activa", existe.correo);
+            mostrarAlertaFlotante("¡Acceso concedido exitosamente!");
+            comprobarEstadoSesion();
+        } else {
+            mostrarAlertaFlotante("Credenciales incorrectas locales.");
+        }
+    } else {
+        let dbUsuarios = JSON.parse(localStorage.getItem("siaho_db_usuarios") || "[]");
+        let existe = dbUsuarios.find(u => u.correo.toLowerCase() === correo.toLowerCase());
+        if(existe) {
+            mostrarAlertaFlotante("El correo ya se encuentra registrado.");
+            return;
+        }
+        dbUsuarios.push({ correo: correo, password: pass });
+        localStorage.setItem("siaho_db_usuarios", JSON.stringify(dbUsuarios));
+        localStorage.setItem("siaho_sesion_activa", correo);
+        mostrarAlertaFlotante("¡Cuenta creada con éxito!");
+        comprobarEstadoSesion();
+    }
+}
+
+function cerrarSesionActual() {
+    if(modalSalidaInstancia) modalSalidaInstancia.show();
+}
+
+function confirmarCierreEfectivo() {
+    localStorage.removeItem("siaho_sesion_activa");
+    if(modalSalidaInstancia) modalSalidaInstancia.hide();
+    comprobarEstadoSesion();
+}
+
+function cambiarVista(vista) {
+    const vP = document.getElementById('vistaPrincipal');
+    const vE = document.getElementById('vistaEstadisticas');
+    const nR = document.getElementById('navRegistros');
+    const nE = document.getElementById('navEstadisticas');
+    
+    if(vista === 'registros') {
+        vP.classList.remove('d-none');
+        vE.classList.add('d-none');
+        nR.classList.add('active');
+        nE.classList.remove('active');
+    } else {
+        vP.classList.add('d-none');
+        vE.classList.remove('d-none');
+        nR.classList.remove('active');
+        nE.classList.add('active');
+        renderizarEstadisticasAgrupadas();
+    }
+}
+
+function inicializarAplicacionCompleta() {
+    cargarCarteleraNoticias();
+    sincronizarDatosNube();
+    
+    const fileInput = document.getElementById('fotoFile');
+    if(fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    imagenGlobalBase64 = evt.target.result;
+                    document.getElementById('iconoCamara').style.display = 'none';
+                    document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover;">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    const newsInput = document.getElementById('newsFile');
+    if(newsInput) {
+        newsInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    noticiaImagenBase64 = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    const formCenso = document.getElementById('formularioCenso');
+    if(formCenso) {
+        formCenso.onsubmit = function(e) {
+            e.preventDefault();
+            guardarFormularioCenso();
+        };
+    }
+
+    const formNews = document.getElementById('formNuevaNoticia');
+    if(formNews) {
+        formNews.onsubmit = function(e) {
+            e.preventDefault();
+            publicarNoticiaFlujo();
+        };
+    }
+}
+
+function sincronizarDatosNube() {
+    const userLogueado = localStorage.getItem("siaho_sesion_activa") || "";
+    fetch(`${URL_API_GOOGLE}?action=LEER&usuario=${encodeURIComponent(userLogueado)}`)
+    .then(r => r.json())
+    .then(res => {
+        if(res.status === "SUCCESS") {
+            todosLosDatos = res.data || [];
+            inyectarListadoPantalla(todosLosDatos);
+            document.getElementById('statTotal').innerText = todosLosDatos.length;
+        } else {
+            mostrarAlertaFlotante("Error al consultar datos de la nube.");
+            cargarCacheLocalFallback();
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        mostrarAlertaFlotante("Modo sin conexión activado.");
+        cargarCacheLocalFallback();
+    });
+}
+
+function cargarCacheLocalFallback() {
+    const backup = localStorage.getItem("siaho_cache_local") || "[]";
+    todosLosDatos = JSON.parse(backup);
+    inyectarListadoPantalla(todosLosDatos);
+    document.getElementById('statTotal').innerText = todosLosDatos.length;
+}
+
+function inyectarListadoPantalla(arreglo) {
+    const contenedor = document.getElementById('listaMovil');
+    if(!contenedor) return;
+    if(arreglo.length === 0) {
+        contenedor.innerHTML = '<div class="text-center py-5 text-muted small"><i class="fa-solid fa-folder-open fa-2x mb-2 opacity-50"></i><br>No se encontraron registros de cultores.</div>';
+        return;
+    }
+    
+    let html = "";
+    arreglo.forEach((item) => {
+        const imgProfile = item.foto || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=150";
+        html += `
+        <div class="card card-custom p-3 mb-2 bg-white" onclick="verDetalleFichaCompleta('${item.cedula}')">
+            <div class="d-flex align-items-center">
+                <div class="avatar-container me-3">
+                    <img src="${imgProfile}" style="width:100%; height:100%; object-fit:cover;" alt="Foto">
+                </div>
+                <div class="flex-grow-1 min-w-0">
+                    <h6 class="fw-bold text-dark mb-0 text-truncate text-uppercase" style="font-size:0.88rem;">${item.nombre}</h6>
+                    <p class="text-muted mb-0 super-small" style="font-size:0.75rem;"><i class="fa-solid fa-id-card me-1 text-primary"></i>C.I: ${item.cedula} &nbsp;•&nbsp; <i class="fa-solid fa-tags me-1 text-success"></i>${item.especialidad}</p>
+                    <p class="text-secondary mb-0 text-truncate mt-1" style="font-size:0.7rem;"><i class="fa-solid fa-map-marker-alt me-1 text-danger"></i>${item.municipio} - ${item.parroquia}</p>
+                </div>
+                <div class="text-end ps-2">
+                    <i class="fa-solid fa-chevron-right text-muted opacity-50"></i>
+                </div>
+            </div>
+        </div>`;
+    });
+    contenedor.innerHTML = html;
+}
+
+function filtrarListadoPrincipal() {
+    const txt = document.getElementById('inputBuscar').value.toLowerCase().trim();
+    if(!txt) {
+        inyectarListadoPantalla(todosLosDatos);
+        return;
+    }
+    const filtrados = todosLosDatos.filter(c => 
+        (c.nombre || '').toLowerCase().includes(txt) || 
+        (c.cedula || '').toLowerCase().includes(txt) ||
+        (c.especialidad || '').toLowerCase().includes(txt)
+    );
+    inyectarListadoPantalla(filtrados);
+}
+
+function abrirParaCrear() {
+    document.getElementById('formularioCenso').reset();
+    document.getElementById('action_type').value = "CREAR";
+    document.getElementById('cedula').removeAttribute('readonly');
+    document.getElementById('modalTitulo').innerText = "NUEVO CENSO DE SABERES";
+    document.getElementById('btnEliminarCultor').classList.add('d-none');
+    imagenGlobalBase64 = "";
+    document.getElementById('iconoCamara').style.display = 'block';
+    document.getElementById('previewCont').innerHTML = '';
+    if(modalInstancia) modalInstancia.show();
+}
+
+function verDetalleFichaCompleta(cedula) {
+    const cultor = todosLosDatos.find(c => c.cedula == cedula);
+    if(!cultor) return;
+    
+    document.getElementById('f-foto').src = cultor.foto || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=150";
+    document.getElementById('f-nombre').innerText = (cultor.nombre || '---').toUpperCase();
+    document.getElementById('f-cedula').innerText = cultor.cedula || '---';
+    document.getElementById('f-fecha').innerText = cultor.fechanacimiento || '---';
+    document.getElementById('f-sexo').innerText = cultor.sexo || '---';
+    document.getElementById('f-mun').innerText = (cultor.municipio || '---').toUpperCase();
+    document.getElementById('f-par').innerText = (cultor.parroquia || '---').toUpperCase();
+    document.getElementById('f-com').innerText = (cultor.comuna || '---').toUpperCase();
+    document.getElementById('f-comu').innerText = (cultor.comunidad || '---').toUpperCase();
+    document.getElementById('f-esp').innerText = (cultor.especialidad || '---').toUpperCase();
+    document.getElementById('f-art').innerText = cultor.artesania || '---';
+    document.getElementById('f-apre').innerText = cultor.dequienaprendio || '---';
+    document.getElementById('f-enf').innerText = cultor.enfermedadesquetrata || '---';
+    document.getElementById('f-pla').innerText = cultor.plantasoproductosqueusa || '---';
+    document.getElementById('f-obs').innerText = cultor.observaciones || 'Sin observaciones.';
+    
+    document.getElementById('btnEditarDesdeFicha').onclick = function() {
+        if(modalVerFichaInstancia) modalVerFichaInstancia.hide();
+        setTimeout(() => { abrirParaEditarFormulario(cultor); }, 400);
+    };
+
+    if(modalVerFichaInstancia) modalVerFichaInstancia.show();
+}
+
+function abrirParaEditarFormulario(cultor) {
+    document.getElementById('action_type').value = "EDITAR";
+    document.getElementById('modalTitulo').innerText = "MODIFICAR REGISTRO";
+    
+    document.getElementById('municipio').value = cultor.municipio || '';
+    document.getElementById('parroquia').value = cultor.parroquia || '';
+    document.getElementById('comuna').value = cultor.comuna || '';
+    document.getElementById('comunidad').value = cultor.comunidad || '';
+    document.getElementById('cedula').value = cultor.cedula || '';
+    document.getElementById('cedula').setAttribute('readonly', 'true');
+    document.getElementById('fechanacimiento').value = cultor.fechanacimiento || '';
+    document.getElementById('nombre').value = cultor.nombre || '';
+    document.getElementById('sexo').value = cultor.sexo || '';
+    document.getElementById('especialidad').value = cultor.especialidad || '';
+    document.getElementById('artesania').value = cultor.artesania || '';
+    document.getElementById('dequienaprendio').value = cultor.dequienaprendio || '';
+    document.getElementById('enfermedadesquetrata').value = cultor.enfermedadesquetrata || '';
+    document.getElementById('plantasoproductosqueusa').value = cultor.plantasoproductosqueusa || '';
+    document.getElementById('observaciones').value = cultor.observaciones || '';
+    
+    if(cultor.foto) {
+        imagenGlobalBase64 = cultor.foto;
+        document.getElementById('iconoCamara').style.display = 'none';
+        document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover;">`;
+    } else {
+        imagenGlobalBase64 = "";
+        document.getElementById('iconoCamara').style.display = 'block';
+        document.getElementById('previewCont').innerHTML = '';
+    }
+    
+    document.getElementById('btnEliminarCultor').classList.remove('d-none');
+    if(modalInstancia) modalInstancia.show();
+}
+
+function guardarFormularioCenso() {
+    const userLogueado = localStorage.getItem("siaho_sesion_activa") || "";
+    const payload = {
+        action: document.getElementById('action_type').value,
+        usuario: userLogueado,
+        municipio: document.getElementById('municipio').value.trim(),
+        parroquia: document.getElementById('parroquia').value.trim(),
+        comuna: document.getElementById('comuna').value.trim(),
+        comunidad: document.getElementById('comunidad').value.trim(),
+        cedula: document.getElementById('cedula').value.trim(),
+        fechanacimiento: document.getElementById('fechanacimiento').value,
+        nombre: document.getElementById('nombre').value.trim(),
+        sexo: document.getElementById('sexo').value,
+        especialidad: document.getElementById('especialidad').value.trim(),
+        artesania: document.getElementById('artesania').value.trim(),
+        dequienaprendio: document.getElementById('dequienaprendio').value.trim(),
+        enfermedadesquetrata: document.getElementById('enfermedadesquetrata').value.trim(),
+        plantasoproductosqueusa: document.getElementById('plantasoproductosqueusa').value.trim(),
+        observaciones: document.getElementById('observaciones').value.trim(),
+        foto: imagenGlobalBase64
+    };
+    
+    mostrarAlertaFlotante("Procesando transacción en la nube...");
+    if(modalInstancia) modalInstancia.hide();
+    
+    fetch(URL_API_GOOGLE, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        mostrarAlertaFlotante("Operación ejecutada con éxito.");
+        setTimeout(() => { sincronizarDatosNube(); }, 1500);
+    })
+    .catch(err => {
+        console.error(err);
+        mostrarAlertaFlotante("Error de red. Guardado local alternativo.");
+    });
+}
+
+function eliminarCultorActual() {
+    if(!confirm("¿Está completamente seguro de eliminar este registro del censo?")) return;
+    const userLogueado = localStorage.getItem("siaho_sesion_activa") || "";
+    const cedula = document.getElementById('cedula').value.trim();
+    
+    const payload = {
+        action: "ELIMINAR",
+        usuario: userLogueado,
+        cedula: cedula
+    };
+    
+    mostrarAlertaFlotante("Removiendo registro de forma definitiva...");
+    if(modalInstancia) modalInstancia.hide();
+    
+    fetch(URL_API_GOOGLE, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        mostrarAlertaFlotante("Registro eliminado.");
+        setTimeout(() => { sincronizarDatosNube(); }, 1500);
+    })
+    .catch(err => console.error(err));
+}
+
+function renderizarEstadisticasAgrupadas() {
+    const dMun = document.getElementById('desgloseMunicipios');
+    const dPar = document.getElementById('desgloseParroquias');
+    const dCom = document.getElementById('desgloseComunas');
+    
+    if(!dMun || !dPar || !dCom) return;
+    
+    let mapMun = {}, mapPar = {}, mapCom = {};
+    
+    todosLosDatos.forEach(c => {
+        let m = (c.municipio || 'No Especificado').trim().toUpperCase();
+        let p = (c.parroquia || 'No Especificado').trim().toUpperCase();
+        let co = (c.comuna || 'No Especificado').trim().toUpperCase();
+        
+        mapMun[m] = (mapMun[m] || 0) + 1;
+        mapPar[p] = (mapPar[p] || 0) + 1;
+        mapCom[co] = (mapCom[co] || 0) + 1;
+    });
+    
+    dMun.innerHTML = construirAccordionHtml(mapMun, "mun");
+    dPar.innerHTML = construirAccordionHtml(mapPar, "par");
+    dCom.innerHTML = construirAccordionHtml(mapCom, "com");
+}
+
+function construirAccordionHtml(objetoMap, tipo) {
+    let html = "";
+    let idx = 0;
+    for(let clave in objetoMap) {
+        idx++;
+        const idBox = `${tipo}-${idx}`;
+        html += `
+        <div class="stat-accordion-item">
+            <button class="stat-header-trigger" onclick="conmutarDespliegueInterno('${idBox}', '${clave.replace(/'/g, "\\'")}', '${tipo}')">
+                <span class="fw-bold text-dark small text-truncate" style="max-width:75%;"><i class="fa-solid fa-map-pin me-2 text-muted"></i>${clave}</span>
+                <span class="stat-count-badge">${objetoMap[clave]}</span>
+            </button>
+            <div class="stat-details-box" id="box-${idBox}"></div>
+        </div>`;
+    }
+    if(html === "") html = '<div class="text-center text-muted small py-4">Sin datos estadísticos disponibles.</div>';
+    return html;
+}
+
+function conmutarDespliegueInterno(idBox, territorialKey, tipo) {
+    const el = document.getElementById(`box-${idBox}`);
+    if(el.style.display === "block") { el.style.display = "none"; return; }
+    let filtrados = todosLosDatos.filter(c => {
+        if(tipo === "mun") return (c.municipio || '') === territorialKey;
+        if(tipo === "par") return (c.parroquia || '') === territorialKey;
+        return (c.comuna || '') === territorialKey;
+    });
+    let subHtml = '<ul class=\"list-group list-group-flush rounded-3 border-0\" style=\"font-size:0.75rem;\">';
+    filtrados.forEach(c => { subHtml += `<li class=\"list-group-item bg-transparent py-2 px-1 text-secondary text-uppercase fw-semibold\"><i class=\"fa-solid fa-user me-2 text-primary\"></i>${c.nombre}</li>`; });
+    subHtml += '</ul>';
+    el.innerHTML = subHtml;
+    el.style.display = "block";
+}
+
+function exportarFichaA_PDF() {
+    const elemento = document.getElementById('areaDescargaFicha');
+    html2pdf().set({ margin: 0.3, filename: 'Ficha_SIAHO.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(elemento).save();
+}
+
+function exportarFichaA_Imagen() {
+    const elemento = document.getElementById('areaDescargaFicha');
+    html2canvas(elemento, { scale: 2, useCORS: true }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'Ficha_Cultor_SIAHO.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+}
+
+function mostrarAlertaFlotante(msg) {
+    const box = document.getElementById('alertaFlotante');
+    if(!box) return;
+    box.innerText = msg;
+    box.style.display = 'block';
+    setTimeout(() => { box.style.display = 'none'; }, 3500);
+}
+
+function cargarCarteleraNoticias() {
+    const userLogueado = localStorage.getItem("siaho_sesion_activa") || "";
+    fetch(`${URL_API_GOOGLE}?action=LEER_NOTICIAS&usuario=${encodeURIComponent(userLogueado)}`)
+    .then(r => r.json())
+    .then(res => {
+        if(res.status === "SUCCESS") {
+            noticiasData = res.data || [];
+            localStorage.setItem("siaho_cache_noticias", JSON.stringify(noticiasData));
+            renderizarNoticiasDOM();
+        } else {
+            fallbackNoticiasCache();
+        }
+    })
+    .catch(() => { fallbackNoticiasCache(); });
+}
+
+function fallbackNoticiasCache() {
+    noticiasData = JSON.parse(localStorage.getItem("siaho_cache_noticias") || "[]");
+    renderizarNoticiasDOM();
+}
+
+function renderizarNoticiasDOM() {
+    const container = document.getElementById('contenedorNoticias');
+    if(!container) return;
+    if(noticiasData.length === 0) {
+        container.innerHTML = `
+        <div class="news-card p-3 d-flex align-items-center justify-content-center border-dashed" style="flex:0 0 100%; border:2px dashed #cbd5e1; background: transparent; height:120px;">
+            <div class="text-center text-muted small"><i class="fa-solid fa-images fa-lg mb-1 opacity-50"></i><br>Cartelera vacía en este momento.</div>
+        </div>`;
+        return;
+    }
+    
+    let html = "";
+    noticiasData.forEach((n, i) => {
+        const poster = n.foto || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400";
+        const btnEliminarHtml = verificarRolAdministrador() ? `<button class="btn btn-danger super-small py-0 px-2 position-absolute" style="top:8px; right:8px; font-size:0.65rem; z-index:10; border-radius:6px;" onclick="eliminarNoticiaFlujo(event, ${i})">Borrar</button>` : '';
+        html += `
+        <div class="news-card position-relative">
+            ${btnEliminarHtml}
+            <div class="news-img-container">
+                <img src="${poster}" alt="Portada">
+            </div>
+            <div class="p-2">
+                <h7 class="fw-bold text-dark d-block text-truncate mb-1" style="font-size:0.78rem; text-transform:uppercase;">${n.titulo}</h7>
+                <p class="text-muted mb-0 text-truncate-3 super-small" style="font-size:0.68rem; line-height:1.2; height:36px;">${n.descripcion}</p>
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function abrirAdminNoticias(esCrear) {
+    if(esCrear) {
+        document.getElementById('formNuevaNoticia').reset();
+        document.getElementById('noticiaIndex').value = "";
+        noticiaImagenBase64 = "";
+        document.getElementById('tituloModalNoticia').innerText = "Publicar Novedad Territorial";
+        if(modalAdminInstancia) modalAdminInstancia.show();
+    }
+}
+
+function publicarNoticiaFlujo() {
+    const userLogueado = localStorage.getItem("siaho_sesion_activa") || "";
+    const payload = {
+        action: "CREAR_NOTICIA",
+        usuario: userLogueado,
+        titulo: document.getElementById('newsTitle').value.trim(),
+        descripcion: document.getElementById('newsDesc').value.trim(),
+        foto: noticiaImagenBase64
+    };
+    
+    mostrarAlertaFlotante("Subiendo comunicado a los servidores...");
+    if(modalAdminInstancia) modalAdminInstancia.hide();
+    
+    fetch(URL_API_GOOGLE, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        mostrarAlertaFlotante("Cartelera actualizada.");
+        setTimeout(() => { cargarCarteleraNoticias(); }, 1500);
+    })
+    .catch(err => console.error(err));
+}
+
+function eliminarNoticiaFlujo(e, idx) {
+    e.stopPropagation();
+    if(!confirm("¿Desea dar de baja esta noticia de la cartelera oficial?")) return;
+    const userLogueado = localStorage.getItem("siaho_sesion_activa") || "";
+    
+    const payload = {
+        action: "ELIMINAR_NOTICIA",
+        usuario: userLogueado,
+        index: idx
+    };
+    
+    mostrarAlertaFlotante("Borrando noticia...");
+    fetch(URL_API_GOOGLE, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+    .then(() => {
+        mostrarAlertaFlotante("Noticia eliminada.");
+        setTimeout(() => { cargarCarteleraNoticias(); }, 1500);
+    })
+    .catch(err => console.error(err));
 }
 </script>
 </body>
