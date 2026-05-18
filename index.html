@@ -415,10 +415,27 @@ document.addEventListener("DOMContentLoaded", () => {
         if (document.getElementById('modalVerFicha')) modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
         if (document.getElementById('modalConfirmarSalida')) modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
     } catch (e) { console.error("Error inicializando modales:", e); }
-    
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW Status:', err));
+// 🔥 SÚPER LIMPIEZA AUTOMÁTICA DE SERVICE WORKERS VIEJOS
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    for (let registration of registrations) {
+      // Si el service worker actual no tiene las nuevas reglas, lo destruimos
+      registration.unregister().then(function(success) {
+        if (success) console.log("SW obsoleto destruido con éxito.");
+      });
     }
+  });
+}
+
+// Ahora sí, registramos el nuevo con normalidad
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('Nuevo SW de SIAHO listo y optimizado:', reg.scope))
+      .catch(err => console.error('Error al registrar SW:', err));
+  });
+}
+    
 
     comprobarEstadoSesion();
     if (document.getElementById('inputBuscar')) document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
