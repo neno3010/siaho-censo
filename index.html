@@ -527,29 +527,124 @@ function cargarDatos() {
     const emailLimpio = usuarioLogueado.trim().toLowerCase();
     if(!emailLimpio) return;
     
+    // Rompemos el caché agregando el timestamp al final de la URL
     const urlLimpiaSinCache = URL_API_GOOGLE + (URL_API_GOOGLE.includes('?') ? '&' : '?') + '_ts=' + Date.now();
     
-    // OPTIMIZACIÓN DE CABECERAS PARA EVITAR LOCKS:
+    // Forzamos la cabecera CORS para evitar el bloqueo del navegador
     fetch(urlLimpiaSinCache, {
         method: "GET",
-        mode: "cors", // Forzamos el modo Cross-Origin Resource Sharing
+        mode: "cors",
         credentials: "omit",
         headers: {
             "Accept": "application/json"
         }
     })
     .then(res => {
-        if (!res.ok) throw new Error("Respuesta de red no okey");
+        if (!res.ok) throw new Error("Error en la respuesta del servidor de Google");
         return res.json();
     })
     .then(data => {
-        // Tu lógica para procesar los cultores y noticias...
-        console.log("Datos cargados con éxito de la nube:", data);
+        console.log("Datos recibidos de la nube:", data);
+        
+        // 1. Guardar los datos en la variable global
+        if (data && data.cultores) {
+            todosLosDatos = data.cultores;
+        } else if (Array.isArray(data)) {
+            todosLosDatos = data; // Por si tu backend devuelve el array directo
+        } else {
+            todosLosDatos = [];
+        }
+
+        // 2. Guardar y procesar noticias si vienen en la respuesta
+        if (data && data.noticias) {
+            noticiasData = data.noticias;
+            renderizarCarteleraNoticias();
+        }
+
+        // 3. Actualizar los contadores de la interfaz
+        document.getElementById('statTotal').innerText = todosLosDatos.length;
+
+        // 4. Renderizar el listado principal (adiós al mensaje de carga permanente)
+        renderizarListadoPantalla(todosLosDatos);
     })
     .catch(err => {
-        console.error("Error en fetch de SIAHO:", err);
-        notificar("⚠️ Error de sincronización con la nube", "#ef4444");
+        console.error("Error crítico en fetch de SIAHO:", err);
+        
+        // Si falla la red, intentamos recuperar lo último que tengamos del listado para que no quede infinito
+        const listaMovil = document.getElementById('listaMovil');
+        if (listaMovil && todosLosDatos.length === 0) {
+            listaMovil.innerHTML = `
+                <div class="text-center py-4 text-danger">
+                    <i class="fa-solid fa-triangle-exclamation fa-2x mb-2"></i>
+                    <p class="small mb-0 font-weight-bold">Fallo de sincronización</p>
+                    <p class="super-small text-muted" style="font-size:0.75rem;">Verifica tu conexión o el estado de la API en Google.</p>
+                </div>`;
+        }
+        notificar("⚠️ Error de conexión con la base de datos", "#ef4444");
     });
+}
+
+// Función encargada de construir las tarjetas de los cultores en pantalla
+function renderizarListadoPantalla(datos) {
+    const listaMovil = document.getElementById('listaMovil');
+    if (!listaMovil) return;
+
+    if (datos.length === 0) {
+        listaMovil.innerHTML = `
+            <div class="text-center py-5 text-muted">
+                <i class="fa-solid fa-folder-open fa-2x mb-2 opacity-50"></i>
+                <p class="small mb-0">No se encontraron registros de cultores</p>
+            </div>`;
+        return;
+    }
+
+    let htmlContenido = "";
+    datos.forEach((cultor, index) => {
+        // Validación de foto por defecto si no tiene
+        const fotoSrc = cultor.foto || "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=150";
+        
+        htmlContenido += `
+            <div class="card card-custom p-3 mb-2 bg-white border" onclick="abrirVerFicha(${index})">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-container">
+                        <img src="${fotoSrc}" style="width:100%; height:100%; object-fit:cover;" alt="Foto">
+                    </div>
+                    <div class="flex-grow-1" style="min-width: 0;">
+                        <h6 class="fw-bold text-dark mb-0 text-truncate text-uppercase" style="font-size:0.9rem;">${cultor.nombre || 'SIN NOMBRE'}</h6>
+                        <p class="text-muted small mb-0 style="font-size:0.78rem;">
+                            <i class="fa-solid fa-id-card me-1 text-primary"></i> ${cultor.cedula || 'S/C'} 
+                            <span class="mx-1">|</span> 
+                            <i class="fa-solid fa-location-dot me-1 text-danger"></i> ${cultor.municipio || 'S/T'}
+                        </p>
+                        <span class="badge bg-light text-primary border border-primary-subtle mt-1 super-small" style="font-size:0.68rem;">
+                            ${cultor.especialidad || 'General'}
+                        </span>
+                    </div>
+                    <div class="text-muted">
+                        <i class="fa-solid fa-chevron-right fa-sm"></i>
+                    </div>
+                </div>
+            </div>`;
+    });
+
+    listaMovil.innerHTML = htmlContenido;
+}
+
+// Lógica de filtrado en tiempo real para la barra de búsqueda
+function filtrarListadoPrincipal() {
+    const termino = document.getElementById('inputBuscar').value.toLowerCase().trim();
+    if (!termino) {
+        renderizarListadoPantalla(todosLosDatos);
+        return;
+    }
+
+    const filtrados = todosLosDatos.filter(c => {
+        const nombre = (c.nombre || "").toLowerCase();
+        const cedula = (c.cedula || "").toString();
+        return nombre.includes(termino) || cedula.includes(termino);
+    });
+
+    renderizarListadoPantalla(filtrados);
 }
     
 function cerrarSesionActual() {
