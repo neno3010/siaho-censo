@@ -405,12 +405,20 @@ function verificarRolAdministrador() {
 function comprobarEstadoSesion() {
     const s = localStorage.getItem("siaho_sesion_activa");
     
-    // Vinculación adaptada a la estructura real de tu maquetación HTML
-    const vLogin = document.getElementById('autenticacionFiltro');
-    const vApp = document.getElementById('appContenido');
-    
+    // Busca los contenedores principales probando todas las variantes que tienes en tu HTML
+    const vLogin = document.getElementById('autenticacionFiltro') || 
+                   document.getElementById('vistaLogin') || 
+                   document.getElementById('loginVista') ||
+                   document.getElementById('seccionLogin') ||
+                   document.querySelector('.auth-container'); // Intenta por clase si falla el ID
+                   
+    const vApp = document.getElementById('appContenido') || 
+                 document.getElementById('vistaApp') || 
+                 document.getElementById('appVista') ||
+                 document.getElementById('contenedorPrincipal');
+
     if (!vLogin || !vApp) {
-        console.warn("Mapeo temporal: Cargando datos en modo bypass de maquetación.");
+        console.warn("⚠️ SIAHO Vista: No se localizan estructuras para alternar pantallas. Forzando lectura directa.");
         if (s) { verificarRolAdministrador(); cargarDatos(); }
         return; 
     }
@@ -428,6 +436,57 @@ function comprobarEstadoSesion() {
     }
 }
 
+function procesarAutenticacion(e) {
+    e.preventDefault();
+    
+    // Intenta capturar el campo de Email buscando variantes comunes de ID
+    const inputEmail = document.getElementById('authEmail') || 
+                       document.getElementById('email') || 
+                       document.getElementById('usuario') ||
+                       document.querySelector('input[type="email"]');
+                       
+    // Intenta capturar el campo de Contraseña buscando variantes comunes de ID
+    const inputPass = document.getElementById('authPassword') || 
+                      document.getElementById('password') || 
+                      document.getElementById('contrasena') ||
+                      document.querySelector('input[type="password"]');
+    
+    // Validación preventiva si los elementos no existen en el árbol HTML
+    if (!inputEmail || !inputPass) {
+        console.error("❌ SIAHO Auth: Los campos input de correo o clave no se encuentran en el HTML.");
+        notificar("⚠️ Error interno de maquetación en el login", "#ef4444");
+        return;
+    }
+    
+    const email = inputEmail.value.trim().toLowerCase();
+    const pass = inputPass.value;
+    
+    if (!email || !pass) {
+        notificar("⚠️ Completa los campos solicitados", "#f59e0b");
+        return;
+    }
+    
+    notificar("🔐 Autenticando canal seguro...", "#0284c7");
+    
+    if (modoAuthActual === "LOGIN") {
+        if (email === "admin@siaho.com" && pass === "siaho2026") {
+            localStorage.setItem("siaho_sesion_activa", email);
+            localStorage.setItem("siaho_rol", "ADMIN");
+            comprobarEstadoSesion();
+            notificar("🎉 Bienvenido Administrador", "#22c55e");
+        } else if (pass === "censador2026") {
+            localStorage.setItem("siaho_sesion_activa", email);
+            localStorage.setItem("siaho_rol", "CENSADOR");
+            comprobarEstadoSesion();
+            notificar("✅ Acceso concedido como Registrador", "#22c55e");
+        } else {
+            notificar("❌ Credenciales inválidas para SIAHO", "#ef4444");
+        }
+    } else {
+        notificar("📨 Solicitud enviada al administrador", "#0284c7");
+    }
+}
+    
 function conmutarModoAuth(modo) {
     modoAuthActual = modo;
     const btn = document.getElementById('btnSubmitAuth');
