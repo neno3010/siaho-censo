@@ -372,12 +372,12 @@ let noticiasData = [];
 let modoAuthActual = "LOGIN"; 
 
 document.addEventListener("DOMContentLoaded", () => {
-    // 🧯 SÚPER LIMPIEZA AUTOMÁTICA DE INTERCEPTORES OBSOLETOS
+    // Limpieza automática de Service Workers residuales defectuosos
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
             for (let registration of registrations) {
                 registration.unregister().then(function(success) {
-                    if (success) console.log("SW Residual obsoleto removido con éxito.");
+                    if (success) console.log("SW residual limpiado.");
                 });
             }
         });
@@ -388,7 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (document.getElementById('modalAdminNoticias')) modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
         if (document.getElementById('modalVerFicha')) modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
         if (document.getElementById('modalConfirmarSalida')) modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
-    } catch (e) { console.error("Error inicializando modales nativos:", e); }
+    } catch (e) { console.error("Error inicializando modales:", e); }
     
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW Status:', err));
@@ -418,6 +418,19 @@ function comprobarEstadoSesion() {
     } else {
         vLogin.classList.remove('d-none');
         vApp.classList.add('d-none');
+    }
+}
+
+function conmutarModoAuth(modo) {
+    modoAuthActual = modo;
+    const btn = document.getElementById('btnSubmitAuth');
+    const link = document.getElementById('toggleAuthLink');
+    if (modo === "LOGIN") {
+        btn.innerText = "Ingresar al Sistema";
+        link.innerHTML = '¿No tienes cuenta? <span class="text-primary fw-bold" style="cursor:pointer;" onclick="conmutarModoAuth(\'REGISTRO\')">Regístrate aquí</span>';
+    } else {
+        btn.innerText = "Solicitar Registro";
+        link.innerHTML = '¿Ya tienes cuenta? <span class="text-primary fw-bold" style="cursor:pointer;" onclick="conmutarModoAuth(\'LOGIN\')">Inicia sesión</span>';
     }
 }
 
@@ -456,16 +469,17 @@ function cerrarSesionSiaho() {
     notificar("🔒 Sesión cerrada con éxito", "#6b7280");
 }
 
-function cambiarModoAuth(modo) {
-    modoAuthActual = modo;
-    const btn = document.getElementById('btnSubmitAuth');
-    const link = document.getElementById('toggleAuthLink');
-    if (modo === "LOGIN") {
-        btn.innerText = "Ingresar al Sistema";
-        link.innerHTML = '¿No tienes cuenta? <span class="text-primary fw-bold" onclick="cambiarModoAuth('REGISTRO')">Regístrate aquí</span>';
-    } else {
-        btn.innerText = "Solicitar Registro";
-        link.innerHTML = '¿Ya tienes cuenta? <span class="text-primary fw-bold" onclick="cambiarModoAuth('LOGIN')">Inicia sesión</span>';
+function cambiarSeccion(target) {
+    document.querySelectorAll('.content-section').forEach(el => el.classList.add('d-none'));
+    document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
+    
+    const s = document.getElementById(`sec_${target}`);
+    const n = document.getElementById(`nav_${target}`);
+    if (s) s.classList.remove('d-none');
+    if (n) n.classList.add('active');
+    
+    if (target === 'reportes') {
+        procesarYRenderizarEstadisticasAvanzadas();
     }
 }
 
@@ -473,7 +487,6 @@ function cargarDatos() {
     const s = localStorage.getItem("siaho_sesion_activa") || "";
     if (!s) return;
     
-    // Rompemos el caché forzando timestamp único de petición externa
     const urlLimpia = URL_API_GOOGLE + (URL_API_GOOGLE.includes('?') ? '&' : '?') + '_ts=' + Date.now();
     
     fetch(urlLimpia, {
@@ -483,13 +496,10 @@ function cargarDatos() {
         headers: { "Accept": "application/json" }
     })
     .then(res => {
-        if (!res.ok) throw new Error("Respuesta no okey de red");
+        if (!res.ok) throw new Error("Respuesta de red no válida");
         return res.json();
     })
     .then(data => {
-        console.log("Datos limpios mapeados de la nube:", data);
-        
-        // Sincronización exacta con las propiedades devueltas por el script .gs
         if (data && data.cultores) {
             todosLosDatos = data.cultores;
         } else if (data && data.data) {
@@ -517,7 +527,6 @@ function cargarDatos() {
                 <div class="text-center py-4 text-muted">
                     <i class="fa-solid fa-wifi-slash fa-2x mb-2 text-danger"></i>
                     <p class="small mb-0 fw-bold">Sin respuesta de red remota</p>
-                    <p style="font-size:0.75rem;">Verifica tu conexión o el estado de la API.</p>
                 </div>`;
         }
     });
@@ -573,14 +582,14 @@ function renderizarCarteleraNoticias() {
     
     if (!noticiasData || noticiasData.length === 0) {
         c.innerHTML = `
-            <div class="text-center w-100 py-3 text-muted" style="font-size:0.8srem;">
+            <div class="text-center w-100 py-3 text-muted" style="font-size:0.8rem;">
                 <i class="fa-solid fa-newspaper mb-1 d-block opacity-40"></i> Sin anuncios de momento.
             </div>`;
         return;
     }
     
-    const invertidas = [...noticiasData].reverse();
-    invertidas.forEach(n => {
+    const invertivas = [...noticiasData].reverse();
+    invertivas.forEach(n => {
         const f = n.foto || n.imagen || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=400&q=80';
         c.innerHTML += `
         <div class="news-card">
@@ -588,9 +597,9 @@ function renderizarCarteleraNoticias() {
                 <img src="${f}" alt="Portada">
             </div>
             <div class="p-3">
-                <h6 class="fw-bold text-dark mb-1 text-truncate">${n.titulo || n.title || 'Comunicado Oficial'}</h6>
+                <h6 class="fw-bold text-dark mb-1 text-truncate">${n.titulo || 'Comunicado Oficial'}</h6>
                 <p class="text-muted small mb-0 text-truncate-3" style="font-size: 0.72rem; line-height:1.35;">
-                    ${n.descripcion || n.desc || 'Sin descripción provista.'}
+                    ${n.descripcion || 'Sin descripción provista.'}
                 </p>
             </div>
         </div>`;
@@ -642,7 +651,6 @@ function abrirVerFicha(index) {
     const imgFicha = document.getElementById('f_foto');
     imgFicha.src = c.foto || "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=150";
     
-    // Inyectamos el index en el botón de edición rápida
     document.getElementById('btnEditarRapido').setAttribute('onclick', `abrirModalEdicionDesdeFicha(${index})`);
     
     if (modalVerFichaInstancia) modalVerFichaInstancia.show();
@@ -659,7 +667,7 @@ function abrirModalEdicionDesdeFicha(index) {
     document.getElementById('comuna').value = c.comuna || '';
     document.getElementById('comunidad').value = c.comunidad || '';
     document.getElementById('cedula').value = c.cedula || '';
-    document.getElementById('cedula').disabled = true; // Cédula actúa como llave única inmune
+    document.getElementById('cedula').disabled = true; 
     document.getElementById('nombre').value = c.nombre || '';
     document.getElementById('fechanacimiento').value = c.fechanacimiento || '';
     document.getElementById('sexo').value = c.sexo || 'MASCULINO';
@@ -680,7 +688,6 @@ function abrirModalEdicionDesdeFicha(index) {
         imagenGlobalBase64 = "";
     }
     
-    // Permitir eliminar solo si eres Administrador
     const rRol = localStorage.getItem("siaho_rol");
     document.getElementById('btnEliminarCultor').style.display = (rRol === "ADMIN") ? "block" : "none";
     
@@ -715,7 +722,7 @@ function procesarImagenNoticia(element) {
     reader.readAsDataURL(file);
 }
 
-// ENVÍO Y CAPTURA DEL CENSO CON ATRIBUTO DE REGISTRADOR ASIGNADO
+// CUANDO REGISTRA LA INFORMACIÓN (ENVÍO DEL CENSO)
 document.getElementById('formularioCenso').addEventListener('submit', function(e) {
     e.preventDefault();
     notificar("🚀 Sincronizando censo con la base de datos...", "#0284c7");
@@ -724,7 +731,7 @@ document.getElementById('formularioCenso').addEventListener('submit', function(e
     
     const payload = {
         action: document.getElementById('action_type').value,
-        registradoPor: op, // 🔥 AQUÍ SE CORRIGE EL REGISTRADOR DE LA CELDA EN BLANCO
+        registradoPor: op, 
         municipio: document.getElementById('municipio').value.trim(),
         parroquia: document.getElementById('parroquia').value.trim(),
         comuna: document.getElementById('comuna').value.trim(),
@@ -753,7 +760,7 @@ document.getElementById('formularioCenso').addEventListener('submit', function(e
             notificar("🎉 Registro consolidado con éxito", "#22c55e");
             if (modalInstancia) modalInstancia.hide();
             document.getElementById('formularioCenso').reset();
-            cargarDatos(); // Actualización reactiva instantánea
+            cargarDatos(); 
         } else {
             throw new Error(resData.message);
         }
@@ -769,7 +776,7 @@ document.getElementById('formularioCenso').addEventListener('submit', function(e
 function eliminarCultorActual() {
     const ced = document.getElementById('cedula').value.trim();
     if (!ced) return;
-    if (confirm("¿Estás completamente seguro de borrar este registro de la base de datos central?")) {
+    if (confirm("¿Estás seguro de borrar este registro de la base de datos central?")) {
         notificar("💥 Eliminando registro...", "#dc2626");
         fetch(URL_API_GOOGLE, {
             method: "POST",
@@ -797,8 +804,8 @@ function abrirPanelNoticiasAdmin() {
     noticiasData.forEach((n, i) => {
         html += `
         <div class="d-flex justify-content-between align-items-center p-2 mb-2 border rounded bg-light" style="font-size:0.8rem;">
-            <div class="text-truncate me-2 fw-semibold text-secondary text-uppercase">${n.titulo || n.title || 'Anuncio'}</div>
-            <button class="btn btn-danger btn-xs py-1 px-2" onclick="eliminarNoticiaAdmin(${i})"><i class="fa-solid fa-trash"></i></button>
+            <div class="text-truncate me-2 fw-semibold text-secondary text-uppercase">${n.titulo || 'Anuncio'}</div>
+            <button type="button" class="btn btn-danger btn-xs py-1 px-2" onclick="eliminarNoticiaAdmin(${i})"><i class="fa-solid fa-trash"></i></button>
         </div>`;
     });
     if(list) list.innerHTML = html || '<div class="text-center text-muted small py-2">No hay anuncios activos</div>';
@@ -810,7 +817,6 @@ function abrirPanelNoticiasAdmin() {
     if (modalAdminInstancia) modalAdminInstancia.show();
 }
 
-// ENVÍO Y REFRESCO DE NOTICIAS DE LA CARTELERA DINÁMICA
 document.getElementById('formNuevaNoticia').addEventListener('submit', function(e) {
     e.preventDefault();
     notificar("📢 Publicando novedad...", "#0284c7");
@@ -833,7 +839,7 @@ document.getElementById('formNuevaNoticia').addEventListener('submit', function(
             notificar("🎉 Anuncio fijado en la cartelera", "#22c55e");
             document.getElementById('formNuevaNoticia').reset();
             if (modalAdminInstancia) modalAdminInstancia.hide();
-            cargarDatos(); // 🔥 CORRECCIÓN: Fuerza el renderizado inmediato del carrusel de noticias
+            cargarDatos(); 
         } else {
             throw new Error();
         }
@@ -883,9 +889,10 @@ function procesarYRenderizarEstadisticasAvanzadas() {
 function armarAccordionDinamico(objeto, prefijo) {
     let html = "";
     Object.keys(objeto).forEach((key, i) => {
+        // Corrección de la sintaxis del setAttribute / onclick dinámico evitando caracteres de escape redundantes
         html += `
         <div class="stat-accordion-item">
-            <button class="stat-header-trigger" onclick="conmutarAccordionInterno('${prefijo}-${i}', '${key.replace(/'/g, "\\'")}', '${prefijo}')">
+            <button type="button" class="stat-header-trigger" data-prefijo="${prefijo}" data-key="${key}" data-boxid="${prefijo}-${i}" onclick="conmutarAccordionDesdeElemento(this)">
                 <span class="fw-bold text-dark small text-uppercase"><i class="fa-solid fa-layer-group text-muted me-2"></i>${key}</span>
                 <span class="stat-count-badge">${objeto[key]} Censados</span>
             </button>
@@ -895,14 +902,20 @@ function armarAccordionDinamico(objeto, prefijo) {
     return html || `<div class="text-center py-3 text-muted small">Sin datos computados en el alcance actual.</div>`;
 }
 
-function conmutarAccordionInterno(idBox, territorialKey, tipo) {
+function conmutarAccordionDesdeElemento(btn) {
+    const idBox = btn.getAttribute('data-boxid');
+    const territorialKey = btn.getAttribute('data-key');
+    const tipo = btn.getAttribute('data-prefijo');
+    
     const el = document.getElementById(`box-${idBox}`);
     if(el.style.display === "block") { el.style.display = "none"; return; }
+    
     let filtrados = todosLosDatos.filter(c => {
         if(tipo === "mun") return (c.municipio || '') === territorialKey;
         if(tipo === "par") return (c.parroquia || '') === territorialKey;
         return (c.comuna || '') === territorialKey;
     });
+    
     let subHtml = '<ul class="list-group list-group-flush rounded-3 border-0" style="font-size:0.75rem;">';
     filtrados.forEach(c => { subHtml += `<li class="list-group-item bg-transparent py-2 px-1 text-secondary text-uppercase fw-semibold"><i class="fa-solid fa-user me-2 text-primary"></i>${c.nombre}</li>`; });
     subHtml += '</ul>';
@@ -920,6 +933,16 @@ function exportarFichaA_Imagen() {
         const link = document.createElement('a'); link.download = 'Ficha_SIAHO.png'; link.href = canvas.toDataURL(); link.click();
     });
 }
+
+function notificar(msg, color) {
+    const t = document.getElementById('notificacionSiaho');
+    if (!t) return;
+    t.innerText = msg;
+    t.style.backgroundColor = color || "var(--primary-color)";
+    t.style.display = "block";
+    setTimeout(() => { t.style.display = "none"; }, 3500);
+}
 </script>
 </body>
 </html>
+
