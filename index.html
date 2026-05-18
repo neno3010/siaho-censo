@@ -806,8 +806,7 @@
                     App.mostrarToast("❌ Error de comunicación", "#ef4444");
                 });
             },
-
-            // --- ANUNCIOS / NOTICIAS ---
+// --- ANUNCIOS / NOTICIAS ---
             guardarNoticia: (e) => {
                 e.preventDefault();
                 const payload = {
@@ -857,6 +856,57 @@
                         modales.admin.hide();
                         App.cargarDatosNube();
                     }
+                });
+            },
+
+            // --- FICHA DE ASCENSO (NUEVA ACCIÓN ASOCIADA A CULTORES) ---
+            guardarFichaAscenso: (e) => {
+                e.preventDefault();
+                
+                // Mapeo dinámico y preventivo usando los IDs del formulario
+                const payload = {
+                    action: "FICHA_ASCENSO",
+                    usuario_registro: document.getElementById('v_registrador') ? document.getElementById('v_registrador').innerText.trim() : "",
+                    cedula: document.getElementById('c_cedula').value.trim(),
+                    nombre: document.getElementById('c_nombre').value.trim(),
+                    fechanacimiento: document.getElementById('c_nacimiento').value,
+                    sexo: document.getElementById('c_sexo').value,
+                    municipio: document.getElementById('c_municipio').value,
+                    parroquia: document.getElementById('c_parroquia').value,
+                    comuna: document.getElementById('c_comuna').value.trim(),
+                    comunidad: document.getElementById('c_comunidad').value.trim(),
+                    especialidad: document.getElementById('c_especialidad').value,
+                    artesania: document.getElementById('c_artesania') ? document.getElementById('c_artesania').value.trim() : "",
+                    dequienaprendio: document.getElementById('c_maestro') ? document.getElementById('c_maestro').value.trim() : "",
+                    enfermedadesquetrata: document.getElementById('c_enfermedades') ? document.getElementById('c_enfermedades').value.trim() : "",
+                    plantasoproductosqueusa: document.getElementById('c_plantas') ? document.getElementById('c_plantas').value.trim() : "",
+                    observaciones: document.getElementById('c_obs') ? document.getElementById('c_obs').value.trim() : "",
+                    foto: Estado.imagenBase64Temp || ""
+                };
+
+                App.toggleLoader(true);
+                fetch(CONFIG.API_URL, {
+                    method: "POST",
+                    mode: "cors",
+                    body: JSON.stringify(payload)
+                })
+                .then(res => res.json())
+                .then(res => {
+                    App.toggleLoader(false);
+                    if(res.status === "success") {
+                        App.mostrarToast("🎉 Ficha de ascenso registrada con éxito", "#22c55e");
+                        // Aquí puedes añadir resets adicionales de formulario o cierre de modales si aplica:
+                        if(document.getElementById('formCenso')) document.getElementById('formCenso').reset();
+                        modales.censo.hide();
+                        App.cargarDatosNube();
+                    } else {
+                        App.mostrarToast("❌ " + (res.message || "Error al guardar"), "#ef4444");
+                    }
+                })
+                .catch(err => {
+                    App.toggleLoader(false);
+                    App.mostrarToast("❌ Error de conexión al guardar ascenso", "#ef4444");
+                    console.error(err);
                 });
             },
 
@@ -913,7 +963,7 @@
 
                 modales.perfil.show();
             },
-
+            
             // --- GENERACIÓN DE MÉTRICAS TERRITORIALES ---
             renderizarEstadisticas: () => {
                 const calcularAgrupacion = (propiedad) => {
