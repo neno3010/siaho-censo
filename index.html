@@ -475,12 +475,23 @@
                 const em = document.getElementById('inputEmail').value.trim().toLowerCase();
                 const pw = document.getElementById('inputPassword').value;
 
-                if (em === "admin@siaho.com" && pw === "siaho2026") {
-                    App.crearSesionLocal(em, "ADMIN", "🎉 Bienvenido Administrador");
-                } else if (pw === "censador2026") {
-                    App.crearSesionLocal(em, "CENSADOR", "✅ Acceso de Registrador concedido");
+                // Buscar el usuario en la lista descargada de Google Sheets
+                const usuarioEncontrado = Estado.usuarios.find(u => u.email === em && String(u.password) === String(pw));
+
+                if (usuarioEncontrado) {
+                    if (usuarioEncontrado.estado === "PENDIENTE") {
+                        App.mostrarToast("⏳ Tu cuenta aún está en espera de aprobación por el Administrador", "#f59e0b");
+                        return;
+                    }
+                    if (usuarioEncontrado.estado === "INACTIVO") {
+                        App.mostrarToast("❌ Cuenta deshabilitada. Contacta al administrador", "#ef4444");
+                        return;
+                    }
+                    
+                    // Si está ACTIVO, pasa
+                    App.crearSesionLocal(usuarioEncontrado.email, usuarioEncontrado.rol, `🎉 Bienvenido ${usuarioEncontrado.email}`);
                 } else {
-                    App.mostrarToast("❌ Credenciales incorrectas", "#ef4444");
+                    App.mostrarToast("❌ Correo o contraseña incorrectos", "#ef4444");
                 }
             },
             crearSesionLocal: (correo, rol, msg) => {
