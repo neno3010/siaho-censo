@@ -9,7 +9,7 @@
     <link rel="manifest" href="./manifest.json">
     
     <title>SIAHO Censo Móvil Profesional</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" onerror="alert('Error de conexión de red: No se pudo cargar la hoja de estilos de Bootstrap de forma remota.')">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -24,7 +24,6 @@
         }
         body { background-color: var(--bg); font-family: system-ui, -apple-system, sans-serif; padding-bottom: 100px; overflow-x: hidden; }
         
-        /* --- ESTILOS PANTALLA LOGIN/REGISTRO --- */
         #pantallaAuth {
             position: fixed;
             top:0; left:0; width:100%; height:100%; 
@@ -35,6 +34,974 @@
         .auth-card {
             background: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(8px);
+            border-radius: 24px; padding: 30px 24px; width: 100%; max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .banner-ancestral {
+            position: relative;
+            width: 100%; padding: 1.5rem 1.25rem; display: flex;
+            align-items: flex-end; color: white; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(30, 27, 75, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #130f2b 0%, #1e1b4b 45%, #312e81 100%);
+            border-bottom: 3.5px solid #d97706; overflow: hidden;
+        }
+        .banner-ancestral::before {
+            content: "";
+            position: absolute; top: -50%; right: -25%; width: 280px; height: 280px;
+            background: radial-gradient(circle, rgba(217, 119, 6, 0.22) 0%, rgba(79, 70, 229, 0.12) 50%, rgba(0,0,0,0) 75%);
+            filter: blur(25px); z-index: 1; pointer-events: none;
+        }
+        .banner-ancestral > div { position: relative; z-index: 2; }
+        .banner-ancestral p i { color: #fbbf24; text-shadow: 0 0 8px rgba(251, 191, 36, 0.6); }
+        
+        .news-carousel { display: flex; overflow-x: auto; gap: 14px; padding: 5px 2px 15px 2px; scrollbar-width: none; }
+        .news-carousel::-webkit-scrollbar { display: none; }
+        
+        .news-card { flex: 0 0 85%; background: white; border-radius: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); overflow: hidden; position: relative; border: 1px solid #e2e8f0; }
+        .news-img-container { width: 100%; height: 120px; background: #e2e8f0; position: relative; cursor: pointer; }
+        .news-img-container img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .bottom-nav { 
+            position: fixed;
+            bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); 
+            backdrop-filter: blur(12px); display: grid; grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            padding: 6px 10px 14px 10px; border-top: 1px solid #e2e8f0; z-index: 1000;
+        }
+        .nav-item-custom { text-align: center; color: #64748b; text-decoration: none; font-size: 0.75rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .nav-item-custom.active { color: var(--primary); font-weight: 700; }
+        .nav-item-custom i { font-size: 1.4rem; margin-bottom: 2px; }
+        
+        .fab-container { display: flex; justify-content: center; align-items: center; width: 75px; position: relative; }
+        .fab-add { 
+            width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary), var(--accent)); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; 
+            position: absolute; top: -32px;
+            border: 4px solid #fff; box-shadow: 0 6px 16px rgba(2,132,199,0.4); 
+            font-size: 1.3rem; transition: transform 0.2s;
+        }
+        .fab-add:active { transform: scale(0.92); }
+
+        .card-custom { border: none; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s; cursor: pointer; }
+        .card-custom:active { transform: scale(0.98); }
+        .avatar-container { width: 55px; height: 55px; min-width: 55px; overflow: hidden; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        
+        .section-title-custom { background: linear-gradient(90deg, #0284c7, #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.5px; margin-top: 15px; margin-bottom: 8px; display: flex; align-items: center; }
+        .section-title-custom::after { content: ''; flex-grow: 1; background: linear-gradient(90deg, #cbd5e1, transparent); height: 2px; margin-left: 10px; }
+        .form-control-interactive { border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; transition: all 0.25s ease; background-color: #ffffff; font-size: 0.85rem; }
+        .form-control-interactive:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); }
+        
+        .stat-accordion-item { background: white; border-radius: 14px; margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; overflow: hidden; }
+        .stat-header-trigger { width: 100%; padding: 14px; border: none; background: white; display: flex; justify-content: space-between; align-items: center; text-align: left; }
+        .stat-count-badge { background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; }
+        .stat-details-box { background: #f8fafc; padding: 10px 14px; border-top: 1px solid #f1f5f9; display: none; }
+
+        .ficha-exportable { background: #fff; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; position: relative; }
+        .ficha-header { border-bottom: 3px double #0284c7; padding-bottom: 12px; margin-bottom: 15px; text-align: center; }
+        .ficha-avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover; margin: 0 auto 10px auto; display: block; }
+
+        .toast-notificacion { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 6000; display: none; background: #1e293b; color: #fff; padding: 12px 24px; border-radius: 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); font-weight: 500; font-size: 0.9rem; }
+        .text-truncate-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+    </style>
+</head>
+<body>
+
+<div id="alertaFlotante" class="toast-notificacion"></div>
+
+<div id="pantallaAuth">
+    <div class="auth-card">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold text-dark mb-0" id="authTitulo">Iniciar Sesión</h3>
+            <p class="text-muted small" id="authSubtitulo">Ingresa tus credenciales para acceder al sistema sabios y sabias</p>
+        </div>
+        <form id="formAutenticacion">
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-secondary">Correo Electrónico</label>
+                <div class="position-relative">
+                    <i class="fa-solid fa-envelope position-absolute text-muted" style="left:12px; top:13px;"></i>
+                    <input type="email" id="authCorreo" class="form-control form-control-interactive ps-5" placeholder="usuario@correo.com" required>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-bold text-secondary">Contraseña</label>
+                <div class="position-relative">
+                    <i class="fa-solid fa-lock position-absolute text-muted" style="left:12px; top:13px;"></i>
+                    <input type="password" id="authPassword" class="form-control form-control-interactive ps-5" placeholder="••••••••" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 fw-bold py-2 rounded-3 shadow-sm mb-3" id="btnAuthSubmit">Entrar al Sistema</button>
+            <div class="text-center">
+                <a href="#" class="small text-decoration-none fw-bold text-accent" id="btnCambiarModo" onclick="conmutarModoAuth(event)">¿No tienes cuenta? Regístrate aquí</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="appContenido" style="display: none;">
+    <div class="banner-ancestral">
+        <div class="w-100 d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="fw-bold mb-0 text-white" style="letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.4)">SIAHO</h2>
+                <p class="text-white-50 mb-0 small" style="font-size: 0.8rem;"><i class="fa-solid fa-tree me-1"></i>Saberes Ancestrales Territoriales</p>
+            </div>
+            <div class="text-end d-flex align-items-center gap-3">
+                <div class="text-end">
+                    <h1 class="fw-black mb-0 text-white" id="statTotal" style="font-size: 2.2rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5)">0</h1>
+                    <span class="text-white-50 super-small" style="font-size:0.65rem;">CULTORES</span>
+                </div>
+                <button class="btn btn-sm btn-outline-light border-0" onclick="cerrarSesionActual()" title="Cerrar Sesión">
+                    <i class="fa-solid fa-right-from-bracket fa-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-3" id="vistaPrincipal">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold text-secondary mb-0"><i class="fa-solid fa-bullhorn text-primary me-2"></i>Cartelera Informativa</h6>
+            <button id="btnCrearNoticia" class="btn btn-sm btn-light text-muted fw-bold d-none" onclick="abrirAdminNoticias(true)" style="font-size: 0.72rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <i class="fa-solid fa-plus-circle text-success me-1"></i> Noticia
+            </button>
+        </div>
+        
+        <div class="news-carousel" id="contenedorNoticias"></div>
+
+        <div class="position-relative my-2">
+            <i class="fa-solid fa-magnifying-glass position-absolute text-muted" style="left:15px; top:14px;"></i>
+            <input type="text" id="inputBuscar" class="form-control shadow-sm border-0 ps-5" placeholder="Buscar por nombre o cédula..." style="height:44px; border-radius:22px;">
+        </div>
+
+        <div id="listaMovil" class="mt-2"></div>
+    </div>
+
+    <div class="container mt-3 d-none" id="vistaEstadisticas">
+        <div class="d-flex align-items-center mb-3 p-2 bg-white rounded-3 shadow-sm">
+            <div class="p-2 bg-primary text-white rounded-3 me-3"><i class="fa-solid fa-chart-pie fa-lg"></i></div>
+            <div>
+                <h6 class="fw-bold text-dark mb-0">Distribución Territorial Fina</h6>
+                <small class="text-muted">Toca un territorio para ver los censados</small>
+            </div>
+        </div>
+
+        <ul class="nav nav-pills nav-fill mb-3 bg-white p-1 rounded-3 shadow-sm" role="tablist">
+            <li class="nav-item"><button class="nav-link active py-2 fw-bold small" id="t-mun" data-bs-toggle="pill" data-bs-target="#c-mun" type="button" role="tab">Municipio</button></li>
+            <li class="nav-item"><button class="nav-link py-2 fw-bold small" id="t-par" data-bs-toggle="pill" data-bs-target="#c-par" type="button" role="tab">Parroquia</button></li>
+            <li class="nav-item"><button class="nav-link py-2 fw-bold small" id="t-com" data-bs-toggle="pill" data-bs-target="#c-com" type="button" role="tab">Comuna</button></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="c-mun" role="tabpanel"><div id="desgloseMunicipios"></div></div>
+            <div class="tab-pane fade" id="c-par" role="tabpanel"><div id="desgloseParroquias"></div></div>
+            <div class="tab-pane fade" id="c-com" role="tabpanel"><div id="desgloseComunas"></div></div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a id="navRegistros" class="nav-item-custom active" onclick="cambiarVista('registros')">
+            <i class="fa-solid fa-folder-open"></i>Registros
+        </a>
+        <div class="fab-container">
+            <a class="nav-item-custom" onclick="abrirParaCrear(); return false;">
+                <div class="fab-add"><i class="fa-solid fa-plus"></i></div>
+            </a>
+        </div>
+        <a id="navEstadisticas" class="nav-item-custom" onclick="cambiarVista('estadisticas')">
+            <i class="fa-solid fa-chart-line"></i>Estadísticas
+        </a>
+    </div>
+</div>
+
+<div class="modal fade" id="modalVerFicha" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 bg-transparent">
+            <div class="modal-body p-0" id="areaDescargaFicha">
+                <div class="ficha-exportable">
+                    <div class="ficha-header">
+                        <h5 class="fw-bold text-primary mb-0">REPÚBLICA BOLIVARIANA DE VENEZUELA</h5>
+                        <small class="fw-bold text-muted small">SIAHO - REGISTRO NACIONAL DE CULTORES</small>
+                    </div>
+                    <img id="f-foto" src="" class="ficha-avatar shadow-sm" alt="Foto">
+                    <h5 class="text-center fw-bold text-dark mb-1" id="f-nombre">---</h5>
+                    <p class="text-center text-muted small mb-3">C.I: <span id="f-cedula">---</span></p>
+                    
+                    <div class="row g-2" style="font-size: 0.85rem;">
+                        <div class="col-6 border-bottom pb-1"><strong>F. Nacimiento:</strong> <span id="f-fecha" class="text-secondary">---</span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>Género:</strong> <span id="f-sexo" class="text-secondary">---</span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>Municipio:</strong> <span id="f-mun" class="text-secondary"></span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>Parroquia:</strong> <span id="f-par" class="text-secondary"></span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>Comuna:</strong> <span id="f-com" class="text-secondary"></span></div>
+                        <div class="col-6 border-bottom pb-1"><strong>Comunidad:</strong> <span id="f-comu" class="text-secondary"></span></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Especialidad:</strong> <span id="f-esp" class="badge bg-primary text-white"></span></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Artesanía:</strong> <span id="f-art" class="text-secondary"></span></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Origen Runa/Maestro:</strong> <span id="f-apre" class="text-secondary"></span></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Enfermedades Tratadas:</strong> <span id="f-enf" class="text-secondary"></span></div>
+                        <div class="col-12 border-bottom pb-1"><strong>Plantas que Usa:</strong> <span id="f-pla" class="text-secondary"></span></div>
+                        <div class="col-12"><strong>Observaciones:</strong> <p id="f-obs" class="text-muted small mb-0 mt-1" style="line-height:1.3;"></p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 bg-white rounded-bottom-4 d-flex gap-2">
+                <button class="btn btn-danger w-100 btn-sm fw-bold py-2" onclick="exportarFichaA_PDF()"><i class="fa-solid fa-file-pdf me-2"></i>Descargar PDF</button>
+                <button class="btn btn-success w-100 btn-sm fw-bold py-2" onclick="exportarFichaA_Imagen()"><i class="fa-solid fa-image me-2"></i>Descargar Imagen</button>
+                <button class="btn btn-warning w-100 btn-sm fw-bold py-2 text-white" id="btnEditarDesdeFicha"><i class="fa-solid fa-pen me-2"></i>Editar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalAdminNoticias" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <div class="modal-header bg-dark text-white py-3">
+                <h6 class="modal-title fw-bold" id="tituloModalNoticia"><i class="fa-solid fa-newspaper me-2 text-warning"></i>Gestionar Noticia</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formNuevaNoticia">
+                <input type="hidden" id="noticiaIndex" value="">
+                <div class="modal-body p-3">
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Título del Acontecimiento</label>
+                        <input type="text" id="newsTitle" class="form-control" placeholder="Ej: Encuentro de Sabios Populares" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Breve Resumen Informativo</label>
+                        <textarea id="newsDesc" class="form-control" rows="3" placeholder="Contenido de la cartelera..." required></textarea>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">Fotografía Portada de Noticia</label>
+                        <input type="file" id="newsFile" class="form-control" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer bg-light py-2" id="footerModalNoticia">
+                     <button type="button" class="btn btn-light btn-sm text-muted" data-bs-dismiss="modal">Cerrar</button>
+                     <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold" id="btnGuardarNoticia">Publicar en la Nube</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalConfirmarSalida" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg text-center p-3">
+            <div class="modal-body pt-4">
+                <div class="mb-3 text-warning">
+                    <i class="fa-solid fa-triangle-exclamation fa-3x opacity-75"></i>
+                </div>
+                <h6 class="fw-bold text-dark mb-2" style="font-size: 1.05rem;">¿Cerrar Sesión Segura?</h6>
+                <p class="text-muted small mb-0">Se limpiará la memoria temporal de cultores en este dispositivo móvil.</p>
+            </div>
+            <div class="d-flex gap-2 justify-content-center mt-3 pb-2">
+                <button type="button" class="btn btn-sm btn-light fw-bold px-3 text-muted" data-bs-dismiss="modal" style="border-radius: 10px; min-width: 90px;">Cancelar</button>
+                <button type="button" class="btn btn-sm btn-danger fw-bold px-3 shadow-sm" onclick="confirmarCierreEfectivo()" style="border-radius: 10px; min-width: 90px; background: linear-gradient(135deg, #ef4444, #b91c1c);">Salir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalRegistro" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen-sm-down modal-lg">
+        <div class="modal-content border-0" style="background: var(--form-grad);">
+            <div class="modal-header border-0 py-3 bg-white shadow-sm">
+                <h6 class="modal-title fw-bold text-primary" id="modalTitulo">NUEVO CENSO</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formularioCenso">
+                <input type="hidden" id="action_type" value="CREAR">
+                <div class="modal-body p-3">
+                    <div class="text-center mb-3">
+                        <div class="upload-zone shadow" onclick="document.getElementById('fotoFile').click()" style="width: 110px; height: 110px; border: 3px dashed var(--primary); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #f0f9ff; cursor: pointer; margin: 0 auto;">
+                            <i class="fa-solid fa-camera fa-2x text-primary" id="iconoCamara" style="display: block;"></i>
+                            <div id="previewCont" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+                        </div>
+                        <div class="mt-2"><small class="text-primary fw-bold" style="font-size:0.75rem; cursor:pointer;" onclick="document.getElementById('fotoFile').click()">Cargar Foto del Cultor</small></div>
+                        <input type="file" class="d-none" id="fotoFile" accept="image/*">
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="section-title-custom"><i class="fa-solid fa-map-location-dot me-2 text-primary"></i>1. UBICACIÓN TERRITORIAL</div>
+                        <div class="col-6"><input type="text" class="form-control form-control-interactive" id="municipio" placeholder="Municipio" required></div>
+                        <div class="col-6"><input type="text" class="form-control form-control-interactive" id="parroquia" placeholder="Parroquia" required></div>
+                        <div class="col-6"><input type="text" class="form-control form-control-interactive" id="comuna" placeholder="Comuna" required></div>
+                        <div class="col-6"><input type="text" class="form-control form-control-interactive" id="comunidad" placeholder="Comunidad" required></div>
+
+                        <div class="section-title-custom"><i class="fa-solid fa-id-card me-2 text-accent"></i>2. DATOS PERSONALES</div>
+                        <div class="col-6"><input type="text" class="form-control form-control-interactive" id="cedula" placeholder="Cédula de Identidad" required></div>
+                        <div class="col-6"><input type="date" class="form-control form-control-interactive" id="fechanacimiento"></div>
+                        <div class="col-12"><input type="text" class="form-control form-control-interactive" id="nombre" placeholder="Nombres y Apellidos" required></div>
+                        <div class="col-12">
+                            <select class="form-select form-select-interactive" id="sexo">
+                                <option value="" disabled selected>Seleccione Género</option>
+                                <option value="Masculino">Masculino</option>
+                                <option value="Femenino">Femenino</option>
+                            </select>
+                        </div>
+
+                        <div class="section-title-custom"><i class="fa-solid fa-feather-pointed me-2 text-success"></i>3. SABERES Y DETALLES ANCESTRALES</div>
+                        <div class="col-6"><input type="text" class="form-control form-control-interactive" id="especialidad" placeholder="Especialidad" required></div>
+                        <div class="col-6"><input type="text" class="form-control form-control-interactive" id="artesania" placeholder="Artesanía que realiza"></div>
+                        <div class="col-12"><input type="text" class="form-control form-control-interactive" id="dequienaprendio" placeholder="¿De quién aprendió?"></div>
+                        <div class="col-12"><input type="text" class="form-control form-control-interactive" id="enfermedadesquetrata" placeholder="Enfermedades que trata"></div>
+                        <div class="col-12"><input type="text" class="form-control form-control-interactive" id="plantasoproductosqueusa" placeholder="Plantas o productos que usa"></div>
+                        <div class="col-12"><textarea class="form-control form-control-interactive" id="observaciones" rows="2" placeholder="Observaciones generales..."></textarea></div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-white py-2 shadow-lg rounded-bottom">
+                    <button type="button" class="btn btn-sm btn-danger d-none" id="btnEliminarCultor" onclick="eliminarCultorActual()">Eliminar Cultor</button>
+                    <button type="button" class="btn btn-light btn-sm text-muted" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold" id="btnGuardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// PEGA AQUÍ TU NUEVA URL DE IMPLEMENTACIÓN DE GOOGLE APPS SCRIPT
+const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbz8dWifJh99QJsB6FGm3bUIeY9CRxNy2uVQs6tTM8z0tM_QS8Itikd5Fr-XxjMvZWS0UA/exec";
+
+let todosLosDatos = [];
+let imagenGlobalBase64 = ""; 
+let modalInstancia = null;
+let modalAdminInstancia = null;
+let modalVerFichaInstancia = null;
+let modalSalidaInstancia = null; 
+let noticiaImagenBase64 = "";
+let noticiasData = [];
+let modoAuthActual = "LOGIN"; 
+
+document.addEventListener("DOMContentLoaded", () => {
+    try {
+        if (document.getElementById('modalRegistro')) modalInstancia = new bootstrap.Modal(document.getElementById('modalRegistro'));
+        if (document.getElementById('modalAdminNoticias')) modalAdminInstancia = new bootstrap.Modal(document.getElementById('modalAdminNoticias'));
+        if (document.getElementById('modalVerFicha')) modalVerFichaInstancia = new bootstrap.Modal(document.getElementById('modalVerFicha'));
+        if (document.getElementById('modalConfirmarSalida')) modalSalidaInstancia = new bootstrap.Modal(document.getElementById('modalConfirmarSalida'));
+    } catch (e) { console.error("Error inicializando modales:", e); }
+    
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW Status:', err));
+    }
+
+    comprobarEstadoSesion();
+    if (document.getElementById('inputBuscar')) document.getElementById('inputBuscar').addEventListener('input', filtrarListadoPrincipal);
+    if (document.getElementById('formAutenticacion')) document.getElementById('formAutenticacion').addEventListener('submit', procesarAutenticacion);
+});
+
+function verificarRolAdministrador() {
+    const usuarioLogueado = localStorage.getItem("siaho_sesion_activa") || "";
+    return usuarioLogueado.trim().toLowerCase() === "admin@siaho.com";
+}
+
+function comprobarEstadoSesion() {
+    const sesionActiva = localStorage.getItem("siaho_sesion_activa");
+    if (sesionActiva) {
+        document.getElementById('pantallaAuth').style.setProperty('display', 'none', 'important');
+        document.getElementById('appContenido').style.display = 'block';
+        
+        if(document.getElementById('btnCrearNoticia')) {
+            if (verificarRolAdministrador()) {
+                document.getElementById('btnCrearNoticia').classList.remove('d-none');
+            } else {
+                document.getElementById('btnCrearNoticia').classList.add('d-none');
+            }
+        }
+
+        todosLosDatos = [];
+        const listaMovil = document.getElementById('listaMovil');
+        if (listaMovil) {
+            listaMovil.innerHTML = `
+                <div class="text-center py-5 text-muted">
+                    <i class="fa-solid fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+                    <p class="small mb-0">Autenticando canal seguro y cargando tus registros...</p>
+                </div>`;
+        }
+        document.getElementById('statTotal').innerText = "0";
+        inicializarAplicacionCompleta();
+    } else {
+        document.getElementById('pantallaAuth').style.setProperty('display', 'flex', 'important');
+        document.getElementById('appContenido').style.display = 'none';
+    }
+}
+
+function conmutarModoAuth(e) {
+    e.preventDefault();
+    const titulo = document.getElementById('authTitulo');
+    const subtitulo = document.getElementById('authSubtitulo');
+    const btnSubmit = document.getElementById('btnAuthSubmit');
+    const btnModo = document.getElementById('btnCambiarModo');
+    
+    if (modoAuthActual === "LOGIN") {
+        modoAuthActual = "REGISTRO";
+        titulo.innerText = "Crear Cuenta";
+        subtitulo.innerText = "Registra tu correo institucional para enrolarte en SIAHO";
+        btnSubmit.innerText = "Registrar y Entrar";
+        btnModo.innerText = "¿Ya tienes un usuario? Inicia sesión aquí";
+    } else {
+        modoAuthActual = "LOGIN";
+        titulo.innerText = "Iniciar Sesión";
+        subtitulo.innerText = "Ingresa tus credenciales para acceder al SIAHO";
+        btnSubmit.innerText = "Entrar al Sistema";
+        btnModo.innerText = "¿No tienes cuenta? Regístrate aquí";
+    }
+}
+
+function procesarAutenticacion(e) {
+    e.preventDefault();
+    const correo = document.getElementById('authCorreo').value.trim().toLowerCase();
+    const password = document.getElementById('authPassword').value;
+    
+    let usuariosGuardados = [];
+    try {
+        usuariosGuardados = JSON.parse(localStorage.getItem("siaho_usuarios_db")) || [];
+    } catch(err) {
+        localStorage.clear();
+        usuariosGuardados = [];
+    }
+    
+    if (modoAuthActual === "REGISTRO") {
+        const existe = usuariosGuardados.find(u => u.correo === correo);
+        if (existe) {
+            notificar("⚠️ Este correo ya se encuentra registrado", "#fbbf24");
+            return;
+        }
+        
+        try {
+            usuariosGuardados.push({ correo: correo, pass: password });
+            localStorage.setItem("siaho_usuarios_db", JSON.stringify(usuariosGuardados));
+            localStorage.setItem("siaho_sesion_activa", correo);
+            notificar("🎉 Cuenta configurada exitosamente", "#22c55e");
+            comprobarEstadoSesion();
+        } catch(spaceErr) {
+            localStorage.clear();
+            usuariosGuardados = [{ correo: correo, pass: password }];
+            localStorage.setItem("siaho_usuarios_db", JSON.stringify(usuariosGuardados));
+            localStorage.setItem("siaho_sesion_activa", correo);
+            notificar("🎉 Cuenta configurada (Memoria Liberada)", "#22c55e");
+            comprobarEstadoSesion();
+        }
+    } else {
+        const usuarioValido = usuariosGuardados.find(u => u.correo === correo && u.pass === password);
+        
+        if (usuarioValido || (correo === "admin@siaho.com" && password === "12345")) {
+            try {
+                localStorage.setItem("siaho_sesion_activa", correo);
+                if(!usuarioValido) {
+                    usuariosGuardados.push({ correo: "admin@siaho.com", pass: "12345" });
+                    localStorage.setItem("siaho_usuarios_db", JSON.stringify(usuariosGuardados));
+                }
+            } catch(e) {
+                localStorage.clear();
+                localStorage.setItem("siaho_sesion_activa", correo);
+            }
+            notificar("🔒 Acceso autorizado", "#22c55e");
+            comprobarEstadoSesion();
+        } else {
+            notificar("❌ Credenciales incorrectas", "#ef4444");
+        }
+    }
+}
+
+function cerrarSesionActual() { 
+    if (modalSalidaInstancia) modalSalidaInstancia.show(); 
+}
+
+function confirmarCierreEfectivo() {
+    if (modalSalidaInstancia) modalSalidaInstancia.hide();
+    
+    localStorage.removeItem("siaho_sesion_activa");
+    document.getElementById('formAutenticacion').reset();
+    todosLosDatos = [];
+    noticiasData = [];
+    
+    if (document.getElementById('listaMovil')) document.getElementById('listaMovil').innerHTML = "";
+    if (document.getElementById('contenedorNoticias')) document.getElementById('contenedorNoticias').innerHTML = "";
+    document.getElementById('statTotal').innerText = "0";
+    
+    notificar("👋 Sesión finalizada correctamente", "#64748b");
+    comprobarEstadoSesion();
+}
+
+function inicializarAplicacionCompleta() {
+    cargarDatos();
+    setInterval(cargarDatos, 30000); 
+}
+
+function formatearFechaEstandar(fechaRaw) {
+    if (!fechaRaw) return "";
+    let str = fechaRaw.toString().trim();
+    if (!str) return "";
+    if (str.includes('T')) return str.split('T')[0];
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+    return "";
+}
+
+function notificar(mensaje, colorFondo = "#1e293b") {
+    const alerta = document.getElementById('alertaFlotante');
+    alerta.innerText = mensaje;
+    alerta.style.backgroundColor = colorFondo;
+    alerta.style.display = 'block';
+    setTimeout(() => { alerta.style.display = 'none'; }, 3500);
+}
+
+function cambiarVista(vista) {
+    const principal = document.getElementById('vistaPrincipal');
+    const estadisticas = document.getElementById('vistaEstadisticas');
+    const navReg = document.getElementById('navRegistros');
+    const navEst = document.getElementById('navEstadisticas');
+    if (vista === 'registros') {
+        principal.classList.remove('d-none');
+        estadisticas.classList.add('d-none');
+        navReg.classList.add('active');
+        navEst.classList.remove('active');
+    } else if (vista === 'estadisticas') {
+        principal.classList.add('d-none');
+        estadisticas.classList.remove('d-none');
+        navReg.classList.remove('active');
+        navEst.classList.add('active');
+        procesarYRenderizarEstadisticasAvanzadas();
+    }
+}
+
+function cargarDatos() {
+    const usuarioLogueado = localStorage.getItem("siaho_sesion_activa") || "";
+    const emailLimpio = usuarioLogueado.trim().toLowerCase();
+    if(!emailLimpio) return;
+
+    const urlLimpiaSinCache = URL_API_GOOGLE + (URL_API_GOOGLE.includes('?') ? '&' : '?') + '_ts=' + Date.now();
+
+    fetch(urlLimpiaSinCache)
+    .then(res => {
+        if (!res.ok) throw new Error("Error en respuesta HTTP del servidor.");
+        return res.json();
+    })
+    .then(res => {
+        if (res.status === "success") {
+            const datosBrutos = res.data || [];
+            
+            const noticiasRaw = res.noticias && Array.isArray(res.noticias) ? res.noticias : [];
+            noticiasData = noticiasRaw.filter(n => n && typeof n === 'object' && n.titulo && n.titulo.trim() !== "");
+            
+            if (emailLimpio === "admin@siaho.com") {
+                todosLosDatos = datosBrutos;
+            } else {
+                todosLosDatos = datosBrutos.filter(c => (c.registradoPor || "").trim().toLowerCase() === emailLimpio);
+            }
+            
+            document.getElementById('statTotal').innerText = todosLosDatos.length;
+            renderizarListadoPrincipal(todosLosDatos);
+            renderizarNoticias(); 
+            
+            if (!document.getElementById('vistaEstadisticas').classList.contains('d-none')) {
+                procesarYRenderizarEstadisticasAvanzadas();
+            }
+        } else {
+            throw new Error(res.message || "Fallo del script de Google.");
+        }
+    })
+    .catch(err => {
+        console.error("Fallo de red:", err);
+        const listaMovil = document.getElementById('listaMovil');
+        if (listaMovil && todosLosDatos.length === 0) {
+            listaMovil.innerHTML = `
+                <div class="text-center py-4 text-danger small bg-white rounded-3 p-3 shadow-sm border">
+                    <i class="fa-solid fa-triangle-exclamation fa-2x mb-2"></i>
+                    <p class="fw-bold mb-1">Sin Conexión con Google Sheets</p>
+                    <p class="super-small text-muted mb-0">Revisa la URL de Apps Script o tus permisos de red móviles.</p>
+                </div>`;
+        }
+    });
+}
+
+function abrirParaCrear() {
+    if(modalInstancia) {
+        document.getElementById('formularioCenso').reset();
+        document.getElementById('action_type').value = "CREAR";
+        document.getElementById('modalTitulo').innerText = "NUEVO CENSO";
+        document.getElementById('cedula').removeAttribute('readonly');
+        document.getElementById('btnEliminarCultor').classList.add('d-none');
+        document.getElementById('previewCont').innerHTML = "";
+        document.getElementById('iconoCamara').style.display = "block";
+        imagenGlobalBase64 = "";
+        modalInstancia.show();
+    }
+}
+
+function filtrarListadoPrincipal() {
+    const t = document.getElementById('inputBuscar').value.toLowerCase().trim();
+    if(!t) { renderizarListadoPrincipal(todosLosDatos); return; }
+    const filtrados = todosLosDatos.filter(c => 
+        (c.nombre || '').toLowerCase().includes(t) || 
+        (c.cedula || '').toString().includes(t)
+    );
+    renderizarListadoPrincipal(filtrados);
+}
+
+function renderizarListadoPrincipal(lista) {
+    const contenedor = document.getElementById('listaMovil');
+    if (!contenedor) return;
+    if(lista.length === 0) {
+        contenedor.innerHTML = `<div class="text-center py-4 text-muted small">No se encontraron cultores registrados en este alcance territorial.</div>`;
+        return;
+    }
+    let html = "";
+    lista.forEach((c, idx) => {
+        const fotoSrc = c.foto ? c.foto : "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=150&q=80";
+        html += `
+        <div class="card card-custom p-3 mb-2 bg-white" onclick="verDetallesFicha(${idx})">
+            <div class="d-flex align-items-center">
+                <div class="avatar-container me-3">
+                    <img src="${fotoSrc}" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="fw-bold mb-0 text-dark small text-uppercase">${c.nombre || 'Sin Nombre'}</h6>
+                    <p class="text-muted mb-0 super-small" style="font-size:0.75rem;">C.I: ${c.cedula || '---'} | <span class="badge bg-light text-primary border">${c.especialidad || 'General'}</span></p>
+                    <p class="mb-0 text-secondary super-small" style="font-size:0.7rem;"><i class="fa-solid fa-location-dot me-1 text-danger"></i>${c.municipio || '---'}, ${c.parroquia || '---'}</p>
+                </div>
+                <div class="text-end text-muted"><i class="fa-solid fa-chevron-right fa-sm"></i></div>
+            </div>
+        </div>`;
+    });
+    contenedor.innerHTML = html;
+}
+
+function verDetallesFicha(idx) {
+    const c = todosLosDatos[idx];
+    if(!c) return;
+    document.getElementById('f-foto').src = c.foto ? c.foto : "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=300&q=80";
+    document.getElementById('f-nombre').innerText = (c.nombre || '---').toUpperCase();
+    document.getElementById('f-cedula').innerText = c.cedula || '---';
+    document.getElementById('f-fecha').innerText = formatearFechaEstandar(c.fechanacimiento) || '---';
+    document.getElementById('f-sexo').innerText = c.sexo || '---';
+    document.getElementById('f-mun').innerText = c.municipio || '---';
+    document.getElementById('f-par').innerText = c.parroquia || '---';
+    document.getElementById('f-com').innerText = c.comuna || '---';
+    document.getElementById('f-comu').innerText = c.comunidad || '---';
+    document.getElementById('f-esp').innerText = c.especialidad || '---';
+    document.getElementById('f-art').innerText = c.artesania || '---';
+    document.getElementById('f-apre').innerText = c.dequienaprendio || '---';
+    document.getElementById('f-enf').innerText = c.enfermedadesquetrata || '---';
+    document.getElementById('f-pla').innerText = c.plantasoproductosqueusa || '---';
+    document.getElementById('f-obs').innerText = c.observaciones || 'Sin observaciones.';
+    
+    document.getElementById('btnEditarDesdeFicha').onclick = () => {
+        modalVerFichaInstancia.hide();
+        abrirParaEditar(c);
+    };
+    modalVerFichaInstancia.show();
+}
+
+function abrirParaEditar(c) {
+    document.getElementById('action_type').value = "EDITAR";
+    document.getElementById('modalTitulo').innerText = "MODIFICAR HISTORIAL";
+    document.getElementById('cedula').value = c.cedula;
+    document.getElementById('cedula').setAttribute('readonly', 'true');
+    document.getElementById('nombre').value = c.nombre || '';
+    document.getElementById('fechanacimiento').value = formatearFechaEstandar(c.fechanacimiento);
+    document.getElementById('sexo').value = c.sexo || '';
+    document.getElementById('municipio').value = c.municipio || '';
+    document.getElementById('parroquia').value = c.parroquia || '';
+    document.getElementById('comuna').value = c.comuna || '';
+    document.getElementById('comunidad').value = c.comunidad || '';
+    document.getElementById('especialidad').value = c.especialidad || '';
+    document.getElementById('artesania').value = c.artesania || '';
+    document.getElementById('dequienaprendio').value = c.dequienaprendio || '';
+    document.getElementById('enfermedadesquetrata').value = c.enfermedadesquetrata || '';
+    document.getElementById('plantasoproductosqueusa').value = c.plantasoproductosqueusa || '';
+    document.getElementById('observaciones').value = c.observaciones || '';
+    
+    if(c.foto) {
+        document.getElementById('previewCont').innerHTML = `<img src="${c.foto}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+        document.getElementById('iconoCamara').style.display = "none";
+        imagenGlobalBase64 = c.foto;
+    } else {
+        document.getElementById('previewCont').innerHTML = "";
+        document.getElementById('iconoCamara').style.display = "block";
+        imagenGlobalBase64 = "";
+    }
+    
+    document.getElementById('btnEliminarCultor').classList.remove('d-none');
+    modalInstancia.show();
+}
+
+document.getElementById('fotoFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const MAX_WIDTH = 300;
+            const MAX_HEIGHT = 300;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+            } else {
+                if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+            }
+            canvas.width = width; canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            imagenGlobalBase64 = canvas.toDataURL('image/jpeg', 0.6); 
+            document.getElementById('previewCont').innerHTML = `<img src="${imagenGlobalBase64}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+            document.getElementById('iconoCamara').style.display = "none";
+        };
+        img.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+});
+
+document.getElementById('formularioCenso').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const payload = {
+        action: document.getElementById('action_type').value,
+        registradoPor: localStorage.getItem("siaho_sesion_activa") || "desconocido",
+        cedula: document.getElementById('cedula').value.trim(),
+        nombre: document.getElementById('nombre').value.trim(),
+        fechanacimiento: document.getElementById('fechanacimiento').value,
+        sexo: document.getElementById('sexo').value,
+        municipio: document.getElementById('municipio').value.trim(),
+        parroquia: document.getElementById('parroquia').value.trim(),
+        comuna: document.getElementById('comuna').value.trim(),
+        comunidad: document.getElementById('comunidad').value.trim(),
+        especialidad: document.getElementById('especialidad').value.trim(),
+        artesania: document.getElementById('artesania').value.trim(),
+        dequienaprendio: document.getElementById('dequienaprendio').value.trim(),
+        enfermedadesquetrata: document.getElementById('enfermedadesquetrata').value.trim(),
+        plantasoproductosqueusa: document.getElementById('plantasoproductosqueusa').value.trim(),
+        observaciones: document.getElementById('observaciones').value.trim(),
+        foto: imagenGlobalBase64
+    };
+    
+    notificar("🚀 Sincronizando datos con la nube...", "#0284c7");
+    fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+    .then(() => {
+        modalInstancia.hide();
+        notificar("✅ Sincronizado exitosamente", "#22c55e");
+        setTimeout(cargarDatos, 1500);
+    }).catch(() => { modalInstancia.hide(); cargarDatos(); });
+});
+
+function eliminarCultorActual() {
+    const ci = document.getElementById('cedula').value;
+    if (ci && confirm(`¿Seguro que desea eliminar de forma permanente el registro C.I: ${ci}?`)) {
+        notificar("🗑️ Purgando registro...", "#1e293b");
+        fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "ELIMINAR", cedula: ci.trim() }) })
+        .then(() => { modalInstancia.hide(); notificar("💥 Registro borrado", "#ef4444"); setTimeout(cargarDatos, 1500); })
+        .catch(() => { modalInstancia.hide(); cargarDatos(); });
+    }
+}
+
+function renderizarNoticias() {
+    const contenedor = document.getElementById('contenedorNoticias');
+    if (!contenedor) return;
+    contenedor.innerHTML = "";
+
+    if (!noticiasData || noticiasData.length === 0) {
+        contenedor.innerHTML = `
+            <div class="w-100 text-center py-4 text-muted bg-white rounded-4 shadow-sm border" style="flex: 0 0 100%;">
+                <i class="fa-solid fa-folder-open fa-2x mb-2 text-black-50"></i>
+                <p class="small mb-0 fw-bold">No hay acontecimientos publicados en cartelera.</p>
+                <small class="text-secondary super-small">Las publicaciones del administrador aparecerán aquí.</small>
+            </div>`;
+        return;
+    }
+
+    noticiasData.forEach((noticia, index) => {
+        const tituloNoticia = noticia.titulo ? noticia.titulo : "Sin Título";
+        const descNoticia = noticia.descripcion ? noticia.descripcion : "Sin descripción";
+        const imagenCard = noticia.foto && noticia.foto.startsWith("data:image") 
+            ? noticia.foto 
+            : "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=400&q=80";
+
+        const card = document.createElement('div');
+        card.className = "news-card";
+        card.innerHTML = `
+            <div class="news-img-container" onclick="gestionarNoticiaExistente(${index})">
+                <img src="${imagenCard}">
+            </div>
+            <div class="p-2" onclick="gestionarNoticiaExistente(${index})">
+                <h6 class="fw-bold text-dark d-block text-truncate small text-uppercase mb-0" style="font-size:0.75rem;">${tituloNoticia}</h6>
+                <p class="text-muted mb-0 super-small text-truncate-3" style="font-size:0.68rem; line-height:1.2;">${descNoticia}</p>
+            </div>
+        `;
+        contenedor.appendChild(card);
+    });
+}
+
+function abrirAdminNoticias(esNueva) {
+    if(!modalAdminInstancia) return;
+    document.getElementById('formNuevaNoticia').reset();
+    noticiaImagenBase64 = "";
+    const footer = document.getElementById('footerModalNoticia');
+    
+    if(esNueva) {
+        document.getElementById('tituloModalNoticia').innerText = "Nueva Publicación (Admin)";
+        document.getElementById('noticiaIndex').value = "";
+        footer.innerHTML = `
+            <button type="button" class="btn btn-sm btn-light text-muted" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold">Publicar en la Nube</button>
+        `;
+    }
+    modalAdminInstancia.show();
+}
+
+document.getElementById('newsFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const MAX_WIDTH = 450; 
+            const MAX_HEIGHT = 300;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+            } else {
+                if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+            }
+            canvas.width = width; canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            noticiaImagenBase64 = canvas.toDataURL('image/jpeg', 0.6); 
+        };
+        img.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+});
+
+document.getElementById('formNuevaNoticia').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const idx = document.getElementById('noticiaIndex').value;
+    
+    if (!verificarRolAdministrador()) {
+        notificar("⚠️ Permiso denegado: Requiere cuenta Administradora", "#ef4444");
+        modalAdminInstancia.hide();
+        return;
+    }
+
+    const payload = {
+        action: idx === "" ? "CREAR_NOTICIA" : "EDITAR_NOTICIA",
+        index: idx === "" ? "" : parseInt(idx, 10),
+        titulo: document.getElementById('newsTitle').value.trim(),
+        descripcion: document.getElementById('newsDesc').value.trim(),
+        foto: noticiaImagenBase64
+    };
+
+    notificar("📢 Transmitiendo evento global...", "#4f46e5");
+    fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+    .then(() => {
+        modalAdminInstancia.hide();
+        notificar("✨ Cartelera compartida", "#22c55e");
+        setTimeout(cargarDatos, 1500);
+    }).catch(() => { modalAdminInstancia.hide(); });
+});
+
+function gestionarNoticiaExistente(idx) {
+    const n = noticiasData[idx];
+    if(!n) return;
+    
+    document.getElementById('noticiaIndex').value = idx;
+    document.getElementById('newsTitle').value = n.titulo || "";
+    document.getElementById('newsDesc').value = n.descripcion || "";
+    noticiaImagenBase64 = n.foto || "";
+    
+    const footer = document.getElementById('footerModalNoticia');
+
+    if (verificarRolAdministrador()) {
+        document.getElementById('tituloModalNoticia').innerText = "Modificar Noticia (Admin)";
+        footer.innerHTML = `
+            <button type="button" class="btn btn-sm btn-danger me-auto" onclick="eliminarNoticiaActual()">Eliminar</button>
+            <button type="button" class="btn btn-sm btn-light text-muted" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-sm btn-primary px-3 fw-bold">Actualizar</button>
+        `;
+    } else {
+        document.getElementById('tituloModalNoticia').innerText = "Ver Noticia Informativa";
+        footer.innerHTML = `<button type="button" class="btn btn-sm btn-secondary w-100" data-bs-dismiss="modal">Volver a la Cartelera</button>`;
+    }
+    modalAdminInstancia.show();
+}
+
+function eliminarNoticiaActual() {
+    const idx = document.getElementById('noticiaIndex').value;
+    if (!verificarRolAdministrador()) return;
+    
+    if (idx !== "" && confirm("¿Desea dar de baja este acontecimiento de la cartelera?")) {
+        notificar("🗑️ Removiendo de la nube...", "#ef4444");
+        fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "ELIMINAR_NOTICIA", index: parseInt(idx, 10) }) })
+        .then(() => { modalAdminInstancia.hide(); notificar("💥 Noticia purgada", "#ef4444"); setTimeout(cargarDatos, 1500); })
+        .catch(() => { modalAdminInstancia.hide(); });
+    }
+}
+
+function procesarYRenderizarEstadisticasAvanzadas() {
+    const mCont = document.getElementById('desgloseMunicipios');
+    const pCont = document.getElementById('desgloseParroquias');
+    const cCont = document.getElementById('desgloseComunas');
+    let mun = {}, par = {}, com = {};
+    todosLosDatos.forEach(c => {
+        if(c.municipio) mun[c.municipio] = (mun[c.municipio] || 0) + 1;
+        if(c.parroquia) par[c.parroquia] = (par[c.parroquia] || 0) + 1;
+        if(c.comuna) com[c.comuna] = (com[c.comuna] || 0) + 1;
+    });
+    mCont.innerHTML = armarAccordionDinamico(mun, "mun");
+    pCont.innerHTML = armarAccordionDinamico(par, "par");
+    cCont.innerHTML = armarAccordionDinamico(com, "com");
+}
+
+function armarAccordionDinamico(objeto, prefijo) {
+    let html = "";
+    Object.keys(objeto).forEach((key, i) => {
+        html += `
+        <div class="stat-accordion-item">
+            <button class="stat-header-trigger" onclick="conmutarAccordionInterno('${prefijo}-${i}', '${key.replace(/'/g, "\\'")}', '${prefijo}')">
+                <span class="fw-bold text-dark small text-uppercase"><i class="fa-solid fa-layer-group text-muted me-2"></i>${key}</span>
+                <span class="stat-count-badge">${objeto[key]} Censados</span>
+            </button>
+            <div class="stat-details-box" id="box-${prefijo}-${i}"></div>
+        </div>`;
+    });
+    return html || `<div class="text-center py-3 text-muted small">Sin datos computados en el alcance actual.</div>`;
+}
+
+function conmutarAccordionInterno(idBox, territorialKey, tipo) {
+    const el = document.getElementById(`box-${idBox}`);
+    if(el.style.display === "block") { el.style.display = "none"; return; }
+    let filtrados = todosLosDatos.filter(c => {
+        if(tipo === "mun") return (c.municipio || '') === territorialKey;
+        if(tipo === "par") return (c.parroquia || '') === territorialKey;
+        return (c.comuna || '') === territorialKey;
+    });
+    let subHtml = '<ul class="list-group list-group-flush rounded-3 border-0" style="font-size:0.75rem;">';
+    filtrados.forEach(c => { subHtml += `<li class="list-group-item bg-transparent py-2 px-1 text-secondary text-uppercase fw-semibold"><i class="fa-solid fa-user me-2 text-primary"></i>${c.nombre}</li>`; });
+    subHtml += '</ul>';
+    el.innerHTML = subHtml;
+    el.style.display = "block";
+}
+
+function exportarFichaA_PDF() {
+    const elemento = document.getElementById('areaDescargaFicha');
+    html2pdf().set({ margin: 0.3, filename: 'Ficha_SIAHO.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(elemento).save();
+}
+
+function exportarFichaA_Imagen() {
+    html2canvas(document.getElementById('areaDescargaFicha'), { scale: 2, useCORS: true }).then(canvas => {
+        const link = document.createElement('a'); link.download = 'Ficha_SIAHO.png'; link.href = canvas.toDataURL(); link.click();
+    });
+}
+</script>
+</body>
+</html>            backdrop-filter: blur(8px);
             border-radius: 24px; padding: 30px 24px; width: 100%; max-width: 400px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
         }
@@ -361,7 +1328,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbz8DCxqdvunBHa-3Tyy8gli2CSbOyiAM5qLTF85qkKoFehqro2GyvsscqVoOcgii341Xg/exec";
+const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbyyqJs1YwQqWiCYLXqEUL9X0Ti70wOEqJCJxjDOjh13EjvhR6VnMRaNEWAb3DA6GEp2EA/exec";
 
 let todosLosDatos = [];
 let imagenGlobalBase64 = ""; 
