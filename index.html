@@ -361,7 +361,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbxWdMUS4ig8Nb0IB-QjNa44JgBAUtw8VbGXcZnyASkn0Hd5mq4U7p-GUqqYubSRFxDYeA/exec";
+const URL_API_GOOGLE = "https://script.google.com/macros/s/AKfycbz8DCxqdvunBHa-3Tyy8gli2CSbOyiAM5qLTF85qkKoFehqro2GyvsscqVoOcgii341Xg/exec";
 
 let todosLosDatos = [];
 let imagenGlobalBase64 = ""; 
@@ -422,7 +422,7 @@ function comprobarEstadoSesion() {
         inicializarAplicacionCompleta();
     } else {
         document.getElementById('pantallaAuth').style.setProperty('display', 'flex', 'important');
-        document.getElementById('appContenido').style.none = 'none';
+        document.getElementById('appContenido').style.display = 'none'; // Corregido .none = 'none'
     }
 }
 
@@ -577,7 +577,10 @@ function cargarDatos() {
     .then(res => {
         if (res.status === "success") {
             const datosBrutos = res.data || [];
-            noticiasData = res.noticias && Array.isArray(res.noticias) ? res.noticias : [];
+            
+            // FILTRADO DE FILAS VACÍAS DE GOOGLE SHEETS PARA EVITAR SECCIONES FANTASMA
+            const noticiasRaw = res.noticias && Array.isArray(res.noticias) ? res.noticias : [];
+            noticiasData = noticiasRaw.filter(n => n && typeof n === 'object' && n.titulo && n.titulo.trim() !== "");
             
             if (emailLimpio === "admin@siaho.com") {
                 todosLosDatos = datosBrutos;
@@ -789,6 +792,7 @@ function renderizarNoticias() {
     if (!contenedor) return;
     contenedor.innerHTML = "";
 
+    // SI LA LISTA ESTÁ TOTALMENTE VACÍA GRACIAS AL FILTRO DE ARRIBA, SE MUESTRA EL MENSAJE CORRECTO
     if (!noticiasData || noticiasData.length === 0) {
         contenedor.innerHTML = `
             <div class="w-100 text-center py-4 text-muted bg-white rounded-4 shadow-sm border" style="flex: 0 0 100%;">
@@ -877,9 +881,10 @@ document.getElementById('formNuevaNoticia').addEventListener('submit', function(
         return;
     }
 
+    // ENVIAR EL ÍNDICE COMO ENTERO CORRIGE ERRORES DE FILA EN EL SCRIPT DE GOOGLE
     const payload = {
         action: idx === "" ? "CREAR_NOTICIA" : "EDITAR_NOTICIA",
-        index: idx,
+        index: idx === "" ? "" : parseInt(idx, 10),
         titulo: document.getElementById('newsTitle').value.trim(),
         descripcion: document.getElementById('newsDesc').value.trim(),
         foto: noticiaImagenBase64
@@ -925,7 +930,7 @@ function eliminarNoticiaActual() {
     
     if (idx !== "" && confirm("¿Desea dar de baja este acontecimiento de la cartelera de todos los usuarios globales?")) {
         notificar("🗑️ Removiendo de la nube...", "#ef4444");
-        fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "ELIMINAR_NOTICIA", index: idx }) })
+        fetch(URL_API_GOOGLE, { method: "POST", mode: "no-cors", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "ELIMINAR_NOTICIA", index: parseInt(idx, 10) }) })
         .then(() => { modalAdminInstancia.hide(); notificar("💥 Noticia purgada", "#ef4444"); setTimeout(cargarDatos, 1000); })
         .catch(() => { modalAdminInstancia.hide(); });
     }
