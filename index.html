@@ -552,7 +552,6 @@ function cargarDatos() {
     // Rompemos el caché agregando el timestamp al final de la URL
     const urlLimpiaSinCache = URL_API_GOOGLE + (URL_API_GOOGLE.includes('?') ? '&' : '?') + '_ts=' + Date.now();
     
-    // Forzamos la cabecera CORS para evitar el bloqueo del navegador
     fetch(urlLimpiaSinCache, {
         method: "GET",
         mode: "cors",
@@ -562,50 +561,52 @@ function cargarDatos() {
         }
     })
     .then(res => {
-        if (!res.ok) throw new Error("Error en la respuesta del servidor de Google");
+        if (!res.ok) throw new Error("Error en la respuesta del servidor");
         return res.json();
     })
     .then(data => {
-        console.log("Datos recibidos de la nube:", data);
+        console.log("Estructura recibida de la nube:", data);
         
-        // 1. Guardar los datos en la variable global
+        // Sincronización con el nuevo retorno del archivo .gs
         if (data && data.cultores) {
             todosLosDatos = data.cultores;
-        } else if (Array.isArray(data)) {
-            todosLosDatos = data; // Por si tu backend devuelve el array directo
         } else {
             todosLosDatos = [];
         }
 
-        // 2. Guardar y procesar noticias si vienen en la respuesta
+        // Procesar e inyectar las noticias en el carrusel
         if (data && data.noticias) {
             noticiasData = data.noticias;
-            renderizarCarteleraNoticias();
+            if (typeof renderizarCarteleraNoticias === 'function') {
+                renderizarCarteleraNoticias();
+            }
         }
 
-        // 3. Actualizar los contadores de la interfaz
-        document.getElementById('statTotal').innerText = todosLosDatos.length;
+        // Actualizar el contador numérico de la parte superior de la App
+        const statTotal = document.getElementById('statTotal');
+        if (statTotal) {
+            statTotal.innerText = todosLosDatos.length;
+        }
 
-        // 4. Renderizar el listado principal (adiós al mensaje de carga permanente)
+        // Renderizar el listado en la pantalla eliminando el aviso de carga
         renderizarListadoPantalla(todosLosDatos);
     })
     .catch(err => {
-        console.error("Error crítico en fetch de SIAHO:", err);
+        console.error("Error en consulta de SIAHO:", err);
+        notificar("⚠️ Error de consulta en la nube", "#ef4444");
         
-        // Si falla la red, intentamos recuperar lo último que tengamos del listado para que no quede infinito
+        // Quitar el mensaje de carga si falla internet para que no se quede infinito
         const listaMovil = document.getElementById('listaMovil');
         if (listaMovil && todosLosDatos.length === 0) {
             listaMovil.innerHTML = `
-                <div class="text-center py-4 text-danger">
-                    <i class="fa-solid fa-triangle-exclamation fa-2x mb-2"></i>
-                    <p class="small mb-0 font-weight-bold">Fallo de sincronización</p>
-                    <p class="super-small text-muted" style="font-size:0.75rem;">Verifica tu conexión o el estado de la API en Google.</p>
+                <div class="text-center py-4 text-muted">
+                    <i class="fa-solid fa-wifi-slash fa-2x mb-2 text-danger"></i>
+                    <p class="small mb-0 fw-bold">Sin respuesta del servidor</p>
+                    <p style="font-size:0.75rem;">Verifica tu conexión a internet.</p>
                 </div>`;
         }
-        notificar("⚠️ Error de conexión con la base de datos", "#ef4444");
     });
 }
-
 // Función encargada de construir las tarjetas de los cultores en pantalla
 function renderizarListadoPantalla(datos) {
     const listaMovil = document.getElementById('listaMovil');
