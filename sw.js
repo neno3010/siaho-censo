@@ -1,17 +1,21 @@
-self.addEventListener('fetch', event => {
-  // CORRECCIÓN CRÍTICA: Si la petición va dirigida a la API de Google Apps Script,
-  // se procesa directamente por internet sin que el Service Worker interfiera.
-  if (event.request.url.includes('script.google.com')) {
-    return; // No hace nada, deja que la petición siga su curso normal por red
+// Estrategia de red inteligente para SIAHO
+self.addEventListener('fetch', (event) => {
+  const url = event.request.url;
+
+  // REGLA DE ESCAPE ABSOLUTA: Si es CUALQUIER servidor de Google Scripts, 
+  // sal del Service Worker de inmediato y ve directo por internet (Network Only)
+  if (url.includes('script.google.com') || url.includes('script.googleusercontent.com')) {
+    return; // Detiene la interceptación por completo
   }
 
-  // Tu lógica actual de caché para archivos locales (HTML, CSS, JS, etc.)
+  // Recursos estáticos locales del sistema (HTML, CSS, JS locales)
   event.respondWith(
-    caches.match(event.request).then(response => {
+    caches.match(event.request).then((response) => {
+      // Si está en caché lo devuelve, si no, lo busca en internet
       return response || fetch(event.request).catch(() => {
-        // En caso de estar offline y pedir una página que no esté en caché
+        // Fallback en caso de estar totalmente offline
         if (event.request.mode === 'navigate') {
-          return caches.match('./index.html'); 
+          return caches.match('./index.html');
         }
       });
     })
