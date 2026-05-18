@@ -407,15 +407,27 @@ function verificarRolAdministrador() {
 
 function comprobarEstadoSesion() {
     const s = localStorage.getItem("siaho_sesion_activa");
-    const vLogin = document.getElementById('vistaLogin');
-    const vApp = document.getElementById('vistaApp');
     
-    // Si falta alguno de los contenedores críticos en el HTML, lo registramos en consola sin romper el script
+    // Intenta capturar los contenedores probando múltiples variantes comunes de IDs
+    const vLogin = document.getElementById('vistaLogin') || 
+                   document.getElementById('loginVista') || 
+                   document.getElementById('vista_login') ||
+                   document.getElementById('seccionLogin');
+                   
+    const vApp = document.getElementById('vistaApp') || 
+                 document.getElementById('appVista') || 
+                 document.getElementById('vista_app') ||
+                 document.getElementById('contenedorPrincipal');
+
+    // Salvavidas: Si tu HTML no tiene estos contenedores, evita que el script colapse
     if (!vLogin || !vApp) {
-        console.warn("⚠️ Advertencia SIAHO: No se encontraron los contenedores HTML 'vistaLogin' o 'vistaApp'. Revisa tu estructura HTML.");
+        console.warn("⚠️ SIAHO Web Control: Los contenedores de vista estructural no fueron encontrados. Se saltó la conmutación de pantallas para evitar congelamiento.");
+        // De igual forma intentamos cargar la data por si estás saltándote el login en desarrollo
+        if (s) { verificarRolAdministrador(); cargarDatos(); }
         return; 
     }
 
+    // Flujo normal de alternancia de pantallas si los elementos existen
     if (s) {
         vLogin.classList.add('d-none');
         vApp.classList.remove('d-none');
