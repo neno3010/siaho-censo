@@ -849,24 +849,25 @@
                     }
                 });
             },
-
-            // --- VISUALIZACIÓN PERFIL EXCLUSIVO DE CULTORES (DATOS DIRECTOS DE BD) ---
+// --- VISUALIZACIÓN PERFIL DINÁMICO COMPLETO (SIAHO) ---
             verPerfil: (cultor) => {
                 cultorSeleccionado = cultor;
                 
-                // Carga dinámica de la foto de perfil y campos según cabeceras exactas de Sheets
+                // 1. Cargar la imagen de perfil de manera dinámica
                 document.getElementById('v_foto').src = cultor.foto || CONFIG.IMG_DEFAULT;
-                document.getElementById('v_nombre').innerText = cultor.nombre || "";
+                
+                // 2. Establecer el encabezado principal del perfil
+                document.getElementById('v_nombre').innerText = cultor.nombre || "SIN NOMBRE";
+                document.getElementById('v_especialidad').innerText = cultor.especialidad || "NO ESPECIFICA";
+
+                // 3. Mapear los campos fijos y conocidos de la estructura base
                 document.getElementById('v_cedula').innerText = cultor.cedula || "";
                 document.getElementById('v_sexo').innerText = cultor.sexo || "";
                 document.getElementById('v_municipio').innerText = cultor.municipio || "";
                 document.getElementById('v_parroquia').innerText = cultor.parroquia || "";
                 document.getElementById('v_comuna').innerText = cultor.comuna || "";
                 document.getElementById('v_comunidad').innerText = cultor.comunidad || "";
-                document.getElementById('v_especialidad').innerText = cultor.especialidad || "";
                 document.getElementById('v_registrador').innerText = cultor.usuario_registro || "Desconocido";
-                
-                // Corrección de propiedades que no cargaban por diferencias de nomenclatura
                 document.getElementById('v_nacimiento').innerText = cultor.fechanacimiento ? String(cultor.fechanacimiento).split("T")[0] : "";
                 document.getElementById('v_artesania').innerText = cultor.artesania || "";
                 document.getElementById('v_maestro').innerText = cultor.dequienaprendio || "";
@@ -874,21 +875,54 @@
                 document.getElementById('v_plantas').innerText = cultor.plantasoproductosqueusa || "";
                 document.getElementById('v_obs').innerText = cultor.observaciones || "";
 
+                // 4. DETECTAR Y AGREGAR CAMPOS ADICIONALES AUTOMÁTICAMENTE
+                // Limpiamos primero cualquier fila dinámica anterior para no duplicar datos
+                document.querySelectorAll('.fila-dinamica-custom').forEach(el => el.remove());
+                
+                // Campos del objeto que NO queremos repetir en la tabla porque ya se listaron arriba o son internos
+                const camposExcluidos = [
+                    'nombre', 'especialidad', 'cedula', 'sexo', 'municipio', 'parroquia', 
+                    'comuna', 'comunidad', 'usuario_registro', 'fechanacimiento', 'artesania', 
+                    'dequienaprendio', 'enfermedadesquetrata', 'plantasoproductosqueusa', 'observaciones', 'foto'
+                ];
+
+                const tablaCuerpo = document.querySelector('#areaImpresion table tbody');
+                
+                if (tablaCuerpo) {
+                    Object.keys(cultor).forEach(columna => {
+                        // Si la columna viene de Google Sheets con datos y no está en los excluidos, la renderiza
+                        if (!camposExcluidos.includes(columna) && cultor[columna] !== undefined && cultor[columna] !== null && cultor[columna] !== "") {
+                            
+                            // Formatear el nombre de la cabecera (Primera letra mayúscula y quitar guiones)
+                            let etiquetaLimpia = columna.charAt(0).toUpperCase() + columna.slice(1);
+                            etiquetaLimpia = etiquetaLimpia.replace(/_/g, ' ');
+
+                            const nuevaFila = document.createElement('tr');
+                            nuevaFila.className = 'fila-dinamica-custom';
+                            nuevaFila.innerHTML = `
+                                <td class="fw-bold text-secondary text-capitalize">${etiquetaLimpia}:</td>
+                                <td>${cultor[columna]}</td>
+                            `;
+                            tablaCuerpo.appendChild(nuevaFila);
+                        }
+                    });
+                }
+
+                // 5. Configurar la acción del botón de edición interna
                 document.getElementById('btnEditarDesdePerfil').onclick = () => {
                     modales.perfil.hide();
                     
                     document.getElementById('c_accion').value = "EDITAR";
                     document.getElementById('c_cedula').value = cultor.cedula;
-                    document.getElementById('c_cedula').disabled = true; 
-                    document.getElementById('c_nombre').value = cultor.nombre;
+                    document.getElementById('c_cedula').disabled = true; // Proteger ID primario
+                    document.getElementById('c_nombre').value = cultor.nombre || "";
                     document.getElementById('c_sexo').value = cultor.sexo || "MASCULINO";
-                    document.getElementById('c_municipio').value = cultor.municipio;
-                    document.getElementById('c_parroquia').value = cultor.parroquia;
-                    document.getElementById('c_comuna').value = cultor.comuna;
-                    document.getElementById('c_comunidad').value = cultor.comunidad;
-                    document.getElementById('c_especialidad').value = cultor.especialidad;
+                    document.getElementById('c_municipio').value = cultor.municipio || "";
+                    document.getElementById('c_parroquia').value = cultor.parroquia || "";
+                    document.getElementById('c_comuna').value = cultor.comuna || "";
+                    document.getElementById('c_comunidad').value = cultor.comunidad || "";
+                    document.getElementById('c_especialidad').value = cultor.especialidad || "";
                     
-                    // Cargar al formulario mapeando desde las propiedades correctas de base de datos
                     document.getElementById('c_nacimiento').value = cultor.fechanacimiento ? String(cultor.fechanacimiento).split("T")[0] : "";
                     document.getElementById('c_artesania').value = cultor.artesania || "";
                     document.getElementById('c_maestro').value = cultor.dequienaprendio || "";
