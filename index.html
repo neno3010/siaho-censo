@@ -943,11 +943,12 @@
             },
             
             // --- ENLACE DIRECTO DESDE cambiarPestana ---
+            // --- ENLACE DIRECTO DESDE cambiarPestana ---
             renderizarEstadisticas: () => {
                 App.procesarMetricasTerritoriales(Estado.datos);
             },
 
-            // --- MÉTRICAS TERRITORIALES (PROCESAMIENTO Y AGRUPACIÓN) ---
+            // --- MÉTRICAS TERRITORIALES CORREGIDAS (A PRUEBA DE ERRORES DE TIPO) ---
             procesarMetricasTerritoriales: (listaCultores) => {
                 const contenedor = document.getElementById('contenedorMetricasTerritoriales');
                 if(!contenedor) return;
@@ -961,9 +962,15 @@
                 let agrupacion = { municipio: {}, parroquia: {}, comunidad: {} };
 
                 listaCultores.forEach(c => {
-                    let m = (c.municipio || "NO ESPECIFICADO").toUpperCase().trim();
-                    let p = (c.parroquia || "NO ESPECIFICADO").toUpperCase().trim();
-                    let com = (c.comunidad || "NO ESPECIFICADO").toUpperCase().trim();
+                    // Convertimos forzadamente a String antes de usar toUpperCase y trim para evitar el Uncaught TypeError
+                    let m = (c.municipio !== undefined && c.municipio !== null) ? String(c.municipio).toUpperCase().trim() : "NO ESPECIFICADO";
+                    let p = (c.parroquia !== undefined && c.parroquia !== null) ? String(c.parroquia).toUpperCase().trim() : "NO ESPECIFICADO";
+                    let com = (c.comunidad !== undefined && c.comunidad !== null) ? String(c.comunidad).toUpperCase().trim() : "NO ESPECIFICADO";
+
+                    // Si por algún motivo el campo quedó vacío tras el trim, asignamos el valor por defecto
+                    if (m === "") m = "NO ESPECIFICADO";
+                    if (p === "") p = "NO ESPECIFICADO";
+                    if (com === "") com = "NO ESPECIFICADO";
 
                     agrupacion.municipio[m] = (agrupacion.municipio[m] || 0) + 1;
                     agrupacion.parroquia[p] = (agrupacion.parroquia[p] || 0) + 1;
