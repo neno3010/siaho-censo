@@ -849,8 +849,7 @@
                     }
                 });
             },
-// --- VISUALIZACIÓN PERFIL DINÁMICO COMPLETO (SIAHO) ---
-           // --- VISUALIZACIÓN PERFIL DINÁMICO CON ETIQUETAS DE COLORES (SIAHO) ---
+// --- VISUALIZACIÓN PERFIL DINÁMICO CON CABECERAS EXACTAS DE BD ---
             verPerfil: (cultor) => {
                 cultorSeleccionado = cultor;
                 
@@ -864,61 +863,59 @@
                 const generarTagsDeColores = (texto) => {
                     if (!texto || String(texto).trim() === "") return `<span class="text-muted">Ninguna</span>`;
                     
-                    // Lista de clases de colores de Bootstrap para alternar de forma llamativa
                     const colores = ['bg-primary', 'bg-success', 'bg-danger', 'bg-warning text-dark', 'bg-info text-dark', 'bg-dark', 'bg-secondary'];
                     
-                    // Separar el texto por comas, limpiar espacios en blanco y mapear a badges
                     return String(texto).split(',').map(item => {
                         const itemLimpio = item.trim();
                         if (itemLimpio === "") return "";
-                        // Selecciona un color aleatorio de la lista
                         const colorAleatorio = colores[Math.floor(Math.random() * colores.length)];
                         return `<span class="badge ${colorAleatorio} me-1 mb-1 shadow-sm text-uppercase font-monospace text-xs" style="letter-spacing: 0.5px; padding: 5px 10px; border-radius: 6px;">${itemLimpio}</span>`;
                     }).join('');
                 };
 
-                // 3. Renderizar especialidad con etiquetas coloridas en el encabezado
+                // Renderizar especialidad con etiquetas coloridas en el encabezado
                 document.getElementById('v_especialidad').innerHTML = generarTagsDeColores(cultor.especialidad);
 
-                // 4. Mapear los campos fijos y conocidos en la tabla base
-                document.getElementById('v_cedula').innerText = cultor.cedula || "";
-                document.getElementById('v_sexo').innerText = cultor.sexo || "";
-                document.getElementById('v_municipio').innerText = cultor.municipio || "";
-                document.getElementById('v_parroquia').innerText = cultor.parroquia || "";
-                document.getElementById('v_comuna').innerText = cultor.comuna || "";
-                document.getElementById('v_comunidad').innerText = cultor.comunidad || "";
-                document.getElementById('v_registrador').innerText = cultor.usuario_registro || "Desconocido";
-                document.getElementById('v_nacimiento').innerText = cultor.fechanacimiento ? String(cultor.fechanacimiento).split("T")[0] : "";
-                document.getElementById('v_maestro').innerText = cultor.dequienaprendio || "Ninguno";
-                document.getElementById('v_obs').innerText = cultor.observaciones || "";
-
-                // Aplicar las etiquetas dinámicas por comas a los campos descriptivos clave
-                document.getElementById('v_artesania').innerHTML = generarTagsDeColores(cultor.artesania);
-                document.getElementById('v_enfermedades').innerHTML = generarTagsDeColores(cultor.enfermedadesquetrata);
-                document.getElementById('v_plantas').innerHTML = generarTagsDeColores(cultor.plantasoproductosqueusa);
-
-                // 5. DETECTAR Y AGREGAR NUEVOS CAMPOS DE GOOGLE SHEETS AUTOMÁTICAMENTE
-                document.querySelectorAll('.fila-dinamica-custom').forEach(el => el.remove());
-                
-                const camposExcluidos = [
-                    'nombre', 'especialidad', 'cedula', 'sexo', 'municipio', 'parroquia', 
-                    'comuna', 'comunidad', 'usuario_registro', 'fechanacimiento', 'artesania', 
-                    'dequienaprendio', 'enfermedadesquetrata', 'plantasoproductosqueusa', 'observaciones', 'foto'
-                ];
-
+                // 3. Renderizar y Limpiar la Tabla del Perfil de forma estricta
                 const tablaCuerpo = document.querySelector('#areaImpresion table tbody');
-                
                 if (tablaCuerpo) {
+                    // Inicializamos la tabla únicamente con tus campos base estructurados
+                    tablaCuerpo.innerHTML = `
+                        <tr><td class="fw-bold text-secondary" style="width:35%;">Cédula:</td><td>${cultor.cedula || ""}</td></tr>
+                        <tr><td class="fw-bold text-secondary">Nacimiento:</td><td>${cultor.fechanacimiento ? String(cultor.fechanacimiento).split("T")[0] : ""}</td></tr>
+                        <tr><td class="fw-bold text-secondary">Sexo:</td><td>${cultor.sexo || ""}</td></tr>
+                        <tr><td class="fw-bold text-secondary">Municipio:</td><td>${cultor.municipio || ""}</td></tr>
+                        <tr><td class="fw-bold text-secondary">Parroquia:</td><td>${cultor.parroquia || ""}</td></tr>
+                        <tr><td class="fw-bold text-secondary">Comuna:</td><td>${cultor.comuna || ""}</td></tr>
+                        <tr><td class="fw-bold text-secondary">Comunidad:</td><td>${cultor.comunidad || ""}</td></tr>
+                        <tr><td class="fw-bold text-secondary">Artesania:</td><td>${generarTagsDeColores(cultor.artesania)}</td></tr>
+                        
+                        <tr><td class="fw-bold text-secondary">Dequienaprendio:</td><td>${cultor.dequienaprendio || "Ninguno"}</td></tr>
+                        <tr><td class="fw-bold text-secondary">Enfermedadesquetrata:</td><td>${generarTagsDeColores(cultor.enfermedadesquetrata)}</td></tr>
+                        <tr><td class="fw-bold text-secondary">Plantasoproductosqueusa:</td><td>${generarTagsDeColores(cultor.plantasoproductosqueusa)}</td></tr>
+                        
+                        <tr><td class="fw-bold text-secondary">Observación:</td><td>${cultor.observaciones || ""}</td></tr>
+                        <tr><td class="fw-bold text-secondary">Registrado por:</td><td class="text-muted">${cultor.usuario_registro || "Desconocido"}</td></tr>
+                    `;
+
+                    // 4. CAPTURA AUTOMÁTICA DE NUEVAS COLUMNAS (CAMPOS EXTRA DINÁMICOS)
+                    // Excluimos todos los campos que ya dibujamos manualmente arriba para que no se dupliquen
+                    const camposExcluidos = [
+                        'nombre', 'especialidad', 'cedula', 'sexo', 'municipio', 'parroquia', 
+                        'comuna', 'comunidad', 'usuario_registro', 'fechanacimiento', 'artesania', 
+                        'dequienaprendio', 'enfermedadesquetrata', 'plantasoproductosqueusa', 'observaciones', 'foto'
+                    ];
+
                     Object.keys(cultor).forEach(columna => {
                         if (!camposExcluidos.includes(columna) && cultor[columna] !== undefined && cultor[columna] !== null && String(cultor[columna]).trim() !== "") {
                             
+                            // Formateo visual limpio para columnas nuevas imprevistas en la hoja
                             let etiquetaLimpia = columna.charAt(0).toUpperCase() + columna.slice(1);
                             etiquetaLimpia = etiquetaLimpia.replace(/_/g, ' ');
 
                             const nuevaFila = document.createElement('tr');
                             nuevaFila.className = 'fila-dinamica-custom';
                             
-                            // Comprobamos si el nuevo campo dinámico de Sheets también contiene comas para hacerlo tag
                             const contenidoCelda = String(cultor[columna]).includes(',') ? generarTagsDeColores(cultor[columna]) : cultor[columna];
 
                             nuevaFila.innerHTML = `
@@ -930,7 +927,7 @@
                     });
                 }
 
-                // 6. Configurar el botón para redirigir al formulario de Edición
+                // 5. Configurar paso de parámetros al Formulario de Edición
                 document.getElementById('btnEditarDesdePerfil').onclick = () => {
                     modales.perfil.hide();
                     
@@ -964,7 +961,7 @@
                 modales.perfil.show();
             },
             
-            // --- ENLACE DIRECTO DESDE cambiarPestana ---
+         
             // --- ENLACE DIRECTO DESDE cambiarPestana ---
             renderizarEstadisticas: () => {
                 App.procesarMetricasTerritoriales(Estado.datos);
