@@ -967,14 +967,14 @@
                 App.procesarMetricasTerritoriales(Estado.datos);
             },
 
-            // --- MÉTRICAS TERRITORIALES CON DESGLOSE ORDENADO DESCENDENTE ---
+         // --- MÉTRICAS TERRITORIALES CON DESGLOSE ORDENADO DESCENDENTE ---
             procesarMetricasTerritoriales: (listaCultores) => {
-                const contenedor = document.getElementById('contenedorMetricasTerritoriales');
-                if(!contenedor) return;
-
                 // Validación estricta de Rol: Solo el Administrador ("ADMIN") puede visualizar el desglose
                 if (Estado.rol !== "ADMIN") {
-                    contenedor.innerHTML = `<div class="alert alert-danger m-2 small fw-bold">⚠️ Vista denegada. Solo el Administrador General posee credenciales para evaluar métricas macro-territoriales.</div>`;
+                    const contenedorMunicipios = document.getElementById('statsMunicipios');
+                    if (contenedorMunicipios) {
+                        contenedorMunicipios.innerHTML = `<div class="alert alert-danger m-2 small fw-bold">⚠️ Vista denegada. Solo el Administrador General posee credenciales para evaluar métricas macro-territoriales.</div>`;
+                    }
                     return;
                 }
 
@@ -986,7 +986,7 @@
                 listaCultores.forEach(c => {
                     let m = (c.municipio !== undefined && c.municipio !== null) ? String(c.municipio).toUpperCase().trim() : "NO ESPECIFICADO";
                     let p = (c.parroquia !== undefined && c.parroquia !== null) ? String(c.parroquia).toUpperCase().trim() : "NO ESPECIFICADO";
-                    let com = (c.comunidad !== undefined && c.comunidad !== null) ? String(c.comunidad).toUpperCase().trim() : "NO ESPECIFICADO";
+                    let com = (c.comuna !== undefined && c.comuna !== null) ? String(c.comuna).toUpperCase().trim() : "NO ESPECIFICADO";
 
                     if (m === "") m = "NO ESPECIFICADO";
                     if (p === "") p = "NO ESPECIFICADO";
@@ -998,20 +998,43 @@
                 });
 
                 // Función auxiliar interna para ordenar los objetos según sus totales de mayor a menor
-                const ordenarDescendente = (objetoConteo) => {
-                    let arregloOrdenado = Object.entries(objetoConteo).sort((a, b) => b[1] - a[1]);
-                    return Object.fromEntries(arregloOrdenado);
+                const obtenerArregloOrdenado = (objetoConteo) => {
+                    return Object.entries(objetoConteo).sort((a, b) => b[1] - a[1]);
                 };
 
-                // 2. DESGLOSE ORDENADO DE REGISTROS (De mayor número de cultores a menor)
-                let agrupacion = {
-                    municipio: ordenarDescendente(conteoMunicipios),
-                    parroquia: ordenarDescendente(conteoParroquias),
-                    comunidad: ordenarDescendente(conteoComunidades)
+                // 2. Ordenamiento de los registros
+                const municipiosOrdenados = obtenerArregloOrdenado(conteoMunicipios);
+                const parroquiasOrdenados = obtenerArregloOrdenado(conteoParroquias);
+                const comunidadesOrdenadas = obtenerArregloOrdenado(conteoComunidades);
+
+                // 3. Renderizado directo e inyección en el DOM nativo de la App
+                const pintarBloqueMetricas = (idContenedor, datosOrdenados, icono) => {
+                    const el = document.getElementById(idContenedor);
+                    if (!el) return;
+                    el.innerHTML = "";
+                    
+                    if (datosOrdenados.length === 0) {
+                        el.innerHTML = `<p class="text-muted text-xs">No hay registros cargados.</p>`;
+                        return;
+                    }
+
+                    datosOrdenados.forEach(([nombre, total]) => {
+                        const btn = document.createElement('div');
+                        btn.className = "stat-btn shadow-sm";
+                        btn.innerHTML = `
+                            <span class="text-xs fw-bold text-dark text-uppercase">
+                                <i class="${icono} me-2 text-primary"></i>${nombre}
+                            </span>
+                            <span class="stat-badge">${total}</span>
+                        `;
+                        el.appendChild(btn);
+                    });
                 };
 
-                // 3. Renderizado final estructural (Se mantiene tal cual)
-                App.renderizarTablaMetricas(agrupacion);
+                // Pintar cada sección mapeando los IDs reales de tu documento HTML
+                pintarBloqueMetricas('statsMunicipios', municipiosOrdenados, 'fa-solid fa-map-location-dot');
+                pintarBloqueMetricas('statsParroquias', parroquiasOrdenados, 'fa-solid fa-map-pin');
+                pintarBloqueMetricas('statsComunas', comunidadesOrdenadas, 'fa-solid fa-house-chimney-window');
             },
 
             exportarMetricasCSV: () => {
