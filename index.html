@@ -967,7 +967,13 @@
                 App.procesarMetricasTerritoriales(Estado.datos);
             },
 
-         // --- MÉTRICAS TERRITORIALES CON DESGLOSE ORDENADO DESCENDENTE ---
+        // --- MANEJO DE ESTADÍSTICAS Y MÉTRICAS TERRITORIALES ---
+            renderizarEstadisticas: () => {
+                // Invocamos el procesador pasando el set de datos globales de cultores
+                App.procesarMetricasTerritoriales(Estado.datos);
+            },
+
+            // --- MÉTRICAS TERRITORIALES CON DESGLOSE ORDENADO DESCENDENTE ---
             procesarMetricasTerritoriales: (listaCultores) => {
                 // Validación estricta de Rol: Solo el Administrador ("ADMIN") puede visualizar el desglose
                 if (Estado.rol !== "ADMIN") {
@@ -997,17 +1003,17 @@
                     conteoComunidades[com] = (conteoComunidades[com] || 0) + 1;
                 });
 
-                // Función auxiliar interna para ordenar los objetos según sus totales de mayor a menor
+                // Función auxiliar interna para ordenar de mayor a menor y retornar un Array de arreglos [[nombre, total]]
                 const obtenerArregloOrdenado = (objetoConteo) => {
                     return Object.entries(objetoConteo).sort((a, b) => b[1] - a[1]);
                 };
 
-                // 2. Ordenamiento de los registros
+                // 2. Ordenamiento descendente de los registros
                 const municipiosOrdenados = obtenerArregloOrdenado(conteoMunicipios);
                 const parroquiasOrdenados = obtenerArregloOrdenado(conteoParroquias);
                 const comunidadesOrdenadas = obtenerArregloOrdenado(conteoComunidades);
 
-                // 3. Renderizado directo e inyección en el DOM nativo de la App
+                // 3. Renderizado directo e inyección en la UI respetando selectores nativos
                 const pintarBloqueMetricas = (idContenedor, datosOrdenados, icono) => {
                     const el = document.getElementById(idContenedor);
                     if (!el) return;
@@ -1031,12 +1037,11 @@
                     });
                 };
 
-                // Pintar cada sección mapeando los IDs reales de tu documento HTML
+                // Inyección final en los contenedores del DOM de la aplicación
                 pintarBloqueMetricas('statsMunicipios', municipiosOrdenados, 'fa-solid fa-map-location-dot');
                 pintarBloqueMetricas('statsParroquias', parroquiasOrdenados, 'fa-solid fa-map-pin');
                 pintarBloqueMetricas('statsComunas', comunidadesOrdenadas, 'fa-solid fa-house-chimney-window');
             },
-
             exportarMetricasCSV: () => {
                 const data = Estado.datosMetricasTemporales;
                 if(!data) return;
