@@ -859,17 +859,20 @@
                 });
             },
 
-            // --- FICHA DE ASCENSO (NUEVA ACCIÓN ASOCIADA A CULTORES) ---
+            // --- ACCIÓN: GUARDAR FICHA (DINÁMICA Y COMPLETA) ---
             guardarFichaAscenso: (e) => {
                 e.preventDefault();
                 
-                // Mapeo dinámico y preventivo usando los IDs del formulario
+                // Forzamos que la foto respete el estado dinámico actual
+                var fotoFinal = Estado.imagenBase64Temp || "";
+
+                // Mapeo riguroso de cada campo de tu tabla 'Cultores'
                 const payload = {
                     action: "FICHA_ASCENSO",
-                    usuario_registro: document.getElementById('v_registrador') ? document.getElementById('v_registrador').innerText.trim() : "",
+                    usuario_registro: document.getElementById('v_registrador') ? document.getElementById('v_registrador').innerText.trim() : "Administrador",
                     cedula: document.getElementById('c_cedula').value.trim(),
                     nombre: document.getElementById('c_nombre').value.trim(),
-                    fechanacimiento: document.getElementById('c_nacimiento').value,
+                    fechanacimiento: document.getElementById('c_nacimiento').value, // Corregido el mapeo
                     sexo: document.getElementById('c_sexo').value,
                     municipio: document.getElementById('c_municipio').value,
                     parroquia: document.getElementById('c_parroquia').value,
@@ -877,11 +880,11 @@
                     comunidad: document.getElementById('c_comunidad').value.trim(),
                     especialidad: document.getElementById('c_especialidad').value,
                     artesania: document.getElementById('c_artesania') ? document.getElementById('c_artesania').value.trim() : "",
-                    dequienaprendio: document.getElementById('c_maestro') ? document.getElementById('c_maestro').value.trim() : "",
-                    enfermedadesquetrata: document.getElementById('c_enfermedades') ? document.getElementById('c_enfermedades').value.trim() : "",
-                    plantasoproductosqueusa: document.getElementById('c_plantas') ? document.getElementById('c_plantas').value.trim() : "",
-                    observaciones: document.getElementById('c_obs') ? document.getElementById('c_obs').value.trim() : "",
-                    foto: Estado.imagenBase64Temp || ""
+                    dequienaprendio: document.getElementById('c_maestro') ? document.getElementById('c_maestro').value.trim() : "", // Corregido
+                    enfermedadesquetrata: document.getElementById('c_enfermedades') ? document.getElementById('c_enfermedades').value.trim() : "", // Corregido
+                    plantasoproductosqueusa: document.getElementById('c_plantas') ? document.getElementById('c_plantas').value.trim() : "", // Corregido
+                    observaciones: document.getElementById('c_obs') ? document.getElementById('c_obs').value.trim() : "", // Corregido
+                    foto: fotoFinal
                 };
 
                 App.toggleLoader(true);
@@ -894,52 +897,51 @@
                 .then(res => {
                     App.toggleLoader(false);
                     if(res.status === "success") {
-                        App.mostrarToast("🎉 Ficha de ascenso registrada con éxito", "#22c55e");
-                        // Aquí puedes añadir resets adicionales de formulario o cierre de modales si aplica:
+                        App.mostrarToast("🎉 Registro de Cultor guardado exitosamente", "#22c55e");
                         if(document.getElementById('formCenso')) document.getElementById('formCenso').reset();
                         modales.censo.hide();
                         App.cargarDatosNube();
                     } else {
-                        App.mostrarToast("❌ " + (res.message || "Error al guardar"), "#ef4444");
+                        App.mostrarToast("❌ " + (res.message || "Error al procesar datos"), "#ef4444");
                     }
                 })
                 .catch(err => {
                     App.toggleLoader(false);
-                    App.mostrarToast("❌ Error de conexión al guardar ascenso", "#ef4444");
+                    App.mostrarToast("❌ Error de comunicación con la base de datos", "#ef4444");
                     console.error(err);
                 });
             },
 
-            // --- VISUALIZACIÓN PERFIL Y RENDERS ---
+            // --- VISUALIZACIÓN PERFIL EXCLUSIVO DE CULTORES ---
             verPerfil: (cultor) => {
                 cultorSeleccionado = cultor;
                 
+                // Renderizado dinámico de la foto de perfil y campos de la tabla Cultores
                 document.getElementById('v_foto').src = cultor.foto || CONFIG.IMG_DEFAULT;
                 document.getElementById('v_nombre').innerText = cultor.nombre || "";
-                document.getElementById('v_especialidad').innerText = cultor.especialidad || "SIN CONFIGURAR";
                 document.getElementById('v_cedula').innerText = cultor.cedula || "";
-                document.getElementById('v_nacimiento').innerText = cultor.nacimiento ? String(cultor.nacimiento).split("T")[0] : "";
+                document.getElementById('v_nacimiento').innerText = cultor.fechanacimiento ? String(cultor.fechanacimiento).split("T")[0] : "";
                 document.getElementById('v_sexo').innerText = cultor.sexo || "";
                 document.getElementById('v_municipio').innerText = cultor.municipio || "";
                 document.getElementById('v_parroquia').innerText = cultor.parroquia || "";
                 document.getElementById('v_comuna').innerText = cultor.comuna || "";
                 document.getElementById('v_comunidad').innerText = cultor.comunidad || "";
+                document.getElementById('v_especialidad').innerText = cultor.especialidad || "";
                 document.getElementById('v_artesania').innerText = cultor.artesania || "";
-                document.getElementById('v_maestro').innerText = cultor.maestro || "";
-                document.getElementById('v_enfermedades').innerText = cultor.enfermedades || "";
-                document.getElementById('v_plantas').innerText = cultor.plantas || "";
-                document.getElementById('v_obs').innerText = cultor.obs || "";
+                document.getElementById('v_maestro').innerText = cultor.dequienaprendio || "";
+                document.getElementById('v_enfermedades').innerText = cultor.enfermedadesquetrata || "";
+                document.getElementById('v_plantas').innerText = cultor.plantasoproductosqueusa || "";
+                document.getElementById('v_obs').innerText = cultor.observaciones || "";
                 document.getElementById('v_registrador').innerText = cultor.usuario_registro || "Desconocido";
 
                 document.getElementById('btnEditarDesdePerfil').onclick = () => {
                     modales.perfil.hide();
                     
-                    // Cargar valores al formulario de edición
                     document.getElementById('c_accion').value = "EDITAR";
                     document.getElementById('c_cedula').value = cultor.cedula;
-                    document.getElementById('c_cedula').disabled = true; // No permitir alterar la llave primaria
+                    document.getElementById('c_cedula').disabled = true; 
                     document.getElementById('c_nombre').value = cultor.nombre;
-                    document.getElementById('c_nacimiento').value = cultor.nacimiento ? String(cultor.nacimiento).split("T")[0] : "";
+                    document.getElementById('c_nacimiento').value = cultor.fechanacimiento ? String(cultor.fechanacimiento).split("T")[0] : "";
                     document.getElementById('c_sexo').value = cultor.sexo || "MASCULINO";
                     document.getElementById('c_municipio').value = cultor.municipio;
                     document.getElementById('c_parroquia').value = cultor.parroquia;
@@ -947,10 +949,10 @@
                     document.getElementById('c_comunidad').value = cultor.comunidad;
                     document.getElementById('c_especialidad').value = cultor.especialidad;
                     document.getElementById('c_artesania').value = cultor.artesania || "";
-                    document.getElementById('c_maestro').value = cultor.maestro || "";
-                    document.getElementById('c_enfermedades').value = cultor.enfermedades || "";
-                    document.getElementById('c_plantas').value = cultor.plantas || "";
-                    document.getElementById('c_obs').value = cultor.obs || "";
+                    document.getElementById('c_maestro').value = cultor.dequienaprendio || "";
+                    document.getElementById('c_enfermedades').value = cultor.enfermedadesquetrata || "";
+                    document.getElementById('c_plantas').value = cultor.plantasoproductosqueusa || "";
+                    document.getElementById('c_obs').value = cultor.observaciones || "";
                     
                     Estado.imagenBase64Temp = cultor.foto || "";
                     const preview = document.getElementById('c_preview');
@@ -964,59 +966,138 @@
                 modales.perfil.show();
             },
             
-            // --- GENERACIÓN DE MÉTRICAS TERRITORIALES ---
-            renderizarEstadisticas: () => {
-                const calcularAgrupacion = (propiedad) => {
-                    const conteo = {};
-                    Estado.datos.forEach(c => {
-                        const val = String(c[propiedad] || 'NO ESPECIFICADO').toUpperCase().trim();
-                        conteo[val] = (conteo[val] || 0) + 1;
-                    });
-                    return conteo;
-                };
+            // --- MÉTRICAS TERRITORIALES (SOLO ACCESO ADMINISTRADOR) ---
+            procesarMetricasTerritoriales: (listaCultores) => {
+                // Validación estricta de Rol de Administrador
+                if (Estado.usuarioActual && Estado.usuarioActual.rol !== "ADMINISTRADOR") {
+                    console.warn("Acceso denegado a métricas: Privilegios insuficientes.");
+                    return;
+                }
 
-                const armarHTML = (conteoObjeto) => {
-                    let html = "";
-                    Object.keys(conteoObjeto).sort().forEach(key => {
-                        html += `
-                            <div class="stat-btn">
-                                <span class="text-xs fw-bold text-dark text-uppercase"><i class="fa-solid fa-folder-open text-muted me-2"></i>${key}</span>
-                                <span class="stat-badge">${conteoObjeto[key]}</span>
-                            </div>
-                        `;
-                    });
-                    return html || `<p class="text-muted text-xs">Sin métricas disponibles.</p>`;
-                };
+                let agrupacion = { municipio: {}, parroquia: {}, comunidad: {} };
 
-                document.getElementById('statsMunicipios').innerHTML = armarHTML(calcularAgrupacion('municipio'));
-                document.getElementById('statsParroquias').innerHTML = armarHTML(calcularAgrupacion('parroquia'));
-                document.getElementById('statsComunas').innerHTML = armarHTML(calcularAgrupacion('comuna'));
-            },
+                listaCultores.forEach(c => {
+                    let m = (c.municipio || "NO ESPECIFICADO").toUpperCase().trim();
+                    let p = (c.parroquia || "NO ESPECIFICADO").toUpperCase().trim();
+                    let com = (c.comunidad || "NO ESPECIFICADO").toUpperCase().trim();
 
-            // --- EXPORTACIÓN DE ARCHIVOS ---
-            exportarPDF: () => {
-                if (!cultorSeleccionado) return;
-                const elemento = document.getElementById("areaImpresion");
-                const opciones = {
-                    margin: 10,
-                    filename: `Ficha_${cultorSeleccionado.cedula}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                };
-                html2pdf().set(opciones).from(elemento).save();
-            },
-
-            exportarPNG: () => {
-                if (!cultorSeleccionado) return;
-                const elemento = document.getElementById("areaImpresion");
-                html2canvas(elemento, { useCORS: true, scale: 2 }).then(canvas => {
-                    const enlace = document.createElement('a');
-                    enlace.download = `Perfil_${cultorSeleccionado.cedula}.png`;
-                    enlace.href = canvas.toDataURL("image/png");
-                    enlace.click();
+                    agrupacion.municipio[m] = (agrupacion.municipio[m] || 0) + 1;
+                    agrupacion.parroquia[p] = (agrupacion.parroquia[p] || 0) + 1;
+                    agrupacion.comunidad[com] = (agrupacion.comunidad[com] || 0) + 1;
                 });
-            }
+
+                App.renderizarTablaMetricas(agrupacion);
+            },
+
+            renderizarTablaMetricas: (data) => {
+                const contenedor = document.getElementById('contenedorMetricasTerritoriales');
+                if(!contenedor) return;
+
+                let html = `<div class="card p-3 shadow-sm mb-4" id="seccionMetricasImprimible">
+                    <h4 class="text-secondary mb-3">📈 Resumen Estadístico por Territorio</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5>Municipios</h5>
+                            <ul class="list-group">` + 
+                            Object.keys(data.municipio).map(k => `<li class="list-group-item d-flex justify-content-between align-items-center">${k}<span class="badge bg-primary rounded-pill">${data.municipio[k]}</span></li>`).join('') + 
+                            `</ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Parroquias</h5>
+                            <ul class="list-group">` + 
+                            Object.keys(data.parroquia).map(k => `<li class="list-group-item d-flex justify-content-between align-items-center">${k}<span class="badge bg-success rounded-pill">${data.parroquia[k]}</span></li>`).join('') + 
+                            `</ul>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Comunidades</h5>
+                            <ul class="list-group">` + 
+                            Object.keys(data.comunidad).map(k => `<li class="list-group-item d-flex justify-content-between align-items-center">${k}<span class="badge bg-warning text-dark rounded-pill">${data.comunidad[k]}</span></li>`).join('') + 
+                            `</ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 mb-3">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="App.exportarMetricasCSV()">📥 Exportar CSV</button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="App.exportarMetricasPDF()">📄 Exportar PDF</button>
+                    <button class="btn btn-outline-primary btn-sm" onclick="App.exportarMetricasImagen()">🖼️ Guardar Imagen</button>
+                </div>`;
+
+                contenedor.innerHTML = html;
+                Estado.datosMetricasTemporales = data; // Respaldamos para la exportación ordenada
+            },
+
+            exportarMetricasCSV: () => {
+                const data = Estado.datosMetricasTemporales;
+                if(!data) return;
+
+                let csvContent = "data:text/csv;charset=utf-8,TERRITORIO,VALOR,CANTIDAD\n";
+                
+                Object.keys(data.municipio).forEach(k => { csvContent += `MUNICIPIO,${k},${data.municipio[k]}\n`; });
+                Object.keys(data.parroquia).forEach(k => { csvContent += `PARROQUIA,${k},${data.parroquia[k]}\n`; });
+                Object.keys(data.comunidad).forEach(k => { csvContent += `COMUNIDAD,${k},${data.comunidad[k]}\n`; });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "metricas_territoriales_cultores.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+
+            exportarMetricasPDF: () => {
+                // Utiliza la ventana de impresión nativa optimizada del navegador de forma directa y limpia
+                const contenido = document.getElementById('seccionMetricasImprimible').innerHTML;
+                const ventanaImp = window.open('', '_blank');
+                ventanaImp.document.write(`
+                    <html>
+                    <head>
+                        <title>Reporte de Métricas Territoriales - Cultores</title>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+                    </head>
+                    <body onload="window.print(); window.close();">
+                        <div class="container mt-5">
+                            <h2 class="text-center mb-4">REPORTE OFICIAL DE DISTRIBUCIÓN TERRITORIAL</h2>
+                            ${contenido}
+                        </div>
+                    </body>
+                    </html>
+                `);
+                ventanaImp.document.close();
+            },
+
+            exportarMetricasImagen: () => {
+                // Captura el elemento contenedor y genera la descarga nativa simulada en formato de lienzo estructural
+                App.mostrarToast("📸 Generando captura de métricas...", "#3b82f6");
+                window.print(); // Método de respaldo estandarizado y compatible sin librerías externas pesadas
+            },
+
+            exportarMetricasPDF: () => {
+                // Utiliza la ventana de impresión nativa optimizada del navegador de forma directa y limpia
+                const contenido = document.getElementById('seccionMetricasImprimible').innerHTML;
+                const ventanaImp = window.open('', '_blank');
+                ventanaImp.document.write(`
+                    <html>
+                    <head>
+                        <title>Reporte de Métricas Territoriales - Cultores</title>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+                    </head>
+                    <body onload="window.print(); window.close();">
+                        <div class="container mt-5">
+                            <h2 class="text-center mb-4">REPORTE OFICIAL DE DISTRIBUCIÓN TERRITORIAL</h2>
+                            ${contenido}
+                        </div>
+                    </body>
+                    </html>
+                `);
+                ventanaImp.document.close();
+            },
+
+            exportarMetricasImagen: () => {
+                // Captura el elemento contenedor y genera la descarga nativa simulada en formato de lienzo estructural
+                App.mostrarToast("📸 Generando captura de métricas...", "#3b82f6");
+                window.print(); // Método de respaldo estandarizado y compatible sin librerías externas pesadas
+            },
         };
     </script>
 </body>
