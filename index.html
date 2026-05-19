@@ -850,17 +850,37 @@
                 });
             },
 // --- VISUALIZACIÓN PERFIL DINÁMICO COMPLETO (SIAHO) ---
+           // --- VISUALIZACIÓN PERFIL DINÁMICO CON ETIQUETAS DE COLORES (SIAHO) ---
             verPerfil: (cultor) => {
                 cultorSeleccionado = cultor;
                 
-                // 1. Cargar la imagen de perfil de manera dinámica
+                // 1. Imagen de perfil dinámica
                 document.getElementById('v_foto').src = cultor.foto || CONFIG.IMG_DEFAULT;
                 
-                // 2. Establecer el encabezado principal del perfil
+                // 2. Encabezado principal
                 document.getElementById('v_nombre').innerText = cultor.nombre || "SIN NOMBRE";
-                document.getElementById('v_especialidad').innerText = cultor.especialidad || "NO ESPECIFICA";
 
-                // 3. Mapear los campos fijos y conocidos de la estructura base
+                // Función auxiliar para generar etiquetas de colores aleatorios de Bootstrap
+                const generarTagsDeColores = (texto) => {
+                    if (!texto || String(texto).trim() === "") return `<span class="text-muted">Ninguna</span>`;
+                    
+                    // Lista de clases de colores de Bootstrap para alternar de forma llamativa
+                    const colores = ['bg-primary', 'bg-success', 'bg-danger', 'bg-warning text-dark', 'bg-info text-dark', 'bg-dark', 'bg-secondary'];
+                    
+                    // Separar el texto por comas, limpiar espacios en blanco y mapear a badges
+                    return String(texto).split(',').map(item => {
+                        const itemLimpio = item.trim();
+                        if (itemLimpio === "") return "";
+                        // Selecciona un color aleatorio de la lista
+                        const colorAleatorio = colores[Math.floor(Math.random() * colores.length)];
+                        return `<span class="badge ${colorAleatorio} me-1 mb-1 shadow-sm text-uppercase font-monospace text-xs" style="letter-spacing: 0.5px; padding: 5px 10px; border-radius: 6px;">${itemLimpio}</span>`;
+                    }).join('');
+                };
+
+                // 3. Renderizar especialidad con etiquetas coloridas en el encabezado
+                document.getElementById('v_especialidad').innerHTML = generarTagsDeColores(cultor.especialidad);
+
+                // 4. Mapear los campos fijos y conocidos en la tabla base
                 document.getElementById('v_cedula').innerText = cultor.cedula || "";
                 document.getElementById('v_sexo').innerText = cultor.sexo || "";
                 document.getElementById('v_municipio').innerText = cultor.municipio || "";
@@ -869,17 +889,17 @@
                 document.getElementById('v_comunidad').innerText = cultor.comunidad || "";
                 document.getElementById('v_registrador').innerText = cultor.usuario_registro || "Desconocido";
                 document.getElementById('v_nacimiento').innerText = cultor.fechanacimiento ? String(cultor.fechanacimiento).split("T")[0] : "";
-                document.getElementById('v_artesania').innerText = cultor.artesania || "";
-                document.getElementById('v_maestro').innerText = cultor.dequienaprendio || "";
-                document.getElementById('v_enfermedades').innerText = cultor.enfermedadesquetrata || "";
-                document.getElementById('v_plantas').innerText = cultor.plantasoproductosqueusa || "";
+                document.getElementById('v_maestro').innerText = cultor.dequienaprendio || "Ninguno";
                 document.getElementById('v_obs').innerText = cultor.observaciones || "";
 
-                // 4. DETECTAR Y AGREGAR CAMPOS ADICIONALES AUTOMÁTICAMENTE
-                // Limpiamos primero cualquier fila dinámica anterior para no duplicar datos
+                // Aplicar las etiquetas dinámicas por comas a los campos descriptivos clave
+                document.getElementById('v_artesania').innerHTML = generarTagsDeColores(cultor.artesania);
+                document.getElementById('v_enfermedades').innerHTML = generarTagsDeColores(cultor.enfermedadesquetrata);
+                document.getElementById('v_plantas').innerHTML = generarTagsDeColores(cultor.plantasoproductosqueusa);
+
+                // 5. DETECTAR Y AGREGAR NUEVOS CAMPOS DE GOOGLE SHEETS AUTOMÁTICAMENTE
                 document.querySelectorAll('.fila-dinamica-custom').forEach(el => el.remove());
                 
-                // Campos del objeto que NO queremos repetir en la tabla porque ya se listaron arriba o son internos
                 const camposExcluidos = [
                     'nombre', 'especialidad', 'cedula', 'sexo', 'municipio', 'parroquia', 
                     'comuna', 'comunidad', 'usuario_registro', 'fechanacimiento', 'artesania', 
@@ -890,31 +910,33 @@
                 
                 if (tablaCuerpo) {
                     Object.keys(cultor).forEach(columna => {
-                        // Si la columna viene de Google Sheets con datos y no está en los excluidos, la renderiza
-                        if (!camposExcluidos.includes(columna) && cultor[columna] !== undefined && cultor[columna] !== null && cultor[columna] !== "") {
+                        if (!camposExcluidos.includes(columna) && cultor[columna] !== undefined && cultor[columna] !== null && String(cultor[columna]).trim() !== "") {
                             
-                            // Formatear el nombre de la cabecera (Primera letra mayúscula y quitar guiones)
                             let etiquetaLimpia = columna.charAt(0).toUpperCase() + columna.slice(1);
                             etiquetaLimpia = etiquetaLimpia.replace(/_/g, ' ');
 
                             const nuevaFila = document.createElement('tr');
                             nuevaFila.className = 'fila-dinamica-custom';
+                            
+                            // Comprobamos si el nuevo campo dinámico de Sheets también contiene comas para hacerlo tag
+                            const contenidoCelda = String(cultor[columna]).includes(',') ? generarTagsDeColores(cultor[columna]) : cultor[columna];
+
                             nuevaFila.innerHTML = `
                                 <td class="fw-bold text-secondary text-capitalize">${etiquetaLimpia}:</td>
-                                <td>${cultor[columna]}</td>
+                                <td>${contenidoCelda}</td>
                             `;
                             tablaCuerpo.appendChild(nuevaFila);
                         }
                     });
                 }
 
-                // 5. Configurar la acción del botón de edición interna
+                // 6. Configurar el botón para redirigir al formulario de Edición
                 document.getElementById('btnEditarDesdePerfil').onclick = () => {
                     modales.perfil.hide();
                     
                     document.getElementById('c_accion').value = "EDITAR";
                     document.getElementById('c_cedula').value = cultor.cedula;
-                    document.getElementById('c_cedula').disabled = true; // Proteger ID primario
+                    document.getElementById('c_cedula').disabled = true; 
                     document.getElementById('c_nombre').value = cultor.nombre || "";
                     document.getElementById('c_sexo').value = cultor.sexo || "MASCULINO";
                     document.getElementById('c_municipio').value = cultor.municipio || "";
