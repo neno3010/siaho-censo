@@ -523,25 +523,36 @@
                 setTimeout(() => { toast.classList.remove('show'); }, 3500);
             },
 
-            // --- CARGAR DATOS DESDE SUPABASE ---
+           // --- CARGAR DATOS DESDE SUPABASE (CORREGIDO) ---
             cargarDatos: () => {
                 App.mostrarLoader(true, "Sincronizando con Base de Datos...");
-                fetch(`${CONFIG.SUPABASE_URL}/rest/v1/cultores?select=*&order=nombre.asc`, {
+                
+                // Traemos todos los campos de forma limpia
+                fetch(`${CONFIG.SUPABASE_URL}/rest/v1/cultores?select=*`, {
                     method: "GET",
                     headers: headersSupabase
                 })
                 .then(res => {
-                    if (!res.ok) throw new Error("Error de conexión");
+                    if (!res.ok) throw new Error("Error de conexión o credenciales inválidas");
                     return res.json();
                 })
                 .then(data => {
+                    // Ordenamos los nombres de forma ascendente (A-Z) directamente en JavaScript
+                    data.sort((a, b) => {
+                        let nameA = (a.nombre || "").toUpperCase();
+                        let nameB = (b.nombre || "").toUpperCase();
+                        if (nameA < nameB) return -1;
+                        if (nameA > nameB) return 1;
+                        return 0;
+                    });
+
                     Estado.datos = data;
                     App.renderizarLista(data);
                     App.procesarMetricasTerritoriales(data);
                 })
                 .catch(err => {
                     console.error(err);
-                    App.mostrarToast("❌ Error al sincronizar con Supabase", "#ef4444");
+                    App.mostrarToast("❌ Error al sincronizar con Supabase. Verifique las llaves API.", "#ef4444");
                 })
                 .finally(() => App.mostrarLoader(false));
             },
